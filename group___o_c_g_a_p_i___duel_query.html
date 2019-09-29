@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ocgcore: ocgapi.h File Reference</title>
+<title>ocgcore: Querying active duel states</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('ocgapi_8h.html','');});
+$(document).ready(function(){initNavTree('group___o_c_g_a_p_i___duel_query.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -84,36 +84,12 @@ $(document).ready(function(){initNavTree('ocgapi_8h.html','');});
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">ocgapi.h File Reference</div>  </div>
+<div class="title">Querying active duel states</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>The main C-level interface to ocgcore, exported to DLLs on Windows.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="ocgapi__types_8h_source.html">ocgapi_types.h</a>&quot;</code><br />
-</div>
-<p><a href="ocgapi_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:afa84a25c2b5a02b677840e7e49e4150e"><td class="memItemLeft" align="right" valign="top">OCGAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi_8h.html#afa84a25c2b5a02b677840e7e49e4150e">OCG_GetVersion</a> (int *major, int *minor)</td></tr>
-<tr class="separator:afa84a25c2b5a02b677840e7e49e4150e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1dbbb0cafee1fa820ba62ab8b98d565f"><td class="memItemLeft" align="right" valign="top">OCGAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ga1dbbb0cafee1fa820ba62ab8b98d565f">OCG_CreateDuel</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> *duel, <a class="el" href="struct_o_c_g___duel_options.html">OCG_DuelOptions</a> options)</td></tr>
-<tr class="separator:ga1dbbb0cafee1fa820ba62ab8b98d565f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga81d669dc24c1a83784bb6041b3a92ff3"><td class="memItemLeft" align="right" valign="top">OCGAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ga81d669dc24c1a83784bb6041b3a92ff3">OCG_DestroyDuel</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel)</td></tr>
-<tr class="separator:ga81d669dc24c1a83784bb6041b3a92ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1a1cd401a6177d1859a4f2f0a8f8ee4f"><td class="memItemLeft" align="right" valign="top">OCGAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ga1a1cd401a6177d1859a4f2f0a8f8ee4f">OCG_DuelNewCard</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, <a class="el" href="struct_o_c_g___new_card_info.html">OCG_NewCardInfo</a> info)</td></tr>
-<tr class="separator:ga1a1cd401a6177d1859a4f2f0a8f8ee4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4fb44ad4dd31000c00cc28e0612e86b0"><td class="memItemLeft" align="right" valign="top">OCGAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ga4fb44ad4dd31000c00cc28e0612e86b0">OCG_StartDuel</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel)</td></tr>
-<tr class="separator:ga4fb44ad4dd31000c00cc28e0612e86b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4d99e1d305998f0e6a8210b97bd3e7d9"><td class="memItemLeft" align="right" valign="top">OCGAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga4d99e1d305998f0e6a8210b97bd3e7d9">OCG_DuelProcess</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel)</td></tr>
-<tr class="separator:ga4d99e1d305998f0e6a8210b97bd3e7d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1cb53ca8b109e7f3862c15632ae44673"><td class="memItemLeft" align="right" valign="top">OCGAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga1cb53ca8b109e7f3862c15632ae44673">OCG_DuelGetMessage</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, uint32_t *length)</td></tr>
-<tr class="separator:ga1cb53ca8b109e7f3862c15632ae44673"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5384ae650fa580c1d0cc6dfae989364b"><td class="memItemLeft" align="right" valign="top">OCGAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga5384ae650fa580c1d0cc6dfae989364b">OCG_DuelSetResponse</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, void *buffer, uint32_t length)</td></tr>
-<tr class="separator:ga5384ae650fa580c1d0cc6dfae989364b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga87c125341d04f50c8cda1bb651c7cdd3"><td class="memItemLeft" align="right" valign="top">OCGAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga87c125341d04f50c8cda1bb651c7cdd3">OCG_LoadScript</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, const char *buffer, uint32_t length, const char *name)</td></tr>
-<tr class="separator:ga87c125341d04f50c8cda1bb651c7cdd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3475bee13c188c0215d9c28804fffcd2"><td class="memItemLeft" align="right" valign="top">OCGAPI uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_query.html#ga3475bee13c188c0215d9c28804fffcd2">OCG_DuelQueryCount</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, uint8_t team, uint32_t loc)</td></tr>
 <tr class="separator:ga3475bee13c188c0215d9c28804fffcd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad7f296aaddaf047f18a76801356be09a"><td class="memItemLeft" align="right" valign="top">OCGAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_query.html#gad7f296aaddaf047f18a76801356be09a">OCG_DuelQuery</a> (<a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a> duel, uint32_t *length, <a class="el" href="struct_o_c_g___query_info.html">OCG_QueryInfo</a> info)</td></tr>
@@ -124,25 +100,30 @@ Functions</h2></td></tr>
 <tr class="separator:gaddf051ce3f56df097e6bbd33e2fa9c91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The main C-level interface to ocgcore, exported to DLLs on Windows. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="afa84a25c2b5a02b677840e7e49e4150e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa84a25c2b5a02b677840e7e49e4150e">&#9670;&nbsp;</a></span>OCG_GetVersion()</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gad7f296aaddaf047f18a76801356be09a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad7f296aaddaf047f18a76801356be09a">&#9670;&nbsp;</a></span>OCG_DuelQuery()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">OCGAPI void OCG_GetVersion </td>
+          <td class="memname">OCGAPI void* OCG_DuelQuery </td>
           <td>(</td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>major</em>, </td>
+          <td class="paramtype"><a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a>&#160;</td>
+          <td class="paramname"><em>duel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>minor</em>&#160;</td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_o_c_g___query_info.html">OCG_QueryInfo</a>&#160;</td>
+          <td class="paramname"><em>info</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -151,7 +132,106 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Writes the ocgcore API version numbers at the provided addresses if they're not NULL. </p>
+<p>Returns a pointer to an internal buffer for the FIRST card matching the query. The size of the buffer is written to <code>length</code> if it's not NULL. Subsequent calls invalidate previous queries. </p>
+
+</div>
+</div>
+<a id="ga3475bee13c188c0215d9c28804fffcd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3475bee13c188c0215d9c28804fffcd2">&#9670;&nbsp;</a></span>OCG_DuelQueryCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OCGAPI uint32_t OCG_DuelQueryCount </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a>&#160;</td>
+          <td class="paramname"><em>duel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>team</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>loc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the number of cards in the specified zone. </p>
+
+</div>
+</div>
+<a id="gaddf051ce3f56df097e6bbd33e2fa9c91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaddf051ce3f56df097e6bbd33e2fa9c91">&#9670;&nbsp;</a></span>OCG_DuelQueryField()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OCGAPI void* OCG_DuelQueryField </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a>&#160;</td>
+          <td class="paramname"><em>duel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns a pointer to an internal buffer containing card counts for every zone in the game. The size of the buffer is written to <code>length</code> if it's not NULL. Subsequent calls invalidate previous queries. </p>
+
+</div>
+</div>
+<a id="ga96b702a77a8b8fc9eb89a7fa36957ad7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga96b702a77a8b8fc9eb89a7fa36957ad7">&#9670;&nbsp;</a></span>OCG_DuelQueryLocation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OCGAPI void* OCG_DuelQueryLocation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a>&#160;</td>
+          <td class="paramname"><em>duel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_o_c_g___query_info.html">OCG_QueryInfo</a>&#160;</td>
+          <td class="paramname"><em>info</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns a pointer to an internal buffer for the ALL cards matching the query. The size of the buffer is written to <code>length</code> if it's not NULL. Subsequent calls invalidate previous queries. </p>
 
 </div>
 </div>
@@ -160,7 +240,6 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="ocgapi_8h.html">ocgapi.h</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>

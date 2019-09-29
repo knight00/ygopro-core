@@ -90,6 +90,9 @@ $(document).ready(function(){initNavTree('ocgapi__types_8h.html','');});
 <div class="title">ocgapi_types.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>OCGAPI C structures.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 </div>
 <p><a href="ocgapi__types_8h_source.html">Go to the source code of this file.</a></p>
@@ -118,10 +121,10 @@ Macros</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:adb5d2753332edf47ae2cd12cd1d3e9bb"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="ocgapi__types_8h.html#ac3858d11bccd97050b66c5144416158e">OCG_LogTypes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#adb5d2753332edf47ae2cd12cd1d3e9bb">OCG_LogTypes</a></td></tr>
 <tr class="separator:adb5d2753332edf47ae2cd12cd1d3e9bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7988a3a01410189da94b8a67a4fb9567"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#a7988a3a01410189da94b8a67a4fb9567">OCG_DuelCreationStatus</a></td></tr>
-<tr class="separator:a7988a3a01410189da94b8a67a4fb9567"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90a72ac073b5ac4482d6949c86c90627"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#a90a72ac073b5ac4482d6949c86c90627">OCG_DuelStatus</a></td></tr>
-<tr class="separator:a90a72ac073b5ac4482d6949c86c90627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7988a3a01410189da94b8a67a4fb9567"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#gab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ga7988a3a01410189da94b8a67a4fb9567">OCG_DuelCreationStatus</a></td></tr>
+<tr class="separator:ga7988a3a01410189da94b8a67a4fb9567"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga90a72ac073b5ac4482d6949c86c90627"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga90a72ac073b5ac4482d6949c86c90627">OCG_DuelStatus</a></td></tr>
+<tr class="separator:ga90a72ac073b5ac4482d6949c86c90627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6550a2fd30fa7e87eafb6842b4080bb5"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#a6550a2fd30fa7e87eafb6842b4080bb5">OCG_Duel</a></td></tr>
 <tr class="separator:a6550a2fd30fa7e87eafb6842b4080bb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44008147a42641dc823a1535154d15ed"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_o_c_g___card_data.html">OCG_CardData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#a44008147a42641dc823a1535154d15ed">OCG_CardData</a></td></tr>
@@ -148,23 +151,25 @@ Enumerations</h2></td></tr>
 <a class="el" href="ocgapi__types_8h.html#ac3858d11bccd97050b66c5144416158eaaadd8e825f0abcd1a0f1ea980d8cda9c">OCG_LOG_TYPE_UNDEFINED</a>
  }</td></tr>
 <tr class="separator:ac3858d11bccd97050b66c5144416158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab23f5e358acb760334db1c7398ef434b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a> { <br />
-&#160;&#160;<a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434badcbd517888ede97d82009d76e88a5d68">OCG_DUEL_CREATION_SUCCESS</a>, 
-<a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434ba54c7d61306451b85204628637ec8621f">OCG_DUEL_CREATION_NO_OUTPUT</a>, 
-<a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434ba555833fe5207d6f02c86c16c1a7d0298">OCG_DUEL_CREATION_NOT_CREATED</a>, 
-<a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434ba28acccb222fc4b2758d185f84063efb6">OCG_DUEL_CREATION_NULL_DATA_READER</a>, 
+<tr class="memitem:gab23f5e358acb760334db1c7398ef434b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#gab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a> { <br />
+&#160;&#160;<a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ggab23f5e358acb760334db1c7398ef434badcbd517888ede97d82009d76e88a5d68">OCG_DUEL_CREATION_SUCCESS</a>, 
+<a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ggab23f5e358acb760334db1c7398ef434ba54c7d61306451b85204628637ec8621f">OCG_DUEL_CREATION_NO_OUTPUT</a>, 
+<a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ggab23f5e358acb760334db1c7398ef434ba555833fe5207d6f02c86c16c1a7d0298">OCG_DUEL_CREATION_NOT_CREATED</a>, 
+<a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ggab23f5e358acb760334db1c7398ef434ba28acccb222fc4b2758d185f84063efb6">OCG_DUEL_CREATION_NULL_DATA_READER</a>, 
 <br />
-&#160;&#160;<a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434ba53168e3e9a3222c8f232ab98d47589cf">OCG_DUEL_CREATION_NULL_SCRIPT_READER</a>
+&#160;&#160;<a class="el" href="group___o_c_g_a_p_i___duel_create_destroy.html#ggab23f5e358acb760334db1c7398ef434ba53168e3e9a3222c8f232ab98d47589cf">OCG_DUEL_CREATION_NULL_SCRIPT_READER</a>
 <br />
  }</td></tr>
-<tr class="separator:ab23f5e358acb760334db1c7398ef434b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58d0bf5681450f5aefd13705244ab24d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a> { <a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24da5eddba149ad26e8b25b476492782b1e4">OCG_DUEL_STATUS_END</a>, 
-<a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24daf1cfa25809ed78c4a31ea713892f44c7">OCG_DUEL_STATUS_AWAITING</a>, 
-<a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24dac952cb129fe092d3d1edcaf014071d10">OCG_DUEL_STATUS_CONTINUE</a>
+<tr class="separator:gab23f5e358acb760334db1c7398ef434b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga58d0bf5681450f5aefd13705244ab24d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___o_c_g_a_p_i___duel_process.html#ga58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a> { <a class="el" href="group___o_c_g_a_p_i___duel_process.html#gga58d0bf5681450f5aefd13705244ab24da5eddba149ad26e8b25b476492782b1e4">OCG_DUEL_STATUS_END</a>, 
+<a class="el" href="group___o_c_g_a_p_i___duel_process.html#gga58d0bf5681450f5aefd13705244ab24daf1cfa25809ed78c4a31ea713892f44c7">OCG_DUEL_STATUS_AWAITING</a>, 
+<a class="el" href="group___o_c_g_a_p_i___duel_process.html#gga58d0bf5681450f5aefd13705244ab24dac952cb129fe092d3d1edcaf014071d10">OCG_DUEL_STATUS_CONTINUE</a>
  }</td></tr>
-<tr class="separator:a58d0bf5681450f5aefd13705244ab24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ga58d0bf5681450f5aefd13705244ab24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>OCGAPI C structures. </p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ae6d6cfb339574d152e1c260c7f3f54de"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae6d6cfb339574d152e1c260c7f3f54de">&#9670;&nbsp;</a></span>OCG_VERSION_MAJOR</h2>
 
@@ -236,20 +241,6 @@ Enumerations</h2></td></tr>
 
 </div>
 </div>
-<a id="a7988a3a01410189da94b8a67a4fb9567"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7988a3a01410189da94b8a67a4fb9567">&#9670;&nbsp;</a></span>OCG_DuelCreationStatus</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef enum <a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a> <a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a4a30a1838cb6a74c84f0cac853092988"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a30a1838cb6a74c84f0cac853092988">&#9670;&nbsp;</a></span>OCG_DuelOptions</h2>
 
@@ -258,20 +249,6 @@ Enumerations</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef struct <a class="el" href="struct_o_c_g___duel_options.html">OCG_DuelOptions</a> <a class="el" href="struct_o_c_g___duel_options.html">OCG_DuelOptions</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a90a72ac073b5ac4482d6949c86c90627"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90a72ac073b5ac4482d6949c86c90627">&#9670;&nbsp;</a></span>OCG_DuelStatus</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef enum <a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a> <a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -363,46 +340,6 @@ Enumerations</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="ab23f5e358acb760334db1c7398ef434b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab23f5e358acb760334db1c7398ef434b">&#9670;&nbsp;</a></span>OCG_DuelCreationStatus</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="ocgapi__types_8h.html#ab23f5e358acb760334db1c7398ef434b">OCG_DuelCreationStatus</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab23f5e358acb760334db1c7398ef434badcbd517888ede97d82009d76e88a5d68"></a>OCG_DUEL_CREATION_SUCCESS&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ab23f5e358acb760334db1c7398ef434ba54c7d61306451b85204628637ec8621f"></a>OCG_DUEL_CREATION_NO_OUTPUT&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ab23f5e358acb760334db1c7398ef434ba555833fe5207d6f02c86c16c1a7d0298"></a>OCG_DUEL_CREATION_NOT_CREATED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ab23f5e358acb760334db1c7398ef434ba28acccb222fc4b2758d185f84063efb6"></a>OCG_DUEL_CREATION_NULL_DATA_READER&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ab23f5e358acb760334db1c7398ef434ba53168e3e9a3222c8f232ab98d47589cf"></a>OCG_DUEL_CREATION_NULL_SCRIPT_READER&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-</div>
-</div>
-<a id="a58d0bf5681450f5aefd13705244ab24d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a58d0bf5681450f5aefd13705244ab24d">&#9670;&nbsp;</a></span>OCG_DuelStatus</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="ocgapi__types_8h.html#a58d0bf5681450f5aefd13705244ab24d">OCG_DuelStatus</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a58d0bf5681450f5aefd13705244ab24da5eddba149ad26e8b25b476492782b1e4"></a>OCG_DUEL_STATUS_END&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a58d0bf5681450f5aefd13705244ab24daf1cfa25809ed78c4a31ea713892f44c7"></a>OCG_DUEL_STATUS_AWAITING&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a58d0bf5681450f5aefd13705244ab24dac952cb129fe092d3d1edcaf014071d10"></a>OCG_DUEL_STATUS_CONTINUE&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-</div>
-</div>
 <a id="ac3858d11bccd97050b66c5144416158e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac3858d11bccd97050b66c5144416158e">&#9670;&nbsp;</a></span>OCG_LogTypes</h2>
 
