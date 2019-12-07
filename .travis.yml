@@ -9,6 +9,7 @@ env:
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
   - DEPLOY_DIR=ocgcore
   - DEPLOY_BRANCH=travis-core-$TRAVIS_OS_NAME
+  - DEPLOY_DATE=$(date +%F)
 matrix:
   include:
   - name: "Windows 10"
@@ -51,10 +52,11 @@ deploy:
     repo: edo9300/ygopro-core
 - provider: gcs
   skip_cleanup: true
-  local-dir: $DEPLOY_DIR
+  local_dir: $DEPLOY_DIR
+  upload_dir: ocgcore/$TRAVIS_BRANCH/$DEPLOY_DATE/$TRAVIS_COMMIT
   access_key_id: $GCS_ACCESS_KEY
   secret_access_key: $GCS_SECRET
-  bucket: "projectignis"
+  bucket: projectignis
   acl: authenticated-read
   on:
     all_branches: true
