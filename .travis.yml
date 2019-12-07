@@ -49,6 +49,16 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME != windows"
     repo: edo9300/ygopro-core
+- provider: gcs
+  skip_cleanup: true
+  local-dir: $DEPLOY_DIR
+  access_key_id: $GCS_ACCESS_KEY
+  secret_access_key: $GCS_SECRET
+  bucket: "projectignis"
+  acl: authenticated-read
+  on:
+    all_branches: true
+    repo: edo9300/ygopro-core
 #- provider: releases
 #  api_key: $OAUTH_TOKEN
 #  overwrite: true
