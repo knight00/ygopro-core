@@ -51,6 +51,7 @@ deploy:
     condition: "$TRAVIS_OS_NAME != windows"
     repo: edo9300/ygopro-core
 - provider: gcs
+  edge: true
   skip_cleanup: true
   local_dir: $DEPLOY_DIR
   upload_dir: ocgcore/$TRAVIS_BRANCH/$DEPLOY_DATE/$TRAVIS_COMMIT
