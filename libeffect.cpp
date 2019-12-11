@@ -501,7 +501,7 @@ int32 scriptlib::effect_is_active_type(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::effect_is_has_property(lua_State *L) {
+int32 scriptlib::Effect_HasProperty(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
@@ -513,7 +513,7 @@ int32 scriptlib::effect_is_has_property(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::effect_is_has_category(lua_State *L) {
+int32 scriptlib::Effect_HasCategory(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
@@ -524,7 +524,7 @@ int32 scriptlib::effect_is_has_category(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::effect_is_has_type(lua_State *L) {
+int32 scriptlib::Effect_HasType(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
@@ -535,7 +535,7 @@ int32 scriptlib::effect_is_has_type(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::effect_is_activatable(lua_State *L) {
+int32 scriptlib::Effect_CanBeActivated(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	uint32 playerid = lua_tointeger(L, 2);
