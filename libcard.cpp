@@ -1416,7 +1416,7 @@ int32 scriptlib::card_get_attack_announced_count(lua_State *L) {
 	lua_pushinteger(L, pcard->attack_announce_count);
 	return 1;
 }
-int32 scriptlib::Card_HasAttackedDirectly(lua_State *L) {
+int32 scriptlib::card_has_attacked_directly (lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1459,7 +1459,7 @@ int32 scriptlib::card_get_card_target_count(lua_State *L) {
 	lua_pushinteger(L, pcard->effect_target_cards.size());
 	return 1;
 }
-int32 scriptlib::Card_HasCardAsTarget(lua_State *L) {
+int32 scriptlib::card_has_card_as_target (lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	check_param(L, PARAM_TYPE_CARD, 2);
@@ -1477,7 +1477,7 @@ int32 scriptlib::card_cancel_card_target(lua_State *L) {
 	pcard->cancel_card_target(rcard);
 	return 0;
 }
-int32 scriptlib::Card_GetAbsoluteTargetGroup(lua_State *L) {
+int32 scriptlib::card_get_absolute_target_group(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1485,7 +1485,7 @@ int32 scriptlib::Card_GetAbsoluteTargetGroup(lua_State *L) {
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
-int32 scriptlib::Card_GetAbsoluteTargetGroupCount(lua_State *L) {
+int32 scriptlib::card_get_absolute_target_group_count(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1815,7 +1815,7 @@ int32 scriptlib::card_clear_effect_relation(lua_State *L) {
 	pcard->clear_relate_effect();
 	return 0;
 }
-int32 scriptlib::Card_IsRelatedToEffect(lua_State *L) {
+int32 scriptlib::card_is_related_to_effect(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	check_param(L, PARAM_TYPE_EFFECT, 2);
@@ -1827,7 +1827,7 @@ int32 scriptlib::Card_IsRelatedToEffect(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_IsRelatedToChain(lua_State *L) {
+int32 scriptlib::card_is_related_to_chain(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1841,7 +1841,7 @@ int32 scriptlib::Card_IsRelatedToChain(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_IsRelatedToCard(lua_State *L) {
+int32 scriptlib::card_is_related_to_card(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	check_param(L, PARAM_TYPE_CARD, 2);
@@ -1853,7 +1853,7 @@ int32 scriptlib::Card_IsRelatedToCard(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_IsRelatedToBattle(lua_State *L) {
+int32 scriptlib::card_is_related_to_battle(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1942,7 +1942,7 @@ int32 scriptlib::card_is_disabled(lua_State *L) {
 	lua_pushboolean(L, pcard->is_status(STATUS_DISABLED));
 	return 1;
 }
-int32 scriptlib::Card_CanBeDestroyed(lua_State *L) {
+int32 scriptlib::card_can_be_destroyed(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	effect* peffect = 0;
@@ -1957,14 +1957,14 @@ int32 scriptlib::Card_CanBeDestroyed(lua_State *L) {
 		lua_pushboolean(L, pcard->is_destructable());
 	return 1;
 }
-int32 scriptlib::Card_CanBeNormalSummonSet(lua_State *L) {
+int32 scriptlib::card_can_be_normal_summon_set(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushboolean(L, pcard->is_summonable_card());
 	return 1;
 }
-int32 scriptlib::Card_CanBeFusionSummoned(lua_State *L) {
+int32 scriptlib::card_can_be_fusion_summoned(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2016,7 +2016,7 @@ int32 scriptlib::card_is_special_summonable(lua_State *L) {
 	lua_pushboolean(L, pcard->is_special_summonable(p, sumtype));
 	return 1;
 }
-int32 scriptlib::Card_CanBeSynchroSummoned(lua_State *L) {
+int32 scriptlib::card_can_be_synchro_summoned(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2048,7 +2048,7 @@ int32 scriptlib::Card_CanBeSynchroSummoned(lua_State *L) {
 	lua_pushboolean(L, pcard->is_special_summonable(p, SUMMON_TYPE_SYNCHRO));
 	return 1;
 }
-int32 scriptlib::Card_CanBeXyzSummoned(lua_State *L) {
+int32 scriptlib::card_can_be_xyz_summoned(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2072,7 +2072,7 @@ int32 scriptlib::Card_CanBeXyzSummoned(lua_State *L) {
 	lua_pushboolean(L, pcard->is_special_summonable(p, SUMMON_TYPE_XYZ));
 	return 1;
 }
-int32 scriptlib::Card_CanBeLinkSummoned(lua_State *L) {
+int32 scriptlib::card_can_be_link_summoned(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**)lua_touserdata(L, 1);
@@ -2096,7 +2096,7 @@ int32 scriptlib::Card_CanBeLinkSummoned(lua_State *L) {
 	lua_pushboolean(L, pcard->is_special_summonable(p, SUMMON_TYPE_LINK));
 	return 1;
 }
-int32 scriptlib::Card_CanBeNormalSummoned(lua_State *L) {
+int32 scriptlib::card_can_be_normal_summoned(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2274,7 +2274,7 @@ int32 scriptlib::card_is_able_to_remove_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_CanBeTributed(lua_State *L) {
+int32 scriptlib::card_can_be_tributed(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2285,7 +2285,7 @@ int32 scriptlib::Card_CanBeTributed(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_CanBeTributedByEffect(lua_State *L) {
+int32 scriptlib::card_can_be_tributed_by_effect(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2297,7 +2297,7 @@ int32 scriptlib::Card_CanBeTributedByEffect(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_CanBeDiscarded(lua_State *L) {
+int32 scriptlib::card_can_be_discarded(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2585,7 +2585,7 @@ int32 scriptlib::card_is_forbidden(lua_State *L) {
 	lua_pushboolean(L, pcard->is_status(STATUS_FORBIDDEN));
 	return 1;
 }
-int32 scriptlib::Card_CanChangeController(lua_State *L) {
+int32 scriptlib::card_can_change_controller(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2595,7 +2595,7 @@ int32 scriptlib::Card_CanChangeController(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::Card_CanControllerBeChanged(lua_State *L) {
+int32 scriptlib::card_can_controller_be_changed(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2701,21 +2701,21 @@ int32 scriptlib::card_set_counter_limit(lua_State *L) {
 	pcard->add_effect(peffect);
 	return 0;
 }
-int32 scriptlib::Card_CanChangePosition(lua_State *L) {
+int32 scriptlib::card_can_change_position(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**)lua_touserdata(L, 1);
 	lua_pushboolean(L, pcard->is_capable_change_position_by_effect(pcard->pduel->game_field->core.reason_player));
 	return 1;
 }
-int32 scriptlib::Card_CanBeFlippedSet(lua_State *L) {
+int32 scriptlib::card_can_be_flipped_set(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushboolean(L, pcard->is_capable_turn_set(pcard->pduel->game_field->core.reason_player));
 	return 1;
 }
-int32 scriptlib::Card_CanHoldCounter(lua_State *L) {
+int32 scriptlib::card_can_hold_counter(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2732,7 +2732,7 @@ int32 scriptlib::Card_CanHoldCounter(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_add_counter(pcard->pduel->game_field->core.reason_player, countertype, count, singly, loc));
 	return 1;
 }
-int32 scriptlib::Card_CanRemoveCounter(lua_State *L) {
+int32 scriptlib::card_can_remove_counter(lua_State *L) {
 	check_param_count(L, 5);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2745,7 +2745,7 @@ int32 scriptlib::Card_CanRemoveCounter(lua_State *L) {
 	lua_pushboolean(L, pcard->pduel->game_field->is_player_can_remove_counter(playerid, pcard, 0, 0, countertype, count, reason));
 	return 1;
 }
-int32 scriptlib::Card_CanBeFusionMaterial(lua_State *L) {
+int32 scriptlib::card_can_be_fusion_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2760,7 +2760,7 @@ int32 scriptlib::Card_CanBeFusionMaterial(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_fusion_material(fcard, summon_type));
 	return 1;
 }
-int32 scriptlib::Card_CanBeSynchroMaterial(lua_State *L) {
+int32 scriptlib::card_can_be_synchro_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2781,7 +2781,7 @@ int32 scriptlib::Card_CanBeSynchroMaterial(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_synchro_material(scard, playerid, tuner));
 	return 1;
 }
-int32 scriptlib::Card_CanBeRitualMaterial(lua_State *L) {
+int32 scriptlib::card_can_be_ritual_material(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2793,7 +2793,7 @@ int32 scriptlib::Card_CanBeRitualMaterial(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_ritual_material(scard));
 	return 1;
 }
-int32 scriptlib::Card_CanBeXyzMaterial(lua_State *L) {
+int32 scriptlib::card_can_be_xyz_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2809,7 +2809,7 @@ int32 scriptlib::Card_CanBeXyzMaterial(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard, playerid));
 	return 1;
 }
-int32 scriptlib::Card_CanBeLinkMaterial(lua_State *L) {
+int32 scriptlib::card_can_be_link_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2825,7 +2825,7 @@ int32 scriptlib::Card_CanBeLinkMaterial(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_link_material(scard, playerid));
 	return 1;
 }
-int32 scriptlib::Card_CanBeMaterial(lua_State * L) {
+int32 scriptlib::card_can_be_material(lua_State * L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**)lua_touserdata(L, 1);
@@ -2883,7 +2883,7 @@ int32 scriptlib::card_is_immune_to_effect(lua_State *L) {
 	lua_pushboolean(L, !pcard->is_affect_by_effect(peffect));
 	return 1;
 }
-int32 scriptlib::Card_CanBeTargetedByEffect(lua_State *L) {
+int32 scriptlib::card_can_be_targeted_by_effect(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2896,7 +2896,7 @@ int32 scriptlib::Card_CanBeTargetedByEffect(lua_State *L) {
 	lua_pushboolean(L, pcard->is_capable_be_effect_target(peffect, pduel->game_field->core.reason_player));
 	return 1;
 }
-int32 scriptlib::Card_CanBeTargetedByAttack(lua_State *L) {
+int32 scriptlib::card_can_be_targeted_by_attack(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	check_param(L, PARAM_TYPE_CARD, 2);
