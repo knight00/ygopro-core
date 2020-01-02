@@ -5,8 +5,6 @@
  *      Author: Argon
  */
 
-#define BUILD_WITH_AI
-
 #include "field.h"
 #include "duel.h"
 #include "effect.h"

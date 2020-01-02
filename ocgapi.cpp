@@ -207,22 +207,22 @@ OCGAPI int OCG_DuelProcess(OCG_Duel duel) {
 	return flag;
 }
 
-OCGAPI void* OCG_DuelGetMessage(OCG_Duel duel, uint32_t_t* length) {
+OCGAPI void* OCG_DuelGetMessage(OCG_Duel duel, uint32_t* length) {
 	DUEL->generate_buffer();
 	if(length)
 		*length = DUEL->buff.size();
 	return DUEL->buff.data();
 }
 
-OCGAPI void OCG_DuelSetResponse(OCG_Duel duel, void* buffer, uint32_t_t length) {
+OCGAPI void OCG_DuelSetResponse(OCG_Duel duel, void* buffer, uint32_t length) {
 	DUEL->set_response(static_cast<uint8_t*>(buffer), length);
 }
 
-OCGAPI int OCG_LoadScript(OCG_Duel duel, const char* buffer, uint32_t_t length, const char* name) {
+OCGAPI int OCG_LoadScript(OCG_Duel duel, const char* buffer, uint32_t length, const char* name) {
 	return DUEL->lua->load_script(buffer, length, name);
 }
 
-OCGAPI uint32_t_t OCG_DuelQueryCount(OCG_Duel duel, uint8_t team, uint32_t_t loc) {
+OCGAPI uint32_t OCG_DuelQueryCount(OCG_Duel duel, uint8_t team, uint32_t loc) {
 	if(team != 0 && team != 1)
 		return 0;
 	auto& player = DUEL->game_field->player[team];
@@ -256,7 +256,7 @@ void insert_value(std::vector<uint8_t>& vec, const T& _val) {
 	std::memcpy(&vec[vec_size], &val, val_size);
 }
 
-OCGAPI void* OCG_DuelQuery(OCG_Duel duel, uint32_t_t* length, OCG_QueryInfo info) {
+OCGAPI void* OCG_DuelQuery(OCG_Duel duel, uint32_t* length, OCG_QueryInfo info) {
 	DUEL->query_buffer.clear();
 	card* pcard = nullptr;
 	if(info.loc & LOCATION_OVERLAY) {
@@ -279,7 +279,7 @@ OCGAPI void* OCG_DuelQuery(OCG_Duel duel, uint32_t_t* length, OCG_QueryInfo info
 	return DUEL->query_buffer.data();
 }
 
-OCGAPI void* OCG_DuelQueryLocation(OCG_Duel duel, uint32_t_t* length, OCG_QueryInfo info) {
+OCGAPI void* OCG_DuelQueryLocation(OCG_Duel duel, uint32_t* length, OCG_QueryInfo info) {
 	DUEL->query_buffer.clear();
 	if(info.loc & LOCATION_OVERLAY) {
 		insert_value<int16>(DUEL->query_buffer, 0);
@@ -309,26 +309,26 @@ OCGAPI void* OCG_DuelQueryLocation(OCG_Duel duel, uint32_t_t* length, OCG_QueryI
 		}
 	}
 	std::vector<uint8_t> tmp_vector;
-	insert_value<uint32_t_t>(tmp_vector, DUEL->query_buffer.size());
+	insert_value<uint32_t>(tmp_vector, DUEL->query_buffer.size());
 	DUEL->query_buffer.insert(DUEL->query_buffer.begin(), tmp_vector.begin(), tmp_vector.end());
 	if(length)
 		*length = DUEL->query_buffer.size();
 	return DUEL->query_buffer.data();
 }
 
-OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t_t * length) {
+OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t * length) {
 	auto& query = DUEL->query_buffer;
 	query.clear();
 	//insert_value<int8_t>(query, MSG_RELOAD_FIELD);
-	insert_value<int32_t_t>(query, DUEL->game_field->core.duel_options);
+	insert_value<int32_t>(query, DUEL->game_field->core.duel_options);
 	for(int playerid = 0; playerid < 2; ++playerid) {
 		auto& player = DUEL->game_field->player[playerid];
-		insert_value<int32_t_t>(query, player.lp);
+		insert_value<int32_t>(query, player.lp);
 		for(auto& pcard : player.list_mzone) {
 			if(pcard) {
 				insert_value<int8_t>(query, 1);
 				insert_value<int8_t>(query, pcard->current.position);
-				insert_value<int32_t_t>(query, pcard->xyz_materials.size());
+				insert_value<int32_t>(query, pcard->xyz_materials.size());
 			} else {
 				insert_value<int8_t>(query, 0);
 			}
@@ -341,17 +341,17 @@ OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t_t * length) {
 				insert_value<int8_t>(query, 0);
 			}
 		}
-		insert_value<uint32_t_t>(query, player.list_main.size());
-		insert_value<uint32_t_t>(query, player.list_hand.size());
-		insert_value<uint32_t_t>(query, player.list_grave.size());
-		insert_value<uint32_t_t>(query, player.list_remove.size());
-		insert_value<uint32_t_t>(query, player.list_extra.size());
-		insert_value<uint32_t_t>(query, player.extra_p_count);
+		insert_value<uint32_t>(query, player.list_main.size());
+		insert_value<uint32_t>(query, player.list_hand.size());
+		insert_value<uint32_t>(query, player.list_grave.size());
+		insert_value<uint32_t>(query, player.list_remove.size());
+		insert_value<uint32_t>(query, player.list_extra.size());
+		insert_value<uint32_t>(query, player.extra_p_count);
 	}
-	insert_value<int32_t_t>(query, DUEL->game_field->core.current_chain.size());
+	insert_value<int32_t>(query, DUEL->game_field->core.current_chain.size());
 	for(const auto& ch : DUEL->game_field->core.current_chain) {
 		effect* peffect = ch.triggering_effect;
-		insert_value<int32_t_t>(query, peffect->get_handler()->data.code);
+		insert_value<int32_t>(query, peffect->get_handler()->data.code);
 		loc_info info = peffect->get_handler()->get_info_location();
 		insert_value<uint8>(query, info.controler);
 		insert_value<uint8>(query, info.location);
