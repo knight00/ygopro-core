@@ -12,6 +12,217 @@
 #include "scriptlib.h"
 #include "interpreter.h"
 #include <cmath>
+#ifdef BUILD_WITH_AI
+int interpreter::get_counter(lua_State *L) {
+	int32 countertype = lua_tointeger(L, 2);
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	int32 returnval = 0;
+	for(auto& pcard : pduel->cards){
+		if(pcard->cardid == cardid) {
+			returnval = pcard->get_counter(countertype);
+			break;
+		}
+	}
+
+	lua_pushnumber(L, returnval);
+
+	return 1;
+}
+int interpreter::is_affected_by(lua_State *L) {
+	int32 effecttype = lua_tointeger(L, 2);
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	int32 returnval = 0;
+	//bool returnval = false;
+	for(auto& pcard : pduel->cards) {
+		if(pcard->cardid == cardid) {
+			if(pcard->is_affected_by_effect(effecttype)) {
+				returnval = 1;
+				break;
+				//returnval = true;
+			}
+		}
+	}
+
+	lua_pushnumber(L, returnval);
+	//lua_pushboolean(L, returnval);
+
+	return 1;
+}
+int interpreter::is_affectable_by_chain(lua_State *L) {
+	int32 effect_card_index = lua_tointeger(L, 2);
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	effect* peffect;
+	int32 returnval = 0;
+
+	peffect = pduel->game_field->core.select_chains[effect_card_index - 1].triggering_effect;
+
+	for(auto& pcard : pduel->cards) {
+		if(pcard->cardid == cardid) {
+			pcard->filter_immune_effect();
+			if(pcard->is_affect_by_effect(peffect)) {
+				returnval = 1;
+				break;
+			}
+		}
+	}
+
+	lua_pushnumber(L, returnval);
+
+	return 1;
+}
+int interpreter::can_be_targeted_by_chain(lua_State *L) {
+	int32 effect_card_index = lua_tointeger(L, 2);
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	effect* peffect;
+	uint8 tp;
+	int32 returnval = 0;
+
+	peffect = pduel->game_field->core.select_chains[effect_card_index - 1].triggering_effect;
+	tp = pduel->game_field->core.select_chains[effect_card_index - 1].triggering_player;
+
+	for(auto& pcard : pduel->cards) {
+		if(pcard->cardid == cardid) {
+			pcard->filter_immune_effect();
+			if(pcard->is_capable_be_effect_target(peffect, tp)) {
+				returnval = 1;
+				break;
+			}
+		}
+	}
+	lua_pushnumber(L, returnval);
+
+	return 1;
+}
+int interpreter::get_equipped_cards(lua_State *L) {
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	card* c;
+	//int32 returnval = 0;
+	int counter = 1;
+
+	for(auto cit = pduel->cards.begin(); cit != pduel->cards.end(); ++cit) {
+		c = *cit;
+		if(c->cardid == cardid) {
+			for(auto cit = c->equiping_cards.begin(); cit != c->equiping_cards.end();) {
+				lua_pushnumber(L, counter);
+				auto rm = cit++;
+				pduel->game_field->set_card_to_lua_without_index(L, (*rm), pduel, 0, true);
+				counter++;
+			}
+			break;
+		}
+	}
+	//lua_pushnumber(L, returnval);
+
+	return 1;
+}
+int interpreter::is_public_card(lua_State *L) { //CUSTOM CODE
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	std::vector<card*> private_publiccards_event = pduel->game_field->core.private_publiccards_event;
+
+	if(private_publiccards_event.size() > 0) {
+		int i = 0;
+		for(auto& pcard : private_publiccards_event) {
+			if(pcard->cardid == cardid) {
+				lua_pushnumber(L, 1); //card is public, return 1 to lua engine
+				return 1;
+			}
+		}
+	}
+
+	lua_pushnumber(L, 0); //card not found, return 0 to lua engine
+	return 1;
+}
+int interpreter::get_equip_target(lua_State *L) {
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	//int32 returnval = 0;
+	int counter = 1;
+
+	for(auto& pcard : pduel->cards) {
+		if(pcard->cardid == cardid) {
+			if(pcard->equiping_target) {
+				lua_newtable(L);
+				lua_pushnumber(L, counter);
+				pduel->game_field->set_card_to_lua_without_index(L, pcard->equiping_target, pduel, 0, true);
+			} else {
+				lua_pushboolean(L, 0); //set a false
+			}
+			break;
+		}
+	}
+	//lua_pushnumber(L, returnval);
+
+	return 1;
+}
+
+static const struct luaL_Reg ailib[] = {
+	{ "Chat", scriptlib::chat_message },
+	{ "GetOppExtraDeck", scriptlib::get_opp_extra_deck },
+	{ "GetAIExtraDeck", scriptlib::get_ai_extra_deck },
+	{ "GetOppMainDeck", scriptlib::get_opp_main_deck },
+	{ "GetAIMainDeck", scriptlib::get_ai_main_deck },
+	{ "GetOppMonsterZones", scriptlib::get_opp_monster_zones },
+	{ "GetAIMonsterZones", scriptlib::get_ai_monster_zones },
+	{ "GetOppSpellTrapZones", scriptlib::get_opp_st_zones },
+	{ "GetAISpellTrapZones", scriptlib::get_ai_st_zones },
+	{ "GetOppGraveyard", scriptlib::get_opp_graveyard },
+	{ "GetAIGraveyard", scriptlib::get_ai_graveyard },
+	{ "GetOppBanished", scriptlib::get_opp_banished },
+	{ "GetAIBanished", scriptlib::get_ai_banished },
+	{ "GetOppHand", scriptlib::get_opp_hand },
+	{ "GetAIHand", scriptlib::get_ai_hand },
+	{ "GetPlayerLP", scriptlib::get_player_lp },
+	{ "GetCurrentPhase", scriptlib::get_phase },
+	{ "GetTargetedCardsOfLastInChain", scriptlib::get_targeted_cards },
+	{ "GetLastSummonedCards", scriptlib::get_last_summoned_cards },
+	{ "GetScriptFromCardObject", scriptlib::get_script_from_card_object },
+	{ "GetCardObjectFromScript", scriptlib::get_card_object_from_script },
+	//{ "GetCardName", scriptlib::get_card_name },
+	{ NULL, NULL }
+};
+#endif //BUILD_WITH_AI
 static const struct luaL_Reg cardlib[] = {
 	{ "GetCode", scriptlib::card_get_code },
 	{ "GetOriginalCode", scriptlib::card_get_origin_code },
@@ -642,6 +853,10 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_setglobal(lua_state, "Duel");
 	luaL_newlib(lua_state, debuglib);
 	lua_setglobal(lua_state, "Debug");
+#ifdef BUILD_WITH_AI
+	luaL_newlib(lua_state, ailib);
+	lua_setglobal(lua_state, "AI");
+#endif //BUILD_WITH_AI
 }
 interpreter::~interpreter() {
 	lua_close(lua_state);

@@ -138,7 +138,11 @@ int32 field::process() {
 	}
 	case PROCESSOR_SELECT_DISFIELD:
 	case PROCESSOR_SELECT_PLACE: {
+#ifdef BUILD_WITH_AI
+		if(select_place(it->step, it->arg1, it->arg2, it->arg3, (card*)it->ptarget)) {
+#else
 		if(select_place(it->step, it->arg1, it->arg2, it->arg3)) {
+#endif
 			core.units.pop_front();
 			return PROCESSOR_FLAG_CONTINUE;
 		} else {

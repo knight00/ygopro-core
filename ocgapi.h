@@ -24,6 +24,12 @@ OCGAPI void OCG_DestroyDuel(OCG_Duel duel);
 OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info);
 OCGAPI void OCG_StartDuel(OCG_Duel duel);
 
+#ifdef BUILD_WITH_AI
+OCGAPI int32_t get_ai_going_first_second(ptr pduel, char* deckname);
+OCGAPI void set_player_going_first_second(ptr pduel, int32_t first, char* deckname);
+OCGAPI void set_ai_id(ptr pduel, int playerid);
+#endif //BUILD_WITH_AI
+
 /*** DUEL PROCESSING AND QUERYING ***/
 OCGAPI int OCG_DuelProcess(OCG_Duel duel);
 OCGAPI void* OCG_DuelGetMessage(OCG_Duel duel, uint32_t* length);

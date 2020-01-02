@@ -1080,7 +1080,11 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p1);
 		message->write<uint64>(pcard2->data.code);
+#ifdef BUILD_WITH_AI
+		add_process(PROCESSOR_SELECT_PLACE, 0, 0, (group*)pcard1, p1, flag, 1);
+#else
 		add_process(PROCESSOR_SELECT_PLACE, 0, 0, 0, p1, flag, 1);
+#endif
 		return FALSE;
 	}
 	case 2: {
@@ -1096,7 +1100,11 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p2);
 		message->write<uint64>(pcard1->data.code);
+#ifdef BUILD_WITH_AI
+		add_process(PROCESSOR_SELECT_PLACE, 0, 0, (group*)pcard2, p2, flag, 1);
+#else
 		add_process(PROCESSOR_SELECT_PLACE, 0, 0, 0, p2, flag, 1);
+#endif
 		return FALSE;
 	}
 	case 3: {
@@ -4428,7 +4436,11 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			message->write<uint8>(HINT_SELECTMSG);
 			message->write<uint8>(move_player);
 			message->write<uint64>(target->data.code);
+#ifdef BUILD_WITH_AI
 			add_process(PROCESSOR_SELECT_PLACE, 0, 0, (group*)target, move_player, flag, 1);
+#else
+			add_process(PROCESSOR_SELECT_PLACE, 0, 0, 0, move_player, flag, 1);
+#endif
 		} else {
 			uint32 flag;
 			uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
@@ -4480,7 +4492,11 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			message->write<uint8>(HINT_SELECTMSG);
 			message->write<uint8>(move_player);
 			message->write<uint64>(target->data.code);
+#ifdef BUILD_WITH_AI
 			add_process(PROCESSOR_SELECT_PLACE, 0, 0, (group*)target, move_player, flag, 1);
+#else
+			add_process(PROCESSOR_SELECT_PLACE, 0, 0, 0, move_player, flag, 1);
+#endif
 		}
 		return FALSE;
 	}

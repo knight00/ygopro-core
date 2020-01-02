@@ -91,6 +91,9 @@ struct player_info {
 	std::vector<card_vector> extra_lists_hand;
 	std::vector<card_vector> extra_lists_extra;
 	std::vector<uint32> extra_extra_p_count;
+#ifdef BUILD_WITH_AI
+	bool isAI;
+#endif //BUILD_WITH_AI
 };
 struct field_effect {
 	typedef std::multimap<uint32, effect*> effect_container;
@@ -340,6 +343,10 @@ struct processor {
 	std::unordered_map<uint32, std::pair<uint32, uint32>> chain_counter;
 	processor_list recover_damage_reserve;
 	effect_vector dec_count_reserve;
+#ifdef BUILD_WITH_AI
+	event_list private_event; //CUSTOM CODE keep track of summons for cards like Bottomless Trap Hole
+	card_vector private_publiccards_event; //CUSTOM CODE keep track of public knowledge cards
+#endif //BUILD_WITH_AI
 };
 class field {
 public:
@@ -616,7 +623,11 @@ public:
 	int32 select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max);
 	int32 select_unselect_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max, uint8 finishable);
 	int32 select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 forced);
+#ifdef BUILD_WITH_AI
+	int32 select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count, card* reason_card);
+#else
 	int32 select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count);
+#endif //BUILD_WITH_AI
 	int32 select_position(uint16 step, uint8 playerid, uint32 code, uint8 positions);
 	int32 select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max);
 	int32 select_counter(uint16 step, uint8 playerid, uint16 countertype, uint16 count, uint8 s, uint8 o);
@@ -626,6 +637,12 @@ public:
 	int32 announce_attribute(int16 step, uint8 playerid, int32 count, int32 available);
 	int32 announce_card(int16 step, uint8 playerid);
 	int32 announce_number(int16 step, uint8 playerid);
+#ifdef BUILD_WITH_AI
+	void set_card_to_lua_without_index(void* L, card* pcard, duel* pduel, uint32 description = 0, bool extraSetTableCall = false);
+	void set_card_to_lua(void* L, card* pcard, int i, uint32 description = 0);
+	void add_to_list_if_event_not_exists(tevent newevent);
+	bool sum_check(int32 acc, int32 min, int32 max);
+#endif //BUILD_WITH_AI
 };
 
 //Location Use Reason

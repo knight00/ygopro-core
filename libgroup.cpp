@@ -731,3 +731,22 @@ int32 scriptlib::group_get_bin_class_count(lua_State *L) {
 	lua_pushinteger(L, ans);
 	return 1;
 }
+#ifdef BUILD_WITH_AI
+int32 scriptlib::get_targeted_cards(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	if(pduel->game_field->core.current_chain.size() > 0) {
+		chain* ch = &pduel->game_field->core.current_chain[pduel->game_field->core.current_chain.size() - 1];
+		if(ch) {
+			group* pgroup = ch->target_cards;
+			if(pgroup && pgroup->container.size()) {
+				for(auto& pcard : pgroup->container) {
+					if(pcard) {
+						printf("*** get_targeted_cards %d ***\n", pcard->get_code());
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+#endif //BUILD_WITH_AI

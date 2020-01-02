@@ -464,6 +464,13 @@ int32 scriptlib::duel_sets(lua_State *L) {
 		pduel->game_field->add_process(PROCESSOR_SSET, 0, pduel->game_field->core.reason_effect, (group*)pcard, playerid, toplayer);
 	else
 		pduel->game_field->add_process(PROCESSOR_SSET_G, 0, pduel->game_field->core.reason_effect, pgroup, playerid, toplayer, confirm);
+#ifdef BUILD_WITH_AI
+	if(pcard) {
+		tevent new_event;
+		new_event.trigger_card = pcard;
+		pduel->game_field->add_to_list_if_event_not_exists(new_event);
+	}
+#endif //BUILD_WITH_AI
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_create_token(lua_State *L) {

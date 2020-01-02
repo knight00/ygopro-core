@@ -12,6 +12,440 @@
 #include "card.h"
 #include "effect.h"
 
+#ifdef BUILD_WITH_AI
+int32 scriptlib::chat_message(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_getglobal(L, "tostring");
+	lua_pushvalue(L, -2);
+	lua_pcall(L, 1, 1, 0);
+	sprintf(pduel->strbuffer, "%s", lua_tostring(L, -1));
+	pduel->handle_message(pduel->handle_message_payload, pduel->strbuffer, OCG_LOG_TYPE_FROM_AI);
+	return 0;
+}
+
+int get_ai_id(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	//return pduel->game_field->infos.turn_player;
+	return (pduel->game_field->player[0].isAI) ? 0 : 1;
+}
+int get_opponent_id(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	//return 1 - pduel->game_field->infos.turn_player;
+	return (pduel->game_field->player[0].isAI) ? 1 : 0;
+}
+
+int32 scriptlib::get_opp_extra_deck(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector extra = pduel->game_field->player[playerid].list_extra;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < extra.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(extra[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = extra[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_extra_deck(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector extra = pduel->game_field->player[playerid].list_extra;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < extra.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(extra[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = extra[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_main_deck(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector extra = pduel->game_field->player[playerid].list_main;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < extra.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(extra[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = extra[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_main_deck(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector extra = pduel->game_field->player[playerid].list_main;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < extra.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(extra[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = extra[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_monster_zones(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_mzone;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_monster_zones(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_mzone;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_st_zones(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_szone;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_st_zones(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_szone;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_graveyard(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_grave;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_graveyard(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_grave;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_banished(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_remove;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_hand(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_hand;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_opp_hand(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_opponent_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_hand;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_ai_banished(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	int playerid = get_ai_id(L);
+	player_info::card_vector mzone = pduel->game_field->player[playerid].list_remove;
+	card* pcard;
+
+	lua_newtable(L);
+
+	for(size_t i = 0; i < mzone.size(); i++) {
+		lua_pushnumber(L, i + 1);
+		if(mzone[i] == NULL) {
+			//if(true) {
+			lua_pushboolean(L, 0); //set a false
+			lua_settable(L, -3);
+		} else {
+			pcard = mzone[i];
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+
+	return 1;
+}
+int32 scriptlib::get_player_lp(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+
+	/* get number of arguments */
+	int n = lua_gettop(L);
+	int player = lua_tonumber(L, 1);
+
+	int32 lp = 0;
+	if(player == 1) { //AI lp
+		if(pduel->game_field->player[0].isAI) {
+			lp = pduel->game_field->player[0].lp;
+		} else {
+			lp = pduel->game_field->player[1].lp;
+		}
+	} else if(player == 2) { //player lp
+		if(pduel->game_field->player[0].isAI) {
+			lp = pduel->game_field->player[1].lp;
+		} else {
+			lp = pduel->game_field->player[0].lp;
+		}
+	} else {
+		//error
+		sprintf(pduel->strbuffer, "%s", "GetPlayerLP invalid player");
+		pduel->handle_message(pduel->handle_message_payload, pduel->strbuffer, OCG_LOG_TYPE_FROM_AI_ERROR);
+	}
+	/*
+	if(pduel->game_field->player[player].isAI) {
+	lp = pduel->game_field->player[player].lp; //AI lp
+	} else if(player == 2) {
+	lp = pduel->game_field->player[0].lp; //player lp
+	} else {
+	//error
+	sprintf(pduel->strbuffer, "%s", "GetPlayerLP invalid player");
+	pduel->handle_message(pduel->handle_message_payload, pduel->strbuffer, OCG_LOG_TYPE_FROM_AI_ERROR);
+	}
+	*/
+	lua_pushnumber(L, lp);
+	return 1;
+}
+
+int32 scriptlib::get_phase(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+
+	lua_pushnumber(L, pduel->game_field->infos.phase);
+	return 1;
+}
+int32 scriptlib::get_last_summoned_cards(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	std::list<tevent> private_event = pduel->game_field->core.private_event;
+
+	lua_newtable(L);
+
+	if(private_event.size() > 0) {
+		int i = 0;
+		for(auto elit = private_event.begin(); elit != private_event.end(); ++elit) {
+			lua_pushnumber(L, i + 1);
+			i++;
+			card* pcard = elit->trigger_card;
+			pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, true);
+		}
+	}
+	return 1;
+}
+int32 scriptlib::get_script_from_card_object(lua_State *L) {
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	card* c;
+	int32 returnval = 0;
+	bool foundTheCard = false;
+	for(auto cit = pduel->cards.begin(); cit != pduel->cards.end(); ++cit) {
+		c = *cit;
+		if(c->cardid == cardid) {
+			foundTheCard = true;
+			interpreter::card2value(L, c);
+			break;
+		}
+	}
+	if(!foundTheCard) {
+		interpreter::card2value(L, c);
+	}
+
+	return 1;
+}
+int32 scriptlib::get_card_object_from_script(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**)lua_touserdata(L, 1);
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->set_card_to_lua_without_index(L, pcard, pduel, 0, false);
+	return 1;
+}
+int32 scriptlib::get_card_name(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_INT, 1);
+	int id = lua_tointeger(L, 1);
+	const char* result = ""; //TODO
+	lua_pushstring(L, result);
+	return 1;
+}
+#endif //BUILD_WITH_AI
 int32 scriptlib::debug_message(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	lua_getglobal(L, "tostring");
