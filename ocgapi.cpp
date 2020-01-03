@@ -98,9 +98,8 @@ OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info) {
 
 
 #ifdef BUILD_WITH_AI
-OCGAPI int32_t get_ai_going_first_second(ptr pduel, char* deckname) {
-	duel* pd = (duel*)pduel;
-	lua_State* L = pd->lua->lua_state;
+OCGAPI int32_t get_ai_going_first_second(OCG_Duel duel, char* deckname) {
+	lua_State* L = DUEL->lua->lua_state;
 	lua_getglobal(L, "OnAIGoingFirstSecond");
 	int result = 1; //by default ai goes first
 
@@ -109,8 +108,8 @@ OCGAPI int32_t get_ai_going_first_second(ptr pduel, char* deckname) {
 		lua_pushstring(L, deckname);
 
 		if(lua_pcall(L, 1, 1, 0) != 0) {
-			sprintf(pd->strbuffer, "%s", lua_tostring(L, -1));
-			handle_message(pd, 1);
+			sprintf(DUEL->strbuffer, "%s", lua_tostring(L, -1));
+			DUEL->handle_message(DUEL->handle_message_payload, DUEL->strbuffer, OCG_LOG_TYPE_FROM_AI);
 		}
 
 		result = (int)lua_tointeger(L, -1);
@@ -119,10 +118,9 @@ OCGAPI int32_t get_ai_going_first_second(ptr pduel, char* deckname) {
 
 	return result;
 }
-OCGAPI void set_player_going_first_second(ptr pduel, int32_t first, char* deckname) {
-	duel* pd = (duel*)pduel;
-	if(pd) {
-		lua_State* L = pd->lua->lua_state;
+OCGAPI void set_player_going_first_second(OCG_Duel duel, int32_t first, char* deckname) {
+	if(duel) {
+		lua_State* L = DUEL->lua->lua_state;
 		lua_getglobal(L, "OnPlayerGoingFirstSecond");
 		int result = 1; //by default ai goes first
 
@@ -134,21 +132,20 @@ OCGAPI void set_player_going_first_second(ptr pduel, int32_t first, char* deckna
 			lua_pushstring(L, deckname);
 
 			if(lua_pcall(L, 2, 0, 0) != 0) {
-				sprintf(pd->strbuffer, "%s", lua_tostring(L, -1));
-				handle_message(pd, 1);
+				sprintf(DUEL->strbuffer, "%s", lua_tostring(L, -1));
+				DUEL->handle_message(DUEL->handle_message_payload, DUEL->strbuffer, OCG_LOG_TYPE_FROM_AI);
 			}
 		}
 	}
 }
-OCGAPI void set_ai_id(ptr pduel, int playerid) {
-	duel* pd = (duel*)pduel;
+OCGAPI void set_ai_id(OCG_Duel duel, int playerid) {
 
 	//reset the values first
-	pd->game_field->player[0].isAI = false;
-	pd->game_field->player[1].isAI = false;
+	DUEL->game_field->player[0].isAI = false;
+	DUEL->game_field->player[1].isAI = false;
 
-	pd->game_field->player[playerid].isAI = true;
-	pd->game_field->player[1 - playerid].isAI = false;
+	DUEL->game_field->player[playerid].isAI = true;
+	DUEL->game_field->player[1 - playerid].isAI = false;
 }
 #endif //BUILD_WITH_AI
 
@@ -184,13 +181,13 @@ OCGAPI void OCG_StartDuel(OCG_Duel duel) {
 		}
 	}
 #ifdef BUILD_WITH_AI
-	lua_State* L = pd->lua->lua_state;
+	lua_State* L = DUEL->lua->lua_state;
 	lua_getglobal(L, "OnStartOfDuel");
 
 	if(!lua_isnil(L, -1)) {
 		if(lua_pcall(L, 0, 0, 0) != 0) {
-			sprintf(pd->strbuffer, "%s", lua_tostring(L, -1));
-			handle_message(pd, 1);
+			sprintf(DUEL->strbuffer, "%s", lua_tostring(L, -1));
+			DUEL->handle_message(DUEL->handle_message_payload, DUEL->strbuffer, OCG_LOG_TYPE_FROM_AI);
 		}
 	}
 #endif //BUILD_WITH_AI

@@ -608,6 +608,32 @@ public:
 	static int32 debug_reload_field_end(lua_State *L);
 	static int32 debug_set_ai_name(lua_State *L);
 	static int32 debug_show_hint(lua_State *L);
+
+#ifdef BUILD_WITH_AI
+	//ai
+	static int32 chat_message(lua_State *L);
+	static int32 get_opp_extra_deck(lua_State *L);
+	static int32 get_ai_extra_deck(lua_State *L);
+	static int32 get_opp_main_deck(lua_State *L);
+	static int32 get_ai_main_deck(lua_State *L);
+	static int32 get_opp_monster_zones(lua_State *L);
+	static int32 get_ai_monster_zones(lua_State *L);
+	static int32 get_opp_st_zones(lua_State *L);
+	static int32 get_ai_st_zones(lua_State *L);
+	static int32 get_opp_graveyard(lua_State *L);
+	static int32 get_ai_graveyard(lua_State *L);
+	static int32 get_player_lp(lua_State *L);
+	static int32 get_ai_banished(lua_State *L);
+	static int32 get_opp_banished(lua_State *L);
+	static int32 get_ai_hand(lua_State *L);
+	static int32 get_opp_hand(lua_State *L);
+	static int32 get_phase(lua_State *L);
+	static int32 get_targeted_cards(lua_State *L);
+	static int32 get_last_summoned_cards(lua_State *L);
+	static int32 get_script_from_card_object(lua_State *L);
+	static int32 get_card_object_from_script(lua_State *L);
+	static int32 get_card_name(lua_State *L);
+#endif
 };
 
 #endif /* SCRIPTLIB_H_ */
