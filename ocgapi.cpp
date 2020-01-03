@@ -98,7 +98,7 @@ OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info) {
 
 
 #ifdef BUILD_WITH_AI
-OCGAPI int32_t get_ai_going_first_second(OCG_Duel duel, char* deckname) {
+OCGAPI int32_t OCG_GetAIFirstSecondResult(OCG_Duel duel, char* deckname) {
 	lua_State* L = DUEL->lua->lua_state;
 	lua_getglobal(L, "OnAIGoingFirstSecond");
 	int result = 1; //by default ai goes first
@@ -118,34 +118,28 @@ OCGAPI int32_t get_ai_going_first_second(OCG_Duel duel, char* deckname) {
 
 	return result;
 }
-OCGAPI void set_player_going_first_second(OCG_Duel duel, int32_t first, char* deckname) {
-	if(duel) {
-		lua_State* L = DUEL->lua->lua_state;
-		lua_getglobal(L, "OnPlayerGoingFirstSecond");
-		int result = 1; //by default ai goes first
+OCGAPI void OCG_NonAIPlayerFirstOrSecond(OCG_Duel duel, int32_t first, char* deckname) {
+	lua_State* L = DUEL->lua->lua_state;
+	lua_getglobal(L, "OnPlayerGoingFirstSecond");
+	int result = 1; //by default ai goes first
 
-		if(!lua_isnil(L, -1)) {
-			/* the first argument: first or second */
-			lua_pushnumber(L, first);
+	if(!lua_isnil(L, -1)) {
+		/* the first argument: first or second */
+		lua_pushinteger(L, first);
 
-			/* the second argument: ai deckname */
-			lua_pushstring(L, deckname);
+		/* the second argument: ai deckname */
+		lua_pushstring(L, deckname);
 
-			if(lua_pcall(L, 2, 0, 0) != 0) {
-				sprintf(DUEL->strbuffer, "%s", lua_tostring(L, -1));
-				DUEL->handle_message(DUEL->handle_message_payload, DUEL->strbuffer, OCG_LOG_TYPE_FROM_AI);
-			}
+		if(lua_pcall(L, 2, 0, 0) != 0) {
+			sprintf(DUEL->strbuffer, "%s", lua_tostring(L, -1));
+			DUEL->handle_message(DUEL->handle_message_payload, DUEL->strbuffer, OCG_LOG_TYPE_FROM_AI);
 		}
 	}
 }
-OCGAPI void set_ai_id(OCG_Duel duel, int playerid) {
-
-	//reset the values first
-	DUEL->game_field->player[0].isAI = false;
-	DUEL->game_field->player[1].isAI = false;
-
-	DUEL->game_field->player[playerid].isAI = true;
-	DUEL->game_field->player[1 - playerid].isAI = false;
+OCGAPI void OCG_SetAIPlayer(OCG_Duel duel, uint32_t playerid, int32_t is_ai) {
+	if(playerid > 1)
+		return;
+	DUEL->game_field->player[playerid].isAI = !!is_ai;
 }
 #endif //BUILD_WITH_AI
 

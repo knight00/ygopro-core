@@ -25,9 +25,9 @@ OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info);
 OCGAPI void OCG_StartDuel(OCG_Duel duel);
 
 #ifdef BUILD_WITH_AI
-OCGAPI int32_t get_ai_going_first_second(OCG_Duel duel, char* deckname);
-OCGAPI void set_player_going_first_second(OCG_Duel duel, int32_t first, char* deckname);
-OCGAPI void set_ai_id(OCG_Duel duel, int playerid);
+OCGAPI int32_t OCG_GetAIFirstSecondResult(OCG_Duel duel, char* deckname);
+OCGAPI void OCG_NonAIPlayerFirstOrSecond(OCG_Duel duel, int32_t first, char* deckname);
+OCGAPI void OCG_SetAIPlayer(OCG_Duel duel, uint32_t playerid, int32_t is_ai);
 #endif //BUILD_WITH_AI
 
 /*** DUEL PROCESSING AND QUERYING ***/
