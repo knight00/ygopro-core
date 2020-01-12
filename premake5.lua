@@ -4,6 +4,7 @@ local ocgcore_config=function()
 	optimize "Speed"
 	cppdialect "C++14"
 	defines "LUA_COMPAT_5_2"
+	defines "BUILD_WITH_AI"
 
 	filter "system:not windows"
 		buildoptions { "-Wno-unused-parameter", "-pedantic" }

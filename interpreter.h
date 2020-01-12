@@ -78,6 +78,8 @@ public:
 	static void print_stacktrace(lua_State* L);
 
 #ifdef BUILD_WITH_AI
+	static int get_linked_cards(lua_State *L);
+	static int get_mutual_linked_cards(lua_State *L);
 	static int get_counter(lua_State *L);
 	static int is_affected_by(lua_State *L);
 	static int is_affectable_by_chain(lua_State *L);

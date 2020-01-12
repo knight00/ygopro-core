@@ -13,6 +13,64 @@
 #include "interpreter.h"
 #include <cmath>
 #ifdef BUILD_WITH_AI
+int interpreter::get_linked_cards(lua_State *L) {
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	card* c;
+	//int32 returnval = 0;
+	int counter = 1;
+
+	for(auto cit = pduel->cards.begin(); cit != pduel->cards.end(); ++cit) {
+		c = *cit;
+		if(c->cardid == cardid) {
+			card::card_set cset;
+			c->get_linked_cards(&cset);
+			for(auto cit = cset.begin(); cit != cset.end();) {
+				lua_pushnumber(L, counter);
+				auto rm = cit++;
+				pduel->game_field->set_card_to_lua_without_index(L, (*rm), pduel, 0, true);
+				counter++;
+			}
+			break;
+		}
+	}
+	//lua_pushnumber(L, returnval);
+
+	return 1;
+}
+int interpreter::get_mutual_linked_cards(lua_State *L) {
+	lua_pushstring(L, "cardid");
+	lua_gettable(L, -2);
+	int cardid = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	duel* pduel = interpreter::get_duel_info(L);
+	card* c;
+	//int32 returnval = 0;
+	int counter = 1;
+
+	for(auto cit = pduel->cards.begin(); cit != pduel->cards.end(); ++cit) {
+		c = *cit;
+		if(c->cardid == cardid) {
+			card::card_set cset;
+			c->get_mutual_linked_cards(&cset);
+			for(auto cit = cset.begin(); cit != cset.end();) {
+				lua_pushnumber(L, counter);
+				auto rm = cit++;
+				pduel->game_field->set_card_to_lua_without_index(L, (*rm), pduel, 0, true);
+				counter++;
+			}
+			break;
+		}
+	}
+	//lua_pushnumber(L, returnval);
+
+	return 1;
+}
 int interpreter::get_counter(lua_State *L) {
 	int32 countertype = lua_tointeger(L, 2);
 	lua_pop(L, 1);

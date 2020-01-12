@@ -75,6 +75,12 @@ void field::set_card_to_lua_without_index(void* LL, card* pcard, duel* pduel, ui
 	lua_pushstring(L, "rank");
 	lua_pushnumber(L, pcard->get_rank());
 	lua_settable(L, -3);
+	lua_pushstring(L, "link");
+	lua_pushnumber(L, pcard->get_link());
+	lua_settable(L, -3);
+	lua_pushstring(L, "link_markers");
+	lua_pushnumber(L, pcard->get_link_marker());
+	lua_settable(L, -3);
 	lua_pushstring(L, "attribute");
 	lua_pushnumber(L, pcard->get_attribute());
 	lua_settable(L, -3);
@@ -122,6 +128,27 @@ void field::set_card_to_lua_without_index(void* LL, card* pcard, duel* pduel, ui
 		set_card_to_lua_without_index(L, pcard->xyz_materials[w], pduel);
 		lua_settable(L, -3);
 	}
+	lua_settable(L, -3);
+
+	card_set cset;
+	pcard->get_linked_cards(&cset);
+
+	lua_pushstring(L, "linked_cards_count");
+	lua_pushnumber(L, cset.size());
+	lua_settable(L, -3);
+
+	lua_pushstring(L, "get_linked_cards");
+	lua_pushcfunction(L, interpreter::get_linked_cards);
+	lua_settable(L, -3);
+
+	pcard->get_mutual_linked_cards(&cset);
+
+	lua_pushstring(L, "mtual_linked_cards_count");
+	lua_pushnumber(L, cset.size());
+	lua_settable(L, -3);
+
+	lua_pushstring(L, "get_mtual_linked_cards");
+	lua_pushcfunction(L, interpreter::get_mutual_linked_cards);
 	lua_settable(L, -3);
 
 	lua_pushstring(L, "get_counter");
@@ -241,6 +268,12 @@ void field::set_card_to_lua(void* LL, card* pcard, int i, uint32 description) {
 	lua_pushstring(L, "rank");
 	lua_pushnumber(L, pcard->get_rank());
 	lua_settable(L, -3);
+	lua_pushstring(L, "link");
+	lua_pushnumber(L, pcard->get_link());
+	lua_settable(L, -3);
+	lua_pushstring(L, "link_markers");
+	lua_pushnumber(L, pcard->get_link_marker());
+	lua_settable(L, -3);
 	lua_pushstring(L, "attribute");
 	lua_pushnumber(L, pcard->get_attribute());
 	lua_settable(L, -3);
@@ -287,6 +320,27 @@ void field::set_card_to_lua(void* LL, card* pcard, int i, uint32 description) {
 	for(size_t w = 0; w < pcard->xyz_materials.size(); w++) {
 		set_card_to_lua(L, pcard->xyz_materials[w], w + 1);
 	}
+	lua_settable(L, -3);
+
+	card_set cset;
+	pcard->get_linked_cards(&cset);
+
+	lua_pushstring(L, "linked_cards_count");
+	lua_pushnumber(L, cset.size());
+	lua_settable(L, -3);
+
+	lua_pushstring(L, "get_linked_cards");
+	lua_pushcfunction(L, interpreter::get_linked_cards);
+	lua_settable(L, -3);
+
+	pcard->get_mutual_linked_cards(&cset);
+
+	lua_pushstring(L, "mtual_linked_cards_count");
+	lua_pushnumber(L, cset.size());
+	lua_settable(L, -3);
+
+	lua_pushstring(L, "get_mtual_linked_cards");
+	lua_pushcfunction(L, interpreter::get_mutual_linked_cards);
 	lua_settable(L, -3);
 
 	lua_pushstring(L, "get_counter");
