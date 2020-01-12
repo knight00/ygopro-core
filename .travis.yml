@@ -8,7 +8,7 @@ env:
   - BUILD_CONFIG=Release
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
   - DEPLOY_DIR=ocgcore
-  - DEPLOY_BRANCH=travis-core-$TRAVIS_OS_NAME
+  - DEPLOY_BRANCH=$TRAVIS_BRANCH-core-$TRAVIS_OS_NAME
 matrix:
   include:
   - name: "Windows 10"
@@ -21,11 +21,11 @@ matrix:
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc
-    env: DEPLOY_BRANCH=travis-core-$TRAVIS_OS_NAME-gcc7
+    env: DEPLOY_BRANCH=$TRAVIS_BRANCH-core-$TRAVIS_OS_NAME-gcc7
   - name: "Bionic LLVM7"
     os: linux
     compiler: clang
-    env: DEPLOY_BRANCH=travis-core-$TRAVIS_OS_NAME-llvm7
+    env: DEPLOY_BRANCH=$TRAVIS_BRANCH-core-$TRAVIS_OS_NAME-llvm7
   - name: "Mojave"
     os: osx
     osx_image: xcode10.3
@@ -39,6 +39,7 @@ deploy:
   script: bash ./travis/deploy.sh
   on:
     repo: edo9300/ygopro-core
+    branch: test
 #- provider: releases
 #  api_key: $OAUTH_TOKEN
 #  overwrite: true
