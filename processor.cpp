@@ -3924,6 +3924,9 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		// Draw, new ruling
 		if(is_flag(DUEL_1ST_TURN_DRAW) || (infos.turn_id > 1)) {
 			int32 count = get_draw_count(infos.turn_player);
+			if(is_flag(DUEL_RUSH)) {
+				count = 5 - player[turn_player].list_hand.size();
+			}
 			if(count > 0) {
 				draw(0, REASON_RULE, turn_player, turn_player, count);
 				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
