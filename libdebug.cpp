@@ -472,6 +472,8 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 	if(pduel->game_field->is_location_useable(playerid, location, sequence)) {
 		card* pcard = pduel->new_card(code);
 		pcard->owner = owner;
+		if(location == LOCATION_EXTRA && position == 0)
+			position = POS_FACEDOWN_DEFENSE;
 		pcard->sendto_param.position = position;
 		if(location == LOCATION_PZONE) {
 			int32 seq = pduel->game_field->get_pzone_index(sequence);
@@ -590,25 +592,16 @@ int32 scriptlib::debug_reload_field_begin(lua_State *L) {
 	if (!rule)
 		rule = 3;
 	pduel->clear();
+#define CHECK(MR) case MR : { flag |= DUEL_MODE_MR##MR; break; }
 	if(rule && !build) {
 		switch (rule) {
-		case 1: {
-			flag |= DUEL_MODE_MR1;
-			break;
+		CHECK(1)
+		CHECK(2)
+		CHECK(3)
+		CHECK(4)
+		CHECK(5)
 		}
-		case 2: {
-			flag |= DUEL_MODE_MR2;
-			break;
-		}
-		case 3: {
-			flag |= DUEL_MODE_MR3;
-			break;
-		}
-		case 4: {
-			flag |= DUEL_MODE_MR4;
-			break;
-		}
-		}
+#undef CHECK
 	} else if (flag & DUEL_OBSOLETE_RULING) {
 		flag |= DUEL_MODE_MR1;
 		pduel->game_field->core.duel_options = flag;
@@ -652,5 +645,10 @@ int32 scriptlib::debug_show_hint(lua_State *L) {
 	message->write<uint16>(len);
 	message->write((void*)pstr, len);
 	message->write<uint8>(0);
+	return 0;
+}
+
+int32 scriptlib::debug_print_stacktrace(lua_State * L) {
+	interpreter::print_stacktrace(L);
 	return 0;
 }

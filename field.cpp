@@ -433,23 +433,96 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	}
 	add_card(playerid, pcard, location, sequence, pzone);
 }
-void field::swap_card(card* pcard1, card* pcard2) {
+void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new_sequence2) {
 	uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
 	uint8 l1 = pcard1->current.location, l2 = pcard2->current.location;
 	uint8 s1 = pcard1->current.sequence, s2 = pcard2->current.sequence;
-	remove_card(pcard1);
-	remove_card(pcard2);
-	add_card(p2, pcard1, l2, s2);
-	add_card(p1, pcard2, l1, s1);
-	for (auto& pmatcard : pcard1->xyz_materials)
-		pmatcard->current.controler = p2;
-	for (auto& pmatcard : pcard2->xyz_materials)
-		pmatcard->current.controler = p1;
-	auto message = pduel->new_message(MSG_SWAP);
-	message->write<uint32>(pcard1->data.code);
-	message->write(pcard2->get_info_location());
-	message->write<uint32>(pcard2->data.code);
-	message->write(pcard1->get_info_location());
+	loc_info info1 = pcard1->get_info_location(), info2 = pcard2->get_info_location();
+	if(!(l1 & LOCATION_ONFIELD) || !(l2 & LOCATION_ONFIELD))
+		return;
+	if(new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1)
+		|| new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2))
+		return;
+	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
+		return;
+	if(l1 == l2) {
+		pcard1->previous.controler = p1;
+		pcard1->previous.location = l1;
+		pcard1->previous.sequence = s1;
+		pcard1->previous.position = pcard1->current.position;
+		pcard1->previous.pzone = pcard1->current.pzone;
+		pcard1->current.controler = p2;
+		pcard1->current.location = l2;
+		pcard1->current.sequence = new_sequence2;
+		pcard2->previous.controler = p2;
+		pcard2->previous.location = l2;
+		pcard2->previous.sequence = s2;
+		pcard2->previous.position = pcard2->current.position;
+		pcard2->previous.pzone = pcard2->current.pzone;
+		pcard2->current.controler = p1;
+		pcard2->current.location = l1;
+		pcard2->current.sequence = new_sequence1;
+		if(p1 != p2) {
+			pcard1->fieldid = infos.field_id++;
+			pcard2->fieldid = infos.field_id++;
+		}
+		if(l1 == LOCATION_MZONE) {
+			player[p1].list_mzone[s1] = 0;
+			player[p1].used_location &= ~(1 << s1);
+			player[p2].list_mzone[s2] = 0;
+			player[p2].used_location &= ~(1 << s2);
+			player[p2].list_mzone[new_sequence2] = pcard1;
+			player[p2].used_location |= 1 << new_sequence2;
+			player[p1].list_mzone[new_sequence1] = pcard2;
+			player[p1].used_location |= 1 << new_sequence1;
+		} else if(l1 == LOCATION_SZONE) {
+			player[p1].list_szone[s1] = 0;
+			player[p1].used_location &= ~(256 << s1);
+			player[p2].list_szone[s2] = 0;
+			player[p2].used_location &= ~(256 << s2);
+			player[p2].list_szone[new_sequence2] = pcard1;
+			player[p2].used_location |= 256 << new_sequence2;
+			player[p1].list_szone[new_sequence1] = pcard2;
+			player[p1].used_location |= 256 << new_sequence1;
+		}
+	} else {
+		remove_card(pcard1);
+		remove_card(pcard2);
+		add_card(p2, pcard1, l2, new_sequence2);
+		add_card(p1, pcard2, l1, new_sequence1);
+	}
+	if(s1 == new_sequence1 && s2 == new_sequence2) {
+		auto message = pduel->new_message(MSG_SWAP);
+		message->write<uint32>(pcard1->data.code);
+		message->write(info1);
+		message->write<uint32>(pcard2->data.code);
+		message->write(info2);
+	} else if(s1 == new_sequence1) {
+		auto message = pduel->new_message(MSG_MOVE);
+		message->write<uint32>(pcard1->data.code);
+		message->write(info1);
+		message->write(pcard1->get_info_location());
+		message->write<uint32>(0);
+		message = pduel->new_message(MSG_MOVE);
+		message->write<uint32>(pcard2->data.code);
+		message->write(info2);
+		message->write(pcard2->get_info_location());
+		message->write<uint32>(0);
+	} else {
+		auto message = pduel->new_message(MSG_MOVE);
+		message->write<uint32>(pcard2->data.code);
+		message->write(info2);
+		message->write(pcard2->get_info_location());
+		message->write<uint32>(0);
+		message = pduel->new_message(MSG_MOVE);
+		message->write<uint32>(pcard1->data.code);
+		message->write(info1);
+		message->write(pcard1->get_info_location());
+		message->write<uint32>(0);
+	}
+}
+void field::swap_card(card* pcard1, card* pcard2) {
+	return swap_card(pcard1, pcard2, pcard1->current.sequence, pcard2->current.sequence);
 }
 // add EFFECT_SET_CONTROL
 void field::set_control(card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count) {
@@ -655,7 +728,6 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);
 	uint32 linked_zone = get_linked_zone(playerid) | (1u << 5) | (1u << 6);
-	flag = flag | ~zone | ~linked_zone;
 	if(player[playerid].list_mzone[5] && is_location_useable(playerid, LOCATION_MZONE, 6)
 		&& check_extra_link(playerid, pcard, 6)) {
 		flag |= 1u << 5;
@@ -670,6 +742,8 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 		if(!is_location_useable(playerid, LOCATION_MZONE, 6))
 			flag |= 1u << 6;
 	}
+	uint32 rule_zone = get_rule_zone_fromex(playerid, pcard);
+	flag = flag | ~zone | ~rule_zone;
 	if(list)
 		*list = flag & 0x7f;
 	int32 count = 5 - field_used_count[flag & 0x1f];
@@ -758,6 +832,16 @@ int32 field::get_forced_zones(card* pcard, uint8 playerid, uint8 location, uint3
 	else
 		(res >>= 16 )&= 0xff;
 	return res;
+}
+uint32 field::get_rule_zone_fromex(int32 playerid, card* pcard) {
+	if(is_flag(DUEL_EMZONE)) {
+		if(!is_flag(DUEL_FSX_MMZONE) || !pcard || (pcard->data.type & (TYPE_LINK)) || (pcard->is_position(POS_FACEUP) && (pcard->data.type & TYPE_PENDULUM)))
+			return get_linked_zone(playerid) | (1u << 5) | (1u << 6);
+		else
+			return 0x7f;
+	} else {
+		return 0x1f;
+	}
 }
 uint32 field::get_linked_zone(int32 playerid, bool free) {
 	uint32 zones = 0;
@@ -1282,11 +1366,6 @@ void field::remove_oath_effect(effect* reason_effect) {
 void field::reset_phase(uint32 phase) {
 	for(auto eit = effects.pheff.begin(); eit != effects.pheff.end();) {
 		auto rm = eit++;
-		// work around: skip turn still raise reset_phase(PHASE_END)
-		// without this taking control only for one turn will be returned when skipping turn
-		// RESET_TURN_END should be introduced
-		//if((*rm)->code == EFFECT_SET_CONTROL)
-		//	continue;
 		if((*rm)->reset(phase, RESET_PHASE)) {
 			if((*rm)->is_flag(EFFECT_FLAG_FIELD_ONLY))
 				remove_effect((*rm));
@@ -1772,12 +1851,6 @@ void field::get_xyz_material(card* scard, int32 findex, uint32 lv, int32 maxc, g
 			        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL) && (findex == 0 || pduel->lua->check_matching(pcard, findex, 0)))
 				core.xmaterial_lst.emplace((xyz_level >> 12) & 0xf, pcard);
 		}
-	}
-	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-		if(maxc > (int32)core.xmaterial_lst.size())
-			maxc = (int32)core.xmaterial_lst.size();
-		auto iter = core.xmaterial_lst.lower_bound(maxc);
-		core.xmaterial_lst.erase(core.xmaterial_lst.begin(), iter);
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset, group* pgroup) {
@@ -2810,11 +2883,11 @@ int32 field::is_chain_disabled(uint8 chaincount) {
 	if(pchain->flag & CHAIN_DISABLE_EFFECT)
 		return TRUE;
 	card* pcard = pchain->triggering_effect->get_handler();
-	effect_set eset;
-	pcard->filter_effect(EFFECT_DISABLE_CHAIN, &eset);
-	for(effect_set::size_type i = 0; i < eset.size(); ++i) {
-		if(eset[i]->get_value() == pchain->chain_id) {
-			eset[i]->reset_flag |= RESET_CHAIN;
+	auto rg = pcard->single_effect.equal_range(EFFECT_DISABLE_CHAIN);
+	for(; rg.first != rg.second; ++rg.first) {
+		effect* peffect = rg.first->second;
+		if(peffect->get_value() == pchain->chain_id) {
+			peffect->reset_flag |= RESET_CHAIN;
 			return TRUE;
 		}
 	}

@@ -157,6 +157,7 @@ public:
 #define EFFECT_TYPE_CONTINUOUS 0x0800
 #define EFFECT_TYPE_XMATERIAL  0x1000
 #define EFFECT_TYPE_GRANT      0x2000
+#define EFFECT_TYPE_TARGET     0x4000
 
 //========== Flags ==========
 enum effect_flag : uint32 {
@@ -365,6 +366,9 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EFFECT_PIERCE                       203
 #define EFFECT_BATTLE_DESTROY_REDIRECT      204
 #define EFFECT_BATTLE_DAMAGE_TO_EFFECT      205
+#define EFFECT_BOTH_BATTLE_DAMAGE           206
+#define EFFECT_ALSO_BATTLE_DAMAGE           207
+#define EFFECT_CHANGE_BATTLE_DAMAGE         208
 #define EFFECT_TOSS_COIN_REPLACE            220
 #define EFFECT_TOSS_DICE_REPLACE            221
 #define EFFECT_FUSION_MATERIAL              230
@@ -383,8 +387,8 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EFFECT_EXTRA_RITUAL_MATERIAL        243
 #define EFFECT_NONTUNER                     244
 #define EFFECT_OVERLAY_REMOVE_REPLACE       245
-#define EFFECT_SCRAP_CHIMERA                246
-#define EFFECT_TUNE_MAGICIAN_X              247
+//#define EFFECT_SCRAP_CHIMERA                246
+//#define EFFECT_TUNE_MAGICIAN_X              247
 #define EFFECT_CANNOT_BE_MATERIAL           248
 #define EFFECT_PRE_MONSTER                  250
 #define EFFECT_MATERIAL_CHECK               251
@@ -534,4 +538,6 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EVENT_REMOVE_COUNTER        0x20000
 #define EVENT_CUSTOM                0x10000000
 
+#define DOUBLE_DAMAGE				0x80000000
+#define HALF_DAMAGE					0x80000001
 #endif /* EFFECT_H_ */

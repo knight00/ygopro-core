@@ -380,6 +380,7 @@ public:
 	void add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence, uint8 pzone = FALSE);
 	void remove_card(card* pcard);
 	void move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence, uint8 pzone = FALSE);
+	void swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new_sequence2);
 	void swap_card(card* pcard1, card* pcard2);
 	void set_control(card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count);
 	card* get_field_card(uint32 playerid, uint32 location, uint32 sequence);
@@ -395,6 +396,7 @@ public:
 	int32 get_mzone_limit(uint8 playerid, uint8 uplayer, uint32 reason);
 	int32 get_szone_limit(uint8 playerid, uint8 uplayer, uint32 reason);
 	int32 get_forced_zones(card* pcard, uint8 playerid, uint8 location, uint32 uplayer, uint32 reason);
+	uint32 get_rule_zone_fromex(int32 playerid, card* pcard);
 	uint32 get_linked_zone(int32 playerid, bool free = false);
 	void get_linked_cards(uint8 self, uint8 location1, uint8 location2, card_set* cset);
 	int32 check_extra_link(int32 playerid, card* pcard, int32 sequence);
@@ -713,15 +715,15 @@ public:
 
 #define GLOBALFLAG_DECK_REVERSE_CHECK	0x1
 #define GLOBALFLAG_BRAINWASHING_CHECK	0x2
-#define GLOBALFLAG_SCRAP_CHIMERA		0x4
+//#define GLOBALFLAG_SCRAP_CHIMERA		0x4
 //#define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
 #define GLOBALFLAG_DETACH_EVENT			0x10
-#define GLOBALFLAG_MUST_BE_SMATERIAL	0x20
+//#define GLOBALFLAG_MUST_BE_SMATERIAL	0x20
 #define GLOBALFLAG_SPSUMMON_COUNT		0x40
-#define GLOBALFLAG_XMAT_COUNT_LIMIT		0x80
+//#define GLOBALFLAG_XMAT_COUNT_LIMIT		0x80
 #define GLOBALFLAG_SELF_TOGRAVE			0x100
 #define GLOBALFLAG_SPSUMMON_ONCE		0x200
-#define GLOBALFLAG_TUNE_MAGICIAN		0x400
+//#define GLOBALFLAG_TUNE_MAGICIAN		0x400
 //
 #define PROCESSOR_FLAG_END		0
 #define PROCESSOR_FLAG_WAITING	0x1
