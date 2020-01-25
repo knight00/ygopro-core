@@ -176,14 +176,14 @@ static const struct luaL_Reg cardlib[] = {
 	{ "CanBeDestroyed", scriptlib::card_can_be_destroyed },
 	{ "CanBeNormalSummonSet", scriptlib::card_can_be_normal_summon_set },
 	{ "CanBeFusionSummoned", scriptlib::card_can_be_fusion_summoned },
-	{ "IsSpecialSummonable", scriptlib::card_is_special_summonable }, // Would be translated to CanBeSpecialSummoned, but see line 186
+	{ "IsSpecialSummonMonster", scriptlib::card_is_special_summon_monster },
 	{ "CanBeSynchroSummoned", scriptlib::card_can_be_synchro_summoned },
 	{ "CanBeXyzSummoned", scriptlib::card_can_be_xyz_summoned },
 	{ "CanBeLinkSummoned", scriptlib::card_can_be_link_summoned },
 	{ "CanBeNormalSummoned", scriptlib::card_can_be_normal_summoned },
 	{ "IsMSetable", scriptlib::card_is_msetable },
 	{ "IsSSetable", scriptlib::card_is_ssetable },
-	{ "IsCanBeSpecialSummoned", scriptlib::card_is_can_be_special_summoned }, // Conflicts with line 179
+	{ "CanBeSpecialSummoned", scriptlib::card_can_be_special_summoned },
 	{ "IsAbleToHand", scriptlib::card_is_able_to_hand },
 	{ "IsAbleToDeck", scriptlib::card_is_able_to_deck },
 	{ "IsAbleToExtra", scriptlib::card_is_able_to_extra },

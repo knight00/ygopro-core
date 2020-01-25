@@ -183,12 +183,12 @@ public:
 	static int32 card_can_be_fusion_summoned(lua_State* L);
 	static int32 card_is_msetable(lua_State *L);
 	static int32 card_is_ssetable(lua_State *L);
-	static int32 card_is_special_summonable(lua_State *L);
+	static int32 card_is_special_summon_monster(lua_State *L);
 	static int32 card_can_be_synchro_summoned(lua_State *L);
 	static int32 card_can_be_xyz_summoned(lua_State *L);
 	static int32 card_can_be_link_summoned(lua_State *L);
 	static int32 card_can_be_normal_summoned(lua_State *L);
-	static int32 card_is_can_be_special_summoned(lua_State *L);
+	static int32 card_can_be_special_summoned(lua_State *L);
 	static int32 card_is_able_to_hand(lua_State *L);
 	static int32 card_is_able_to_grave(lua_State *L);
 	static int32 card_is_able_to_deck(lua_State *L);

@@ -2005,7 +2005,7 @@ int32 scriptlib::card_is_ssetable(lua_State *L) {
 	lua_pushboolean(L, pcard->is_setable_szone(p, ign));
 	return 1;
 }
-int32 scriptlib::card_is_special_summonable(lua_State *L) {
+int32 scriptlib::card_is_special_summon_monster(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2116,7 +2116,7 @@ int32 scriptlib::card_can_be_normal_summoned(lua_State *L) {
 	lua_pushboolean(L, pcard->is_can_be_summoned(p, ign, peffect, minc, zone));
 	return 1;
 }
-int32 scriptlib::card_is_can_be_special_summoned(lua_State *L) {
+int32 scriptlib::card_can_be_special_summoned(lua_State *L) {
 	check_param_count(L, 6);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	check_param(L, PARAM_TYPE_EFFECT, 2);
