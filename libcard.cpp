@@ -1358,7 +1358,7 @@ int32 scriptlib::card_remove_overlay_card(lua_State *L) {
 	int32 reason = lua_tointeger(L, 5);
 	duel* pduel = pcard->pduel;
 	pduel->game_field->remove_overlay_card(reason, pgroup, playerid, 0, 0, min, max);
-	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
+	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 /*status*/, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
 		lua_pushinteger(L, pduel->game_field->returns.at<int32>(0));
 		return 1;
@@ -2649,7 +2649,7 @@ int32 scriptlib::card_remove_counter(lua_State *L) {
 		return 0;
 	} else {
 		pduel->game_field->remove_counter(reason, pcard, rplayer, 0, 0, countertype, count);
-		return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
+		return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 /*status*/, lua_KContext ctx) {
 			duel* pduel = (duel*)ctx;
 			lua_pushboolean(L, pduel->game_field->returns.at<int32>(0));
 			return 1;
@@ -2983,7 +2983,7 @@ int32 scriptlib::card_add_monster_attribute(lua_State *L) {
 	}
 	return 0;
 }
-int32 scriptlib::card_add_monster_attribute_complete(lua_State *L) {
+int32 scriptlib::card_add_monster_attribute_complete(lua_State* /*L*/) {
 	return 0;
 }
 int32 scriptlib::card_cancel_to_grave(lua_State *L) {

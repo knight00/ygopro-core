@@ -309,8 +309,8 @@ OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t * length) {
 	return query.data();
 }
 
-void DefaultLogHandler(void* payload, const char* string, int type) {
+void DefaultLogHandler(void* /*payload*/, const char* /*string*/, int /*type*/) {
 }
 
-void DefaultCardReaderDone(void* payload) {
+void DefaultCardReaderDone(void* /*payload*/) {
 }

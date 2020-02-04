@@ -3296,7 +3296,7 @@ int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_pla
 	}
 	return TRUE;
 }
-int32 field::destroy_replace(uint16 step, group* targets, card* target, uint8 battle) {
+int32 field::destroy_replace(uint16 /*step*/, group* targets, card* target, uint8 battle) {
 	if(target->current.location & (LOCATION_GRAVE | LOCATION_REMOVED)) {
 		target->current.reason = target->temp.reason;
 		target->current.reason_effect = target->temp.reason_effect;
@@ -3651,7 +3651,7 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 	}
 	return TRUE;
 }
-int32 field::release_replace(uint16 step, group* targets, card* target) {
+int32 field::release_replace(uint16 /*step*/, group* targets, card* target) {
 	if(!(target->current.location & (LOCATION_ONFIELD | LOCATION_HAND))) {
 		target->current.reason = target->temp.reason;
 		target->current.reason_effect = target->temp.reason_effect;
@@ -3741,7 +3741,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 	}
 	return TRUE;
 }
-int32 field::send_replace(uint16 step, group * targets, card * target) {
+int32 field::send_replace(uint16 /*step*/, group * targets, card * target) {
 	uint8 playerid = target->sendto_param.playerid;
 	uint8 dest = target->sendto_param.location;
 	if(targets->container.find(target) == targets->container.end())

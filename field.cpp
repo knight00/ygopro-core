@@ -792,7 +792,7 @@ int32 field::get_szone_limit(uint8 playerid, uint8 uplayer, uint32 reason) {
 	int32 limit = max - field_used_count[used_flag];
 	return limit;
 }
-int32 field::get_forced_zones(card* pcard, uint8 playerid, uint8 location, uint32 uplayer, uint32 reason) {
+int32 field::get_forced_zones(card* pcard, uint8 playerid, uint8 location, uint32 uplayer, uint32 /*reason*/) {
 	if(location != LOCATION_MZONE)
 		return 0xff;
 	effect_set eset;
@@ -2702,7 +2702,9 @@ int32 field::is_player_can_place_counter(uint8 playerid, card * pcard, uint16 co
 		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		if (pduel->lua->check_condition(eset[i]->target, 3))
+		pduel->lua->add_param(countertype, PARAM_TYPE_INT);
+		pduel->lua->add_param(count, PARAM_TYPE_INT);
+		if (pduel->lua->check_condition(eset[i]->target, 5))
 			return FALSE;
 	}
 	return TRUE;

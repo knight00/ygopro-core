@@ -2358,7 +2358,7 @@ void card::release_relation(effect* peffect) {
 	}
 	relate_effect.erase(std::make_pair(peffect, (uint16)0));
 }
-int32 card::leave_field_redirect(uint32 reason) {
+int32 card::leave_field_redirect(uint32 /*reason*/) {
 	effect_set es;
 	uint32 redirect;
 	if(data.type & TYPE_TOKEN)
@@ -2375,7 +2375,7 @@ int32 card::leave_field_redirect(uint32 reason) {
 	}
 	return 0;
 }
-int32 card::destination_redirect(uint8 destination, uint32 reason) {
+int32 card::destination_redirect(uint8 destination, uint32 /*reason*/) {
 	effect_set es;
 	uint32 redirect;
 	if(data.type & TYPE_TOKEN)
@@ -3918,7 +3918,7 @@ int32 card::is_capable_change_position(uint8 playerid) {
 		return FALSE;
 	return TRUE;
 }
-int32 card::is_capable_change_position_by_effect(uint8 playerid) {
+int32 card::is_capable_change_position_by_effect(uint8 /*playerid*/) {
 	if((data.type & TYPE_LINK) && (data.type & TYPE_MONSTER))
 		return FALSE;
 	return TRUE;
@@ -4013,7 +4013,7 @@ int32 card::is_can_be_fusion_material(card* fcard, uint32 summon_type) {
 	}
 	return TRUE;
 }
-int32 card::is_can_be_synchro_material(card* scard, uint8 playerid, card* tuner) {
+int32 card::is_can_be_synchro_material(card* scard, uint8 playerid, card* /*tuner*/) {
 	if(data.type & (TYPE_XYZ | TYPE_LINK) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
 		return FALSE;
 	if(!(get_type(scard, SUMMON_TYPE_SYNCHRO, playerid) & TYPE_MONSTER))
