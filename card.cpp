@@ -1616,19 +1616,19 @@ int32 card::is_extra_link_state() {
 int32 card::is_position(int32 pos) {
 	return current.position & pos;
 }
-void card::set_status(uint32 status, int32 enabled) {
+void card::set_status(uint32 _status, int32 enabled) {
 	if (enabled)
-		this->status |= status;
+		this->status |= _status;
 	else
-		this->status &= ~status;
+		this->status &= ~_status;
 }
 // match at least 1 status
-int32 card::get_status(uint32 status) {
-	return this->status & status;
+int32 card::get_status(uint32 _status) {
+	return this->status & _status;
 }
 // match all status
-int32 card::is_status(uint32 status) {
-	if ((this->status & status) == status)
+int32 card::is_status(uint32 _status) {
+	if ((this->status & _status) == _status)
 		return TRUE;
 	return FALSE;
 }

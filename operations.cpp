@@ -1298,42 +1298,41 @@ int32 field::self_destroy(uint16 step, card* ucard, int32 p) {
 			ucard->unique_fieldid = (*cit)->fieldid;
 		} else {
 			core.select_cards.clear();
-			uint8 player = p;
+			uint8 _player = p;
 			for(auto& pcard : cset) {
-				if(pcard->current.controler == player && pcard->unique_fieldid != UINT_MAX)
+				if(pcard->current.controler == _player && pcard->unique_fieldid != UINT_MAX)
 					core.select_cards.push_back(pcard);
 			}
 			if(core.select_cards.size() == 0) {
-				player = 1 - p;
+				_player = 1 - p;
 				for(auto& pcard : cset) {
-					if(pcard->current.controler == player && pcard->unique_fieldid != UINT_MAX)
+					if(pcard->current.controler == _player && pcard->unique_fieldid != UINT_MAX)
 						core.select_cards.push_back(pcard);
 				}
 			}
 			if(core.select_cards.size() == 0) {
-				player = p;
+				_player = p;
 				for(auto& pcard : cset) {
-					if(pcard->current.controler == player)
+					if(pcard->current.controler == _player)
 						core.select_cards.push_back(pcard);
 				}
 			}
 			if(core.select_cards.size() == 0) {
-				player = 1 - p;
+				_player = 1 - p;
 				for(auto& pcard : cset) {
-					if(pcard->current.controler == player)
+					if(pcard->current.controler == _player)
 						core.select_cards.push_back(pcard);
 				}
 			}
 			if(core.select_cards.size() == 1) {
 				return_cards.clear();
 				return_cards.list.push_back(core.select_cards.front());
-			}
-			else {
+			} else {
 				auto message = pduel->new_message(MSG_HINT);
 				message->write<uint8>(HINT_SELECTMSG);
-				message->write<uint8>(player);
+				message->write<uint8>(_player);
 				message->write<uint32>(534);
-				add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, player, 0x10001);
+				add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, _player, 0x10001);
 			}
 			return FALSE;
 		}
