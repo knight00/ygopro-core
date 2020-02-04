@@ -224,8 +224,8 @@ public:
 	int32 add_effect(effect* peffect);
 	void remove_effect(effect* peffect);
 	void remove_effect(effect* peffect, effect_container::iterator it);
-	int32 copy_effect(uint32 code, uint32 reset, uint32 count);
-	int32 replace_effect(uint32 code, uint32 reset, uint32 count);
+	int32 copy_effect(uint32 code, uint32 reset, uint8 count);
+	int32 replace_effect(uint32 code, uint32 reset, uint8 count);
 	void reset(uint32 id, uint32 reset_type);
 	void reset_effect_count();
 	void refresh_disable_status();
@@ -247,7 +247,7 @@ public:
 	int32 add_counter(uint8 playerid, uint16 countertype, uint16 count, uint8 singly);
 	int32 remove_counter(uint16 countertype, uint16 count);
 	int32 is_can_add_counter(uint8 playerid, uint16 countertype, uint16 count, uint8 singly, uint32 loc);
-	int32 get_counter(uint16 countertype);
+	uint16 get_counter(uint16 countertype);
 	void set_material(card_set* materials);
 	void add_card_target(card* pcard);
 	void cancel_card_target(card* pcard);
@@ -274,8 +274,8 @@ public:
 
 	int32 check_unique_code(card* pcard);
 	void get_unique_target(card_set* cset, int32 controler, card* icard = 0);
-	int32 check_cost_condition(int32 ecode, int32 playerid);
-	int32 check_cost_condition(int32 ecode, int32 playerid, int32 sumtype);
+	int32 check_cost_condition(int32 ecode, int8 playerid);
+	int32 check_cost_condition(int32 ecode, int8 playerid, int32 sumtype);
 	int32 is_summonable_card();
 	int32 is_fusion_summonable_card(uint32 summon_type);
 	int32 is_spsummonable(effect* peffect);

@@ -80,7 +80,7 @@ public:
 	int32 is_immuned(card* pcard);
 	int32 is_chainable(uint8 tp);
 	int32 reset(uint32 reset_level, uint32 reset_type);
-	void dec_count(uint32 playerid = 2);
+	void dec_count(uint8 playerid = 2);
 	void recharge();
 	uint8 get_client_mode() const;
 	int32 get_value(uint32 extraargs = 0);

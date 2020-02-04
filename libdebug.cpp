@@ -24,12 +24,12 @@ int32 scriptlib::debug_message(lua_State *L) {
 int32 scriptlib::debug_add_card(lua_State *L) {
 	check_param_count(L, 6);
 	duel* pduel = interpreter::get_duel_info(L);
-	int32 code = lua_tointeger(L, 1);
-	int32 owner = lua_tointeger(L, 2);
-	int32 playerid = lua_tointeger(L, 3);
-	int32 location = lua_tointeger(L, 4);
-	int32 sequence = lua_tointeger(L, 5);
-	int32 position = lua_tointeger(L, 6);
+	int32 code = lua_casted(L, 1, int32);
+	uint8 owner = lua_casted(L, 2, uint8);
+	uint8 playerid = lua_casted(L, 3, uint8);
+	int32 location = lua_casted(L, 4, int32);
+	uint8 sequence = lua_casted(L, 5, uint8);
+	uint8 position = lua_casted(L, 6, uint8);
 	int32 proc = lua_toboolean(L, 7);
 	if(owner != 0 && owner != 1)
 		return 0;
@@ -42,13 +42,12 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 			position = POS_FACEDOWN_DEFENSE;
 		pcard->sendto_param.position = position;
 		if(location == LOCATION_PZONE) {
-			int32 seq = pduel->game_field->get_pzone_index(sequence);
+			uint8 seq = pduel->game_field->get_pzone_index(sequence);
 			pduel->game_field->add_card(playerid, pcard, LOCATION_SZONE, seq, TRUE);
 		} else if(location == LOCATION_FZONE) {
-			int32 loc = LOCATION_SZONE;
-			pduel->game_field->add_card(playerid, pcard, loc, 5);
+			pduel->game_field->add_card(playerid, pcard, LOCATION_SZONE, 5);
 		} else
-			pduel->game_field->add_card(playerid, pcard, location, sequence);
+			pduel->game_field->add_card(playerid, pcard, static_cast<uint8>(location), sequence);
 		pcard->current.position = position;
 		if(!(location & (LOCATION_ONFIELD | LOCATION_PZONE)) || (position & POS_FACEUP)) {
 			pcard->enable_field_effect(true);
@@ -80,10 +79,10 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 int32 scriptlib::debug_set_player_info(lua_State *L) {
 	check_param_count(L, 4);
 	duel* pduel = interpreter::get_duel_info(L);
-	uint32 playerid = lua_tointeger(L, 1);
-	uint32 lp = lua_tointeger(L, 2);
-	uint32 startcount = lua_tointeger(L, 3);
-	uint32 drawcount = lua_tointeger(L, 4);
+	uint8 playerid = lua_casted(L, 1, uint8);
+	uint32 lp = lua_casted(L, 2, uint32);
+	uint32 startcount = lua_casted(L, 3, uint32);
+	uint32 drawcount = lua_casted(L, 4, uint32);
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	pduel->game_field->player[playerid].lp = lp;
@@ -96,10 +95,10 @@ int32 scriptlib::debug_pre_summon(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	uint32 summon_type = lua_tointeger(L, 2);
+	uint32 summon_type = lua_casted(L, 2, uint32);
 	uint8 summon_location = 0;
 	if(lua_gettop(L) > 2)
-		summon_location = lua_tointeger(L, 3);
+		summon_location = lua_casted(L, 3, uint8);
 	pcard->summon_info = summon_type | (summon_location << 16);
 	return 0;
 }
@@ -134,8 +133,8 @@ int32 scriptlib::debug_pre_add_counter(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	uint32 countertype = lua_tointeger(L, 2);
-	uint32 count = lua_tointeger(L, 3);
+	uint32 countertype = lua_casted(L, 2, uint32);
+	uint16 count = lua_casted(L, 3, uint16);
 	uint16 cttype = countertype & ~COUNTER_NEED_ENABLE;
 	auto pr = pcard->counters.emplace(cttype, card::counter_map::mapped_type());
 	auto cmit = pr.first;
@@ -152,8 +151,8 @@ int32 scriptlib::debug_pre_add_counter(lua_State *L) {
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {
 	check_param_count(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
-	uint32 flag = lua_tointeger(L, 1);
-	int32 rule = lua_tointeger(L, 2);
+	uint32 flag = lua_casted(L, 1, uint32);
+	int32 rule = lua_casted(L, 2, int32);
 	bool build = lua_toboolean(L, 3);
 	if (!rule)
 		rule = 3;
@@ -191,7 +190,7 @@ int32 scriptlib::debug_set_ai_name(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	auto message = pduel->new_message(MSG_AI_NAME);
 	const char* pstr = lua_tostring(L, 1);
-	int len = strlen(pstr);
+	uint16 len = static_cast<uint16>(strlen(pstr));
 	if(len > 100)
 		len = 100;
 	message->write<uint16>(len);
@@ -205,7 +204,7 @@ int32 scriptlib::debug_show_hint(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	auto message = pduel->new_message(MSG_SHOW_HINT);
 	const char* pstr = lua_tostring(L, 1);
-	int len = strlen(pstr);
+	uint16 len = static_cast<uint16>(strlen(pstr));
 	if(len > 1024)
 		len = 1024;
 	message->write<uint16>(len);

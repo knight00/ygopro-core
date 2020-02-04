@@ -30,6 +30,8 @@ typedef int32_t BOOL;
 #define MATCH_ANY(x,y) ((x)&(y))
 #define ADD_BIT(x,y) ((x)|=(y))
 #define REMOVE_BIT(x,y) ((x)&=~(y))
+#define lua_casted(L,i,type) static_cast<type>(lua_tointeger(L, i))
+#define lua_casted_decl(L,i,value) static_cast<decltype(value)>(lua_tointeger(L, i))
 
 #define OPERATION_SUCCESS 1
 #define OPERATION_FAIL 0
