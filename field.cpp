@@ -2392,10 +2392,10 @@ int32 field::check_tribute(card* pcard, int32 min, int32 max, group* mg, uint8 t
 	int32 ct = get_tofield_count(pcard, toplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone);
 	if(ct <= 0 && max <= 0)
 		return FALSE;
-	for(auto& pcard : (static_cast<int>(ex_list.size()) >= min) ? ex_list : release_list) {
-		if(pcard->current.location == LOCATION_MZONE && pcard->current.controler == toplayer) {
+	for(auto& ppcard : (static_cast<int>(ex_list.size()) >= min) ? ex_list : release_list) {
+		if(ppcard->current.location == LOCATION_MZONE && ppcard->current.controler == toplayer) {
 			s++;
-			if((zone >> pcard->current.sequence) & 1)
+			if((zone >> ppcard->current.sequence) & 1)
 				ct++;
 		}
 	}
