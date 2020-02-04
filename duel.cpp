@@ -169,7 +169,7 @@ card_data const* duel::read_card(uint32_t code, card_data* copyable) {
 	return ret;
 }
 duel::duel_message::duel_message(uint8_t _message) :message(_message) {
-	write(message);
+	write<uint8_t>(message);
 }
 void duel::duel_message::write(void* buff, size_t size) {
 	const auto vec_size = data.size();
