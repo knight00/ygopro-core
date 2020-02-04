@@ -224,7 +224,7 @@ OCGAPI void* OCG_DuelQueryLocation(OCG_Duel duel, uint32_t* length, OCG_QueryInf
 		insert_value<int16>(DUEL->query_buffer, 0);
 	} else {
 		auto& player = DUEL->game_field->player[info.con];
-		field::card_vector* lst;
+		field::card_vector* lst = nullptr;
 		if(info.loc == LOCATION_MZONE)
 			lst = &player.list_mzone;
 		else if(info.loc == LOCATION_SZONE)
@@ -239,11 +239,13 @@ OCGAPI void* OCG_DuelQueryLocation(OCG_Duel duel, uint32_t* length, OCG_QueryInf
 			lst = &player.list_extra;
 		else if(info.loc == LOCATION_DECK)
 			lst = &player.list_main;
-		for(auto& pcard : *lst) {
-			if(pcard == nullptr) {
-				insert_value<int16>(DUEL->query_buffer, 0);
-			} else {
-				pcard->get_infos(info.flags);
+		if(lst) {
+			for(auto& pcard : *lst) {
+				if(pcard == nullptr) {
+					insert_value<int16>(DUEL->query_buffer, 0);
+				} else {
+					pcard->get_infos(info.flags);
+				}
 			}
 		}
 	}
