@@ -1446,7 +1446,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 		        (check_event(EVENT_SUMMON_SUCCESS, &e) || check_event(EVENT_SPSUMMON_SUCCESS, &e) || check_event(EVENT_FLIP_SUMMON_SUCCESS, &e))
 		        && e.reason_player == infos.turn_player) {
 			chain newchain;
-			tevent e;
+			e = tevent{};
 			e.event_cards = 0;
 			e.event_value = 0;
 			e.event_player = PLAYER_NONE;
@@ -2077,7 +2077,6 @@ int32 field::process_single_event(effect* peffect, const tevent& e, chain_list& 
 int32 field::process_idle_command(uint16 step) {
 	switch(step) {
 	case 0: {
-		effect* peffect;
 		bool must_attack = false;
 		core.select_chains.clear();
 		chain newchain;
@@ -2155,7 +2154,7 @@ int32 field::process_idle_command(uint16 step) {
 				core.select_chains.push_back(newchain);
 		}
 		for(auto eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end();) {
-			peffect = eit->second;
+			effect* peffect = eit->second;
 			++eit;
 			peffect->set_activate_location();
 			newchain.triggering_effect = peffect;
@@ -2416,7 +2415,6 @@ int32 field::process_idle_command(uint16 step) {
 int32 field::process_battle_command(uint16 step) {
 	switch(step) {
 	case 0: {
-		effect* peffect = 0;
 		core.select_chains.clear();
 		chain newchain;
 		nil_event.event_code = EVENT_FREE_CHAIN;
@@ -2427,13 +2425,14 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_player = FALSE;
 		core.attacker = 0;
 		core.attack_target = 0;
-		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) || core.force_turn_end) {
+		effect* skip_peffect = nullptr;
+		if((skip_peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) || core.force_turn_end) {
 			core.units.begin()->step = 41;
 			core.units.begin()->arg1 = 2;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
 				core.units.begin()->arg2 = 1;
 			else core.units.begin()->arg2 = 0;
-			if(core.force_turn_end || !peffect->value) {
+			if(core.force_turn_end || !skip_peffect->value) {
 				reset_phase(PHASE_BATTLE_STEP);
 				adjust_all();
 				infos.phase = PHASE_BATTLE;
@@ -3622,7 +3621,7 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 							}
 						}
 					}
-					effect_set eset;
+					eset.clear();
 					core.attacker->filter_effect(EFFECT_CHANGE_BATTLE_DAMAGE, &eset, FALSE);
 					core.attack_target->filter_effect(EFFECT_CHANGE_BATTLE_DAMAGE, &eset, FALSE);
 					filter_player_effect(pa, EFFECT_CHANGE_BATTLE_DAMAGE, &eset, FALSE);

@@ -965,10 +965,10 @@ void field::shuffle(uint8 playerid, uint8 location) {
 				for(auto& i : pcard->indexer) {
 					effect* peffect = i.first;
 					if(peffect->is_flag(EFFECT_FLAG_CLIENT_HINT) && !peffect->is_flag(EFFECT_FLAG_PLAYER_TARGET)) {
-						auto message = pduel->new_message(MSG_CARD_HINT);
-						message->write(pcard->get_info_location());
-						message->write<uint8>(CHINT_DESC_ADD);
-						message->write<uint64>(peffect->description);
+						auto mmessage = pduel->new_message(MSG_CARD_HINT);
+						mmessage->write(pcard->get_info_location());
+						mmessage->write<uint8>(CHINT_DESC_ADD);
+						mmessage->write<uint64>(peffect->description);
 					}
 				}
 			}
@@ -980,11 +980,11 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			card* ptop = svector.back();
 			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENSE)) {
-				auto message = pduel->new_message(MSG_DECK_TOP);
-				message->write<uint8>(playerid);
-				message->write<uint32>(0);
-				message->write<uint32>(ptop->data.code);
-				message->write<uint32>(ptop->current.position);
+				auto mmessage = pduel->new_message(MSG_DECK_TOP);
+				mmessage->write<uint8>(playerid);
+				mmessage->write<uint32>(0);
+				mmessage->write<uint32>(ptop->data.code);
+				mmessage->write<uint32>(ptop->current.position);
 			}
 		}
 	}
@@ -1914,7 +1914,7 @@ void field::adjust_self_destroy_set() {
 	if(core.selfdes_disabled || !core.unique_destroy_set.empty() || !core.self_destroy_set.empty() || !core.self_tograve_set.empty())
 		return;
 	int32 p = infos.turn_player;
-	for(int32 p1 = 0; p1 < 2; ++p1) {
+	for(int32 i = 0; i < 2; i++) {
 		std::vector<card*> uniq_set;
 		for(auto& ucard : core.unique_cards[p]) {
 			if(ucard->is_position(POS_FACEUP) && ucard->get_status(STATUS_EFFECT_ENABLED)
@@ -1938,12 +1938,12 @@ void field::adjust_self_destroy_set() {
 		p = 1 - p;
 	}
 	card_set cset;
-	for(uint8 p = 0; p < 2; ++p) {
-		for(auto& pcard : player[p].list_mzone) {
+	for(uint8 p1 = 0; p1 < 2; ++p1) {
+		for(auto& pcard : player[p1].list_mzone) {
 			if(pcard && pcard->is_position(POS_FACEUP) && !pcard->is_status(STATUS_BATTLE_DESTROYED))
 				cset.insert(pcard);
 		}
-		for(auto& pcard : player[p].list_szone) {
+		for(auto& pcard : player[p1].list_szone) {
 			if(pcard && pcard->is_position(POS_FACEUP))
 				cset.insert(pcard);
 		}

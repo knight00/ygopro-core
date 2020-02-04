@@ -440,14 +440,14 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 				message->write<uint32>(cv[i]->current.position);
 			}
 			if(core.deck_reversed && (public_count < drawed)) {
-				auto message = pduel->new_message(MSG_CONFIRM_CARDS);
-				message->write<uint8>(1 - playerid);
-				message->write<uint32>(drawed_set->size());
+				auto mmessage = pduel->new_message(MSG_CONFIRM_CARDS);
+				mmessage->write<uint8>(1 - playerid);
+				mmessage->write<uint32>(drawed_set->size());
 				for(auto& pcard : *drawed_set) {
-					message->write<uint32>(pcard->data.code);
-					message->write<uint8>(pcard->current.controler);
-					message->write<uint8>(pcard->current.location);
-					message->write<uint8>(pcard->current.sequence);
+					mmessage->write<uint32>(pcard->data.code);
+					mmessage->write<uint8>(pcard->current.controler);
+					mmessage->write<uint8>(pcard->current.location);
+					mmessage->write<uint8>(pcard->current.sequence);
 				}
 				shuffle(playerid, LOCATION_HAND);
 			}
@@ -553,8 +553,8 @@ int32 field::damage(uint16 step, effect* reason_effect, uint32 reason, uint8 rea
 		raise_event(reason_card, EVENT_DAMAGE, reason_effect, reason, reason_player, playerid, amount);
 		if(reason == REASON_BATTLE && reason_card) {
 			if((player[playerid].lp <= 0) && (core.attack_target == 0) && reason_card->is_affected_by_effect(EFFECT_MATCH_KILL) && !is_player_affected_by_effect(playerid, EFFECT_CANNOT_LOSE_LP)) {
-				auto message = pduel->new_message(MSG_MATCH_KILL);
-				message->write<uint32>(reason_card->data.code);
+				auto mmessage = pduel->new_message(MSG_MATCH_KILL);
+				mmessage->write<uint32>(reason_card->data.code);
 			}
 			raise_single_event(reason_card, 0, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, amount);
 			raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, amount);
@@ -2617,7 +2617,7 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 			pduel->game_field->player[toplayer].list_szone[seq] = pcard;
 			pcard->current.sequence = seq;
 		}
-		for(uint32 i = 0; i < ct; ++i) {
+		for(i = 0; i < ct; ++i) {
 			message->write(loc_info{});
 		}
 		return FALSE;
@@ -4588,7 +4588,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					pduel->lua->add_param(lreason, PARAM_TYPE_INT);
 					value = eset[i]->get_value(3);
 				} else {
-					uint32 lreason = (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+					lreason = (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 					pduel->lua->add_param(target->current.controler, PARAM_TYPE_INT);
 					pduel->lua->add_param(move_player, PARAM_TYPE_INT);
 					pduel->lua->add_param(lreason, PARAM_TYPE_INT);
@@ -5426,12 +5426,12 @@ int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player,
 				message->write<uint8>(core.dice_result[i]);
 			}
 			if(count2 > 0) {
-				auto message = pduel->new_message(MSG_TOSS_DICE);
-				message->write<uint8>(1 - playerid);
-				message->write<uint8>(count2);
+				auto mmessage = pduel->new_message(MSG_TOSS_DICE);
+				mmessage->write<uint8>(1 - playerid);
+				mmessage->write<uint8>(count2);
 				for(int32 i = 0; i < count2; ++i) {
 					core.dice_result[count1 + i] = pduel->get_next_integer(1, 6);
-					message->write<uint8>(core.dice_result[count1 + i]);
+					mmessage->write<uint8>(core.dice_result[count1 + i]);
 				}
 			}
 			raise_event((card*)0, EVENT_TOSS_DICE_NEGATE, reason_effect, 0, reason_player, playerid, count1 + (count2 << 16));

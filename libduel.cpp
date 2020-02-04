@@ -1045,11 +1045,11 @@ int32 scriptlib::duel_confirm_cards(lua_State *L) {
 		message->write<uint32>(pcard->current.sequence);
 	} else {
 		message->write<uint32>(pgroup->container.size());
-		for(auto& pcard : pgroup->container) {
-			message->write<uint32>(pcard->data.code);
-			message->write<uint8>(pcard->current.controler);
-			message->write<uint8>(pcard->current.location);
-			message->write<uint32>(pcard->current.sequence);
+		for(auto& ppcard : pgroup->container) {
+			message->write<uint32>(ppcard->data.code);
+			message->write<uint8>(ppcard->current.controler);
+			message->write<uint8>(ppcard->current.location);
+			message->write<uint32>(ppcard->current.sequence);
 		}
 	}
 	return lua_yield(L, 0);
@@ -1852,12 +1852,12 @@ int32 scriptlib::duel_disable_summon(lua_State *L) {
 		if((pcard->summon_info & SUMMON_TYPE_PENDULUM) != SUMMON_TYPE_PENDULUM)
 			pcard->set_status(STATUS_PROC_COMPLETE, FALSE);
 	} else {
-		for(auto& pcard : pgroup->container) {
-			sumplayer = pcard->summon_player;
-			pcard->set_status(STATUS_SUMMONING, FALSE);
-			pcard->set_status(STATUS_SUMMON_DISABLED, TRUE);
-			if((pcard->summon_info & SUMMON_TYPE_PENDULUM) != SUMMON_TYPE_PENDULUM)
-				pcard->set_status(STATUS_PROC_COMPLETE, FALSE);
+		for(auto& ppcard : pgroup->container) {
+			sumplayer = ppcard->summon_player;
+			ppcard->set_status(STATUS_SUMMONING, FALSE);
+			ppcard->set_status(STATUS_SUMMON_DISABLED, TRUE);
+			if((ppcard->summon_info & SUMMON_TYPE_PENDULUM) != SUMMON_TYPE_PENDULUM)
+				ppcard->set_status(STATUS_PROC_COMPLETE, FALSE);
 		}
 	}
 	uint32 event_code = 0;
@@ -3087,8 +3087,8 @@ int32 scriptlib::duel_set_target_card(lua_State *L) {
 			pcard->create_relation(*ch);
 		} else {
 			targets->container.insert(pgroup->container.begin(), pgroup->container.end());
-			for(auto& pcard : pgroup->container)
-				pcard->create_relation(*ch);
+			for(auto& ppcard : pgroup->container)
+				ppcard->create_relation(*ch);
 		}
 		if(peffect->is_flag(EFFECT_FLAG_CARD_TARGET)) {
 			if(pcard) {
@@ -3096,10 +3096,10 @@ int32 scriptlib::duel_set_target_card(lua_State *L) {
 				message->write<uint32>(1);
 				message->write(pcard->get_info_location());
 			} else {
-				for(auto& pcard : pgroup->container) {
+				for(auto& ppcard : pgroup->container) {
 					auto message = pduel->new_message(MSG_BECOME_TARGET);
 					message->write<uint32>(1);
-					message->write(pcard->get_info_location());
+					message->write(ppcard->get_info_location());
 				}
 			}
 		}

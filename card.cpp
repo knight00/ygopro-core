@@ -2852,7 +2852,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		return FALSE;
 	if(!ignore_count && !pduel->game_field->core.extra_summon[playerid]
 			&& pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid)) {
-		effect_set eset;
+		eset.clear();
 		filter_effect(EFFECT_EXTRA_SET_COUNT, &eset);
 		for(effect_set::size_type i = 0; i < eset.size(); ++i) {
 			std::vector<int32> retval;
