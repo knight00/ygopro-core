@@ -323,7 +323,7 @@ int32 card::is_set_card(uint32 set_code) {
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for(auto& setcode : setcodes) {
-		if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if ((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	//add set code
@@ -342,7 +342,7 @@ int32 card::is_set_card(uint32 set_code) {
 		return FALSE;
 	}
 	for(auto& setcode : setcodes) {
-		if((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	return FALSE;
@@ -351,7 +351,7 @@ int32 card::is_origin_set_card(uint32 set_code) {
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for (auto& setcode : data.setcodes) {
-		if((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	return FALSE;
@@ -365,13 +365,13 @@ int32 card::is_pre_set_card(uint32 set_code) {
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for(auto& setcode : setcodes) {
-		if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if ((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	//add set code
 	setcodes = previous.setcodes;
 	for(auto& setcode : setcodes) {
-		if((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	//another code
@@ -381,7 +381,7 @@ int32 card::is_pre_set_card(uint32 set_code) {
 		return FALSE;
 	}
 	for(auto& setcode : setcodes) {
-		if((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	}
 	return FALSE;
@@ -441,7 +441,7 @@ int32 card::is_sumon_set_card(uint32 set_code, card * scard, uint32 sumtype, uin
 	if (!changed && is_set_card(set_code))
 		return TRUE;
 	for (uint16 setcode : setcodes)
-		if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+		if ((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
 	return FALSE;
 }
@@ -1209,7 +1209,7 @@ uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 			if((lev & 0xfff) == lv || ((lev >> 16) & 0xfff) == lv)
 				return TRUE;
 		} else {
-			if(std::find(res.begin(), res.end(), lv) != res.end())
+			if(std::find(res.begin(), res.end(), (signed)lv) != res.end())
 				return TRUE;
 		}
 	}
