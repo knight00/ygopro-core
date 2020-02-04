@@ -63,7 +63,13 @@ OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info) {
 		if(game_field->is_location_useable(info.con, info.loc, info.seq)) {
 			card* pcard = DUEL->new_card(info.code);
 			pcard->owner = info.team;
-			game_field->add_card(info.con, pcard, info.loc, info.seq);
+			if(info.loc == LOCATION_PZONE) {
+				uint8_t seq = game_field->get_pzone_index(static_cast<uint8_t>(info.seq));
+				game_field->add_card(info.con, pcard, LOCATION_SZONE, seq, TRUE);
+			} else if(info.loc == LOCATION_FZONE) {
+				game_field->add_card(info.con, pcard, LOCATION_SZONE, 5);
+			} else
+				game_field->add_card(info.con, pcard, static_cast<uint8_t>(info.loc), static_cast<uint8_t>(info.seq));
 			pcard->current.position = info.pos;
 			if(!(info.loc & LOCATION_ONFIELD) || (info.pos & POS_FACEUP)) {
 				pcard->enable_field_effect(true);
@@ -86,7 +92,7 @@ OCGAPI void OCG_DuelNewCard(OCG_Duel duel, OCG_NewCardInfo info) {
 			player.extra_lists_hand.resize(info.duelist + 1);
 			player.extra_extra_p_count.resize(info.duelist + 1);
 		}
-		pcard->current.location = info.loc;
+		pcard->current.location = static_cast<uint8_t>(info.loc);
 		pcard->owner = info.team;
 		pcard->current.controler = info.team;
 		pcard->current.position = POS_FACEDOWN_DEFENSE;
@@ -115,7 +121,7 @@ OCGAPI void OCG_StartDuel(OCG_Duel duel) {
 	const int p1start_count = game_field->player[1].start_count;
 	if(p1start_count > 0)
 		game_field->draw(0, REASON_RULE, PLAYER_NONE, 1, p1start_count);
-	for(int p = 0; p < 2; p++) {
+	for(uint8_t p = 0; p < 2; p++) {
 		auto list_size = game_field->player[p].extra_lists_main.size();
 		for(decltype(list_size) l = 0; l < list_size; l++) {
 			auto& main = game_field->player[p].extra_lists_main[l];
@@ -268,7 +274,7 @@ OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t * length) {
 		for(auto& pcard : player.list_mzone) {
 			if(pcard) {
 				insert_value<int8_t>(query, 1);
-				insert_value<int8_t>(query, pcard->current.position);
+				insert_value<int8_t>(query, static_cast<int8_t>(pcard->current.position));
 				insert_value<int32_t>(query, pcard->xyz_materials.size());
 			} else {
 				insert_value<int8_t>(query, 0);
@@ -277,7 +283,7 @@ OCGAPI void * OCG_DuelQueryField(OCG_Duel duel, uint32_t * length) {
 		for(auto& pcard : player.list_szone) {
 			if(pcard) {
 				insert_value<int8_t>(query, 1);
-				insert_value<int8_t>(query, pcard->current.position);
+				insert_value<int8_t>(query, static_cast<int8_t>(pcard->current.position));
 				insert_value<int32_t>(query, pcard->xyz_materials.size());
 			} else {
 				insert_value<int8_t>(query, 0);

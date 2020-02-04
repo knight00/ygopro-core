@@ -82,11 +82,11 @@ public:
 		uint32 findcard(card* pcard);
 	};
 	struct sendto_param_t {
-		void set(uint8 p, uint8 pos, uint8 loc, uint8 seq = 0) {
+		void set(uint8 p, uint32 pos, uint32 loc, uint32 seq = 0) {
 			playerid = p;
-			position = pos;
-			location = loc;
-			sequence = seq;
+			position = static_cast<uint8>(pos);
+			location = static_cast<uint8>(loc);
+			sequence = static_cast<uint8>(seq);
 		}
 		void clear() {
 			playerid = 0;
