@@ -4601,7 +4601,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				}
 			}
 			effect* teffect;
-			if((teffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER))) {
+			if((teffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER)) != nullptr) {
 				uint32 type = teffect->value;
 				if(type & TYPE_TRAP)
 					type |= TYPE_TRAPMONSTER | target->data.type;

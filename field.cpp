@@ -2306,7 +2306,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 	if(!chain_attack && pcard->announce_count > extra_count
 		&& (!extra_count_m || pcard->announce_count > extra_count_m || pcard->announced_cards.findcard(0))) {
 		effect* peffect;
-		if((peffect = pcard->is_affected_by_effect(EFFECT_ATTACK_ALL)) && pcard->attack_all_target) {
+		if((peffect = pcard->is_affected_by_effect(EFFECT_ATTACK_ALL)) != nullptr && pcard->attack_all_target) {
 			for(auto& atarget : *pv) {
 				if(!atarget)
 					continue;

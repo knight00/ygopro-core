@@ -2058,7 +2058,7 @@ int32 field::process_single_event(effect* peffect, const tevent& e, chain_list& 
 		peffect->set_active_type();
 		phandler->create_relation(newchain);
 		effect* deffect;
-		if((deffect = phandler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))) {
+		if((deffect = phandler->is_affected_by_effect(EFFECT_DISABLE_EFFECT)) != nullptr) {
 			effect* negeff = pduel->new_effect();
 			negeff->owner = deffect->owner;
 			negeff->type = EFFECT_TYPE_SINGLE;
@@ -2426,7 +2426,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.attacker = 0;
 		core.attack_target = 0;
 		effect* skip_peffect = nullptr;
-		if((skip_peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) || core.force_turn_end) {
+		if((skip_peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) != nullptr || core.force_turn_end) {
 			core.units.begin()->step = 41;
 			core.units.begin()->arg1 = 2;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
@@ -3113,7 +3113,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->current.reason_player = core.attack_target->current.controler;
 			uint32 dest = LOCATION_GRAVE;
 			uint32 seq = 0;
-			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attacker->data.type & TYPE_MONSTER)) {
+			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) != nullptr && (core.attacker->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attacker);
 				seq = dest >> 16;
 				dest &= 0xffff;
@@ -3134,7 +3134,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->current.reason_player = core.attacker->current.controler;
 			uint32 dest = LOCATION_GRAVE;
 			uint32 seq = 0;
-			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attack_target->data.type & TYPE_MONSTER)) {
+			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) != nullptr && (core.attack_target->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attack_target);
 				seq = dest >> 16;
 				dest &= 0xffff;
@@ -3574,9 +3574,9 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 						}
 					}
 					effect* reflect[2] = {};
-					if(!(reflect[pd] = core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker)))
+					if((reflect[pd] = core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker)) == nullptr)
 						reflect[pd] = is_player_affected_by_effect(pd, EFFECT_REFLECT_BATTLE_DAMAGE);
-					if(!(reflect[1 - pd] = core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target)))
+					if((reflect[1 - pd] = core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target)) == nullptr)
 						reflect[1 - pd] = is_player_affected_by_effect(1 - pd, EFFECT_REFLECT_BATTLE_DAMAGE);
 					bool also[2] = { false, false };
 					if(!both
@@ -3684,7 +3684,7 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 		}
 	}
 	if(reason_card && !pierce
-		&& !(damchange = reason_card->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT))) {
+		&& (damchange = reason_card->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT)) == nullptr) {
 		card* dam_card = (reason_card == core.attacker) ? core.attack_target : core.attacker;
 		bool both = false;
 		if(reason_card->is_affected_by_effect(EFFECT_BOTH_BATTLE_DAMAGE)
@@ -3693,9 +3693,9 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 			both = true;
 		}
 		effect* reflect[2] = {};
-		if(!dam_card || !(reflect[damp] = dam_card->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, reason_card)))
+		if(!dam_card || (reflect[damp] = dam_card->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, reason_card)) == nullptr)
 			reflect[damp] = is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE);
-		if(!(reflect[1 - damp] = reason_card->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, dam_card)))
+		if((reflect[1 - damp] = reason_card->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, dam_card)) == nullptr)
 			reflect[1 - damp] = is_player_affected_by_effect(1 - damp, EFFECT_REFLECT_BATTLE_DAMAGE);
 		bool also[2] = { false, false };
 		if(!both
@@ -4300,7 +4300,7 @@ int32 field::add_chain(uint16 step) {
 		peffect->effect_owner = clit.triggering_player;
 		// DISABLE_CHAIN should be check before cost
 		effect* deffect;
-		if(!peffect->is_flag(EFFECT_FLAG_FIELD_ONLY) && phandler->is_has_relation(clit) && (deffect = phandler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))) {
+		if(!peffect->is_flag(EFFECT_FLAG_FIELD_ONLY) && phandler->is_has_relation(clit) && (deffect = phandler->is_affected_by_effect(EFFECT_DISABLE_EFFECT)) != nullptr) {
 			effect* negeff = pduel->new_effect();
 			negeff->owner = deffect->owner;
 			negeff->type = EFFECT_TYPE_SINGLE;

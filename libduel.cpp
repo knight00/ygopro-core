@@ -1885,7 +1885,7 @@ int32 scriptlib::duel_increase_summon_count(lua_State *L) {
 	}
 	duel* pduel = interpreter::get_duel_info(L);
 	uint32 playerid = pduel->game_field->core.reason_player;
-	if(pcard && (pextra = pcard->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT)))
+	if(pcard && (pextra = pcard->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT)) != nullptr)
 		pextra->get_value(pcard);
 	else
 		pduel->game_field->core.summon_count[playerid]++;
