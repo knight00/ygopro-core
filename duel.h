@@ -51,10 +51,9 @@ public:
 		duel_message(uint8_t _message);
 		void write(void* buff, size_t size);
 		void write(loc_info loc);
-		template<typename T, typename T2>
-		void write(T2 data) {
-			auto val = static_cast<T>(data);
-			write(&val, sizeof(T));
+		template<typename T>
+		inline void write(T data) {
+			write(&data, sizeof(T));
 		}
 	};
 	typedef std::set<card*, card_sort> card_set;
