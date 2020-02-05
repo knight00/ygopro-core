@@ -913,7 +913,7 @@ int32 field::announce_card(int16 step, uint8 playerid) {
 	if(step == 0) {
 		auto message = pduel->new_message(MSG_ANNOUNCE_CARD);
 		message->write<uint8>(playerid);
-		message->write<uint8>(static_cast<uint8>(core.select_options.size()));
+		message->write(static_cast<uint8>(core.select_options.size()));
 		for(auto& option : core.select_options)
 			message->write<uint64>(option);
 		return FALSE;
@@ -936,7 +936,7 @@ int32 field::announce_number(int16 step, uint8 playerid) {
 	if(step == 0) {
 		auto message = pduel->new_message(MSG_ANNOUNCE_NUMBER);
 		message->write<uint8>(playerid);
-		message->write<uint8>(static_cast<uint8>(core.select_options.size()));
+		message->write(static_cast<uint8>(core.select_options.size()));
 		for(auto& option : core.select_options)
 			message->write<uint64>(option);
 		return FALSE;
