@@ -428,7 +428,6 @@ static const struct luaL_Reg duellib[] = {
 	{ "Activate", scriptlib::duel_activate_effect },
 	{ "SetChainLimit", scriptlib::duel_set_chain_limit },
 	{ "SetChainLimitTillChainEnd", scriptlib::duel_set_chain_limit_p },
-	{ "GetChainMaterial", scriptlib::duel_get_chain_material },
 	{ "ConfirmDecktop", scriptlib::duel_confirm_decktop },
 	{ "ConfirmExtratop", scriptlib::duel_confirm_extratop },
 	{ "ConfirmCards", scriptlib::duel_confirm_cards },

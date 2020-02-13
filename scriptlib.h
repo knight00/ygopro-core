@@ -428,7 +428,6 @@ public:
 	static int32 duel_activate_effect(lua_State *L);
 	static int32 duel_set_chain_limit(lua_State *L);
 	static int32 duel_set_chain_limit_p(lua_State *L);
-	static int32 duel_get_chain_material(lua_State *L);
 	static int32 duel_confirm_decktop(lua_State *L);
 	static int32 duel_confirm_extratop(lua_State *L);
 	static int32 duel_confirm_cards(lua_State *L);

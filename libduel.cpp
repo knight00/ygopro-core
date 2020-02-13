@@ -913,19 +913,6 @@ int32 scriptlib::duel_set_chain_limit_p(lua_State *L) {
 	pduel->game_field->core.chain_limit_p.emplace_back(f, pduel->game_field->core.reason_player);
 	return 0;
 }
-int32 scriptlib::duel_get_chain_material(lua_State *L) {
-	check_param_count(L, 1);
-	int32 playerid = lua_tointeger(L, 1);
-	if(playerid != 0 && playerid != 1)
-		return 0;
-	duel* pduel = interpreter::get_duel_info(L);
-	effect_set eset;
-	pduel->game_field->filter_player_effect(playerid, EFFECT_CHAIN_MATERIAL, &eset);
-	if(!eset.size())
-		return 0;
-	interpreter::effect2value(L, eset[0]);
-	return 1;
-}
 int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 	check_param_count(L, 2);
 	int32 playerid = lua_tointeger(L, 1);
