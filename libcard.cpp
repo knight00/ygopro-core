@@ -612,14 +612,14 @@ int32 scriptlib::card_get_owner(lua_State *L) {
 	lua_pushinteger(L, pcard->owner);
 	return 1;
 }
-int32 scriptlib::card_get_controler(lua_State *L) {
+int32 scriptlib::card_get_controller(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->current.controler);
 	return 1;
 }
-int32 scriptlib::card_get_previous_controler(lua_State *L) {
+int32 scriptlib::card_get_previous_controller(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1625,7 +1625,7 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 	lua_pushinteger(L, id);
 	return 1;
 }
-int32 scriptlib::card_is_has_effect(lua_State *L) {
+int32 scriptlib::card_has_effect(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1974,7 +1974,7 @@ int32 scriptlib::card_can_be_fusion_summoned(lua_State *L) {
 	lua_pushboolean(L, pcard->is_fusion_summonable_card(summon_type));
 	return 1;
 }
-int32 scriptlib::card_is_msetable(lua_State *L) {
+int32 scriptlib::card_can_set_in_mzone(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1994,7 +1994,7 @@ int32 scriptlib::card_is_msetable(lua_State *L) {
 	lua_pushboolean(L, pcard->is_setable_mzone(p, ign, peffect, minc, zone));
 	return 1;
 }
-int32 scriptlib::card_is_ssetable(lua_State *L) {
+int32 scriptlib::card_can_set_in_szone(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2141,7 +2141,7 @@ int32 scriptlib::card_can_be_special_summoned(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_hand(lua_State *L) {
+int32 scriptlib::card_can_send_to_hand(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2152,7 +2152,7 @@ int32 scriptlib::card_is_able_to_hand(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_grave(lua_State *L) {
+int32 scriptlib::card_can_send_to_grave(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2163,7 +2163,7 @@ int32 scriptlib::card_is_able_to_grave(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_deck(lua_State *L) {
+int32 scriptlib::card_can_send_to_deck(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2174,7 +2174,7 @@ int32 scriptlib::card_is_able_to_deck(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_extra(lua_State *L) {
+int32 scriptlib::card_can_send_to_extra(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2185,7 +2185,7 @@ int32 scriptlib::card_is_able_to_extra(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_remove(lua_State *L) {
+int32 scriptlib::card_can_be_banished(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2204,7 +2204,7 @@ int32 scriptlib::card_is_able_to_remove(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_hand_as_cost(lua_State *L) {
+int32 scriptlib::card_can_send_to_hand_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2215,7 +2215,7 @@ int32 scriptlib::card_is_able_to_hand_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_grave_as_cost(lua_State *L) {
+int32 scriptlib::card_can_send_to_grave_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2226,7 +2226,7 @@ int32 scriptlib::card_is_able_to_grave_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_deck_as_cost(lua_State *L) {
+int32 scriptlib::card_can_send_to_deck_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2237,7 +2237,7 @@ int32 scriptlib::card_is_able_to_deck_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_extra_as_cost(lua_State *L) {
+int32 scriptlib::card_can_send_to_extra_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2248,7 +2248,7 @@ int32 scriptlib::card_is_able_to_extra_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_deck_or_extra_as_cost(lua_State *L) {
+int32 scriptlib::card_can_send_to_deck_or_extra_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2260,7 +2260,7 @@ int32 scriptlib::card_is_able_to_deck_or_extra_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_able_to_remove_as_cost(lua_State *L) {
+int32 scriptlib::card_can_be_banished_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2356,7 +2356,7 @@ int32 scriptlib::card_is_faceup(lua_State *L) {
 	lua_pushboolean(L, pcard->is_position(POS_FACEUP));
 	return 1;
 }
-int32 scriptlib::card_is_attack_pos(lua_State *L) {
+int32 scriptlib::card_is_attack_position(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2370,7 +2370,7 @@ int32 scriptlib::card_is_facedown(lua_State *L) {
 	lua_pushboolean(L, pcard->is_position(POS_FACEDOWN));
 	return 1;
 }
-int32 scriptlib::card_is_defense_pos(lua_State *L) {
+int32 scriptlib::card_is_defense_position(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -2393,7 +2393,7 @@ int32 scriptlib::card_is_pre_position(lua_State *L) {
 	lua_pushboolean(L, pcard->previous.position & pos);
 	return 1;
 }
-int32 scriptlib::card_is_controler(lua_State *L) {
+int32 scriptlib::card_is_controller(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -3131,7 +3131,7 @@ int32 scriptlib::card_assume_prop(lua_State *L) {
 	pcard->pduel->assumes.insert(pcard);
 	return 0;
 }
-int32 scriptlib::card_set_spsummon_once(lua_State *L) {
+int32 scriptlib::card_set_special_summon_once(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);

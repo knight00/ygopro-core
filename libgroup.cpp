@@ -118,7 +118,7 @@ int32 scriptlib::group_get_first(lua_State *L) {
 		lua_pushnil(L);
 	return 1;
 }
-int32 scriptlib::group_take_at_pos(lua_State *L) {
+int32 scriptlib::group_at(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	group* pgroup = *(group**)lua_touserdata(L, 1);
@@ -370,7 +370,7 @@ int32 scriptlib::group_random_select(lua_State *L) {
 	interpreter::group2value(L, newgroup);
 	return 1;
 }
-int32 scriptlib::group_is_exists(lua_State *L) {
+int32 scriptlib::group_exists(lua_State *L) {
 	check_param_count(L, 4);
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	check_param(L, PARAM_TYPE_FUNCTION, 2);
@@ -827,7 +827,7 @@ int32 scriptlib::group_less_equal_than(lua_State * L) {
 	lua_pushboolean(L, pgroup->container.size() <= sgroup->container.size());
 	return 1;
 }
-int32 scriptlib::group_is_contains(lua_State *L) {
+int32 scriptlib::group_contains(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	check_param(L, PARAM_TYPE_CARD, 2);
