@@ -204,6 +204,14 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 	return static_cast<effect_flag>(static_cast<uint32>(flag1) | static_cast<uint32>(flag2));
 }
 //========== Codes ==========
+//////////kdiy/////////
+#define EFFECT_GOD_IMMUNE				    500
+#define EFFECT_OVERINFINITE_ATTACK			503
+#define EFFECT_OVERINFINITE_DEFENSE			504
+#define EFFECT_ONETURN_IMMUNE				505
+#define EFFECT_ULTIMATE_IMMUNE				506
+#define EFFECT_MUST_BE_MATERIAL				507
+//////////kdiy/////////
 #define EFFECT_IMMUNE_EFFECT                1
 #define EFFECT_DISABLE                      2
 #define EFFECT_CANNOT_DISABLE               3
