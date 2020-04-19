@@ -3545,11 +3545,19 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 			if(a > d) {
 				damp = pd;
 				core.battle_damage[damp] = a - d;
+				//////////kdiy/////////
+				if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
+					core.battle_damage[damp] = 1000000;
+				//////////kdiy/////////
 				reason_card = core.attacker;
 				bd[1] = TRUE;
 			} else if(a < d) {
 				damp = pa;
 				core.battle_damage[damp] = d - a;
+				//////////kdiy/////////
+				if ((d >= 999999 && a < 999999) || (d > 999999 && a == 999999))
+					core.battle_damage[damp] = 1000000;
+				//////////kdiy/////////		
 				reason_card = core.attack_target;
 				bd[0] = TRUE;
 			} else {
@@ -3568,9 +3576,25 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 					for(uint32 i = 0; i < eset.size(); ++i)
 						dp[1 - eset[i]->get_handler_player()] = 1;
 					if(dp[0])
-						core.battle_damage[0] = a - d;
+					//////////kdiy/////////
+					    //core.battle_damage[0] = a - d;
+					{
+						if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
+							core.battle_damage[0] = 1000000;
+						else
+							core.battle_damage[0] = a - d;
+					}
+					//////////kdiy/////////		
 					if(dp[1])
-						core.battle_damage[1] = a - d;
+					//////////kdiy/////////	
+						//core.battle_damage[1] = a - d;
+					{
+						if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
+							core.battle_damage[1] = 1000000;
+						else
+							core.battle_damage[1] = a - d;
+					}
+					//////////kdiy/////////	
 					bool double_damage = false;
 					//bool half_damage = false;
 					for(uint32 i = 0; i < eset.size(); ++i) {
@@ -3704,6 +3728,10 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 			} else if(a < d) {
 				damp = pa;
 				core.battle_damage[damp] = d - a;
+				//////////kdiy/////////
+				if ((d >= 999999 && a < 999999) || (d > 999999 && a == 999999))
+					core.battle_damage[damp] = 1000000;
+				//////////kdiy/////////		
 				reason_card = core.attack_target;
 			}
 		}
