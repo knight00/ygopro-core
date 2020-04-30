@@ -47,8 +47,8 @@ uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace
 			auto rm = i++;
 			effect* peffect = rm->first;
 			auto it = rm->second;
-			// if (peffect->is_flag(EFFECT_FLAG_INITIAL | EFFECT_FLAG_COPY_INHERIT))
-			// remove_effect(peffect, it);
+			if (peffect->is_flag(EFFECT_FLAG_INITIAL | EFFECT_FLAG_COPY_INHERIT))
+			  remove_effect(peffect, it);
 			}
 			pduel->lua->load_card_script(code);
 			pduel->lua->add_param(this, PARAM_TYPE_CARD);
@@ -1502,7 +1502,7 @@ int32 card::get_ritual_level(card* pcard) {
 }
 ///////////kdiy///////////////	
 //uint32 card::check_xyz_level(card* pcard, uint32 lv) {
-int32 card::check_xyz_level(card* pcard, uint32 lv) {
+int32 card::check_xyz_level(card* pcard, int32 lv) {
 ///////////kdiy///////////////		
 	if(status & STATUS_NO_LEVEL)
 		return FALSE;
@@ -1514,7 +1514,10 @@ int32 card::check_xyz_level(card* pcard, uint32 lv) {
 		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 		eff->get_value(2, &res);
 		if(res.size() == 1) {
-			uint32 lev = res[0];
+			///////kdiy///////
+			//uint32 lev = res[0];
+			int32 lev = res[0];
+			///////kdiy///////
 			if((lev & 0xfff) == lv || ((lev >> 16) & 0xfff) == lv)
 				return TRUE;
 		} else {

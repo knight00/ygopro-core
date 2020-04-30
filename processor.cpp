@@ -3544,19 +3544,21 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 		if(core.attack_target->is_position(POS_ATTACK)) {
 			if(a > d) {
 				damp = pd;
-				core.battle_damage[damp] = a - d;
 				//////////kdiy/////////
+				//core.battle_damage[damp] = a - d;
 				if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
 					core.battle_damage[damp] = 1000000;
+				else core.battle_damage[damp] = a - d;
 				//////////kdiy/////////
 				reason_card = core.attacker;
 				bd[1] = TRUE;
 			} else if(a < d) {
 				damp = pa;
-				core.battle_damage[damp] = d - a;
 				//////////kdiy/////////
+				//core.battle_damage[damp] = d - a;
 				if ((d >= 999999 && a < 999999) || (d > 999999 && a == 999999))
 					core.battle_damage[damp] = 1000000;
+				else core.battle_damage[damp] = d - a;
 				//////////kdiy/////////		
 				reason_card = core.attack_target;
 				bd[0] = TRUE;
@@ -3581,18 +3583,16 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 					{
 						if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
 							core.battle_damage[0] = 1000000;
-						else
-							core.battle_damage[0] = a - d;
+						else core.battle_damage[0] = a - d;
 					}
 					//////////kdiy/////////		
 					if(dp[1])
 					//////////kdiy/////////	
-						//core.battle_damage[1] = a - d;
+					    //core.battle_damage[1] = a - d;
 					{
 						if ((a >= 999999 && d < 999999) || (a > 999999 && d == 999999))
 							core.battle_damage[1] = 1000000;
-						else
-							core.battle_damage[1] = a - d;
+						else core.battle_damage[1] = a - d;
 					}
 					//////////kdiy/////////	
 					bool double_damage = false;
@@ -3609,9 +3609,23 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 					//}
 					if(double_damage) {
 						if(dp[0])
-							core.battle_damage[0] *= 2;
+						////////kdiy////////
+						//core.battle_damage[0] *= 2;
+						{
+							if (core.battle_damage[0] >= 999999)
+								core.battle_damage[0] = 1000000;
+							else core.battle_damage[0] *= 2;
+						}
+						////////kdiy////////
 						if(dp[1])
-							core.battle_damage[1] *= 2;
+						////////kdiy////////
+						//core.battle_damage[1] *= 2;
+						{
+							if (core.battle_damage[1] >= 999999)
+								core.battle_damage[1] = 1000000;
+							else core.battle_damage[1] *= 2;
+						}
+						////////kdiy////////
 					}
 					//if(half_damage) {
 					//	if(dp[0])
@@ -3708,9 +3722,23 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 							half_dam = false;
 						}
 						if(double_dam)
-							core.battle_damage[p] *= 2;
+						////////kdiy////////
+						//core.battle_damage[p] *= 2;
+						{
+							if (core.battle_damage[p] >= 999999)
+								core.battle_damage[p] = 1000000;
+							else core.battle_damage[p] *= 2;
+						}
+						////////kdiy////////						
 						if(half_dam)
-							core.battle_damage[p] /= 2;
+						////////kdiy////////
+						//core.battle_damage[p] /= 2;
+						{
+							if (core.battle_damage[p] >= 999999)
+								core.battle_damage[p] = 1000000;
+							else core.battle_damage[p] /= 2;
+						}
+						////////kdiy////////				
 						if(dam_value >= 0 && core.battle_damage[p] > 0)
 							core.battle_damage[p] = dam_value;
 					}
@@ -3727,10 +3755,11 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 				bd[1] = TRUE;
 			} else if(a < d) {
 				damp = pa;
-				core.battle_damage[damp] = d - a;
 				//////////kdiy/////////
+				//core.battle_damage[damp] = d - a;
 				if ((d >= 999999 && a < 999999) || (d > 999999 && a == 999999))
 					core.battle_damage[damp] = 1000000;
+				else core.battle_damage[damp] = d - a;
 				//////////kdiy/////////		
 				reason_card = core.attack_target;
 			}
@@ -3831,10 +3860,20 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 				double_dam = false;
 				half_dam = false;
 			}
-			if(double_dam)
-				core.battle_damage[p] *= 2;
-			if(half_dam)
-				core.battle_damage[p] /= 2;
+			if (double_dam)
+				/////kdiy//////////
+							//core.battle_damage[p] *= 2;	
+				if (core.battle_damage[p] >= 999999)
+					core.battle_damage[p] = 1000000;
+			else core.battle_damage[p] *= 2;			
+/////kdiy//////////
+			if (half_dam)
+				/////kdiy//////////
+							//core.battle_damage[p] /= 2;	
+				if (core.battle_damage[p] >= 999999)
+					core.battle_damage[p] = 1000000;
+			else core.battle_damage[p] /= 2;			
+/////kdiy//////////			
 			if(dam_value >= 0 && core.battle_damage[p] > 0)
 				core.battle_damage[p] = dam_value;
 		}

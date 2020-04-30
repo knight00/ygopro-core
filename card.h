@@ -211,7 +211,7 @@ public:
 	//uint32 check_xyz_level(card* pcard, uint32 lv);
 	int32 get_synchro_level(card* pcard);
 	int32 get_ritual_level(card* pcard);
-	int32 check_xyz_level(card* pcard, uint32 lv);	
+	int32 check_xyz_level(card* pcard, int32 lv);	
 	///////kdiy//////////		
 	uint32 get_attribute(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	uint32 get_race(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);

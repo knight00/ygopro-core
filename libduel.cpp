@@ -1489,6 +1489,9 @@ int32 scriptlib::duel_damage(lua_State *L) {
 	if(lua_gettop(L) >= 4)
 		is_step = lua_toboolean(L, 4);
 	duel* pduel = interpreter::get_duel_info(L);
+///////////kdiy//////////		
+   if (pduel->game_field->player[playerid].lp>=999999) amount=0;
+///////////kdiy//////////			
 	pduel->game_field->damage(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, 0, playerid, amount, is_step);
 	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
