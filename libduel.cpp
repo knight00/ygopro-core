@@ -1251,7 +1251,23 @@ int32 scriptlib::duel_sort_decktop(lua_State *L) {
 	if(count < 1 || count > 64)
 		return 0;
 	duel* pduel = interpreter::get_duel_info(L);
-	pduel->game_field->add_process(PROCESSOR_SORT_DECK, 0, 0, 0, sort_player + (target_player << 16), count);
+	pduel->game_field->add_process(PROCESSOR_SORT_DECK, 0, 0, 0, sort_player + (target_player << 16), count, FALSE);
+	return lua_yield(L, 0);
+}
+int32 scriptlib::duel_sort_deckbottom(lua_State *L) {
+	check_action_permission(L);
+	check_param_count(L, 3);
+	uint32 sort_player = lua_tointeger(L, 1);
+	uint32 target_player = lua_tointeger(L, 2);
+	uint32 count = lua_tointeger(L, 3);
+	if(sort_player != 0 && sort_player != 1)
+		return 0;
+	if(target_player != 0 && target_player != 1)
+		return 0;
+	if(count < 1 || count > 64)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->add_process(PROCESSOR_SORT_DECK, 0, 0, 0, sort_player + (target_player << 16), count, TRUE);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_check_event(lua_State *L) {
@@ -3696,16 +3712,22 @@ int32 scriptlib::duel_select_disable_field(lua_State * L) {
 	uint32 location1 = lua_tointeger(L, 3);
 	uint32 location2 = lua_tointeger(L, 4);
 	duel* pduel = interpreter::get_duel_info(L);
-	uint32 filter = pduel->game_field->is_flag(DUEL_EMZONE) ? 0xC080C080 : 0x80E080E0;
-	filter |= lua_tointeger(L, 5);
 	uint32 all_field = FALSE;
 	if(lua_gettop(L) > 5)
 		all_field = lua_toboolean(L, 6);
+	uint32 filter = 0xe0e0e0e0;
+	if(all_field){
+		filter = pduel->game_field->is_flag(DUEL_EMZONE) ? 0x800080 : 0xE000E0;
+		if(!pduel->game_field->is_flag(DUEL_SEPARATE_PZONE))
+			filter |= 0xC000C000;
+	}
+	if(lua_gettop(L) > 4)
+		filter |= lua_tointeger(L, 5);
 	uint32 ct1 = 0, ct2 = 0, ct3 = 0, ct4 = 0, plist = 0, flag = 0xffffffff;
 	if(location1 & LOCATION_MZONE) {
 		ct1 = pduel->game_field->get_useable_count(NULL, playerid, LOCATION_MZONE, PLAYER_NONE, 0, 0xff, &plist);
 		if (all_field) {
-			plist = plist & ~0x60;
+			plist &= ~0x60;
 			if (!pduel->game_field->is_location_useable(playerid, LOCATION_MZONE, 5))
 				plist |= 0x20;
 			else
@@ -3720,6 +3742,7 @@ int32 scriptlib::duel_select_disable_field(lua_State * L) {
 	if(location1 & LOCATION_SZONE) {
 		ct2 = pduel->game_field->get_useable_count(NULL, playerid, LOCATION_SZONE, PLAYER_NONE, 0, 0xff, &plist);
 		if (all_field) {
+			plist &= ~0xe0;
 			if (!pduel->game_field->is_location_useable(playerid, LOCATION_SZONE, 5))
 				plist |= 0x20;
 			else
@@ -3738,7 +3761,7 @@ int32 scriptlib::duel_select_disable_field(lua_State * L) {
 	if(location2 & LOCATION_MZONE) {
 		ct3 = pduel->game_field->get_useable_count(NULL, 1 - playerid, LOCATION_MZONE, PLAYER_NONE, 0, 0xff, &plist);
 		if (all_field) {
-			plist = plist & ~0x60;
+			plist &= ~0x60;
 			if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_MZONE, 5))
 				plist |= 0x20;
 			else
@@ -3753,6 +3776,7 @@ int32 scriptlib::duel_select_disable_field(lua_State * L) {
 	if(location2 & LOCATION_SZONE) {
 		ct4 = pduel->game_field->get_useable_count(NULL, 1 - playerid, LOCATION_SZONE, PLAYER_NONE, 0, 0xff, &plist);
 		if (all_field) {
+			plist &= ~0xe0;
 			if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_SZONE, 5))
 				plist |= 0x20;
 			else
@@ -3804,7 +3828,9 @@ int32 scriptlib::duel_select_field_zone(lua_State * L) {
 	uint32 filter = 0xe0e0e0e0;
 	if(lua_gettop(L) > 4)
 		filter = lua_tointeger(L, 5);
-	filter |= pduel->game_field->is_flag(DUEL_EMZONE) ? 0xC080C080 : 0x80E080E0;
+	filter |= pduel->game_field->is_flag(DUEL_EMZONE) ? 0x800080 : 0xE000E0;
+	if(!pduel->game_field->is_flag(DUEL_SEPARATE_PZONE))
+		filter |= 0xC000C000;
 	uint32 flag = 0xffffffff;
 	if(location1 & LOCATION_MZONE)
 		flag &= 0xffffff00;
@@ -3812,7 +3838,7 @@ int32 scriptlib::duel_select_field_zone(lua_State * L) {
 		flag &= 0xffff00ff;
 	if(location2 & LOCATION_MZONE)
 		flag &= 0xff00ffff;
-	if(location1 & LOCATION_SZONE)
+	if(location2 & LOCATION_SZONE)
 		flag &= 0xffffff;
 	flag |= filter;
 	if (flag == 0xffffffff)
@@ -4466,15 +4492,7 @@ int32 scriptlib::duel_is_player_can_additional_summon(lua_State * L) {
 }
 int32 scriptlib::duel_is_chain_negatable(lua_State * L) {
 	check_param_count(L, 1);
-	int32 chaincount = lua_tointeger(L, 1);
-	duel* pduel = interpreter::get_duel_info(L);
-	chain* ch = pduel->game_field->get_chain(chaincount);
-	if(!ch)
-		return 0;
-	if(ch->triggering_location == LOCATION_DECK)
-		lua_pushboolean(L, 0);
-	else
-		lua_pushboolean(L, 1);
+	lua_pushboolean(L, 1);
 	return 1;
 }
 int32 scriptlib::duel_is_chain_disablable(lua_State * L) {
@@ -4485,13 +4503,7 @@ int32 scriptlib::duel_is_chain_disablable(lua_State * L) {
 		lua_pushboolean(L, pduel->game_field->is_chain_disablable(chaincount));
 		return 1;
 	}
-	chain* ch = pduel->game_field->get_chain(chaincount);
-	if(!ch)
-		return 0;
-	if(ch->triggering_location == LOCATION_DECK)
-		lua_pushboolean(L, 0);
-	else
-		lua_pushboolean(L, 1);
+	lua_pushboolean(L, 1);
 	return 1;
 }
 int32 scriptlib::duel_check_chain_target(lua_State *L) {

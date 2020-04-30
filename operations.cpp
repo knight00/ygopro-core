@@ -29,8 +29,9 @@ int32 field::negate_chain(uint8 chaincount) {
 		}
 		auto message = pduel->new_message(MSG_CHAIN_NEGATED);
 		message->write<uint8>(chaincount);
-		if(pchain.triggering_location == LOCATION_DECK)
-			return FALSE;
+		if(pchain.triggering_location == LOCATION_DECK
+				|| (!pduel->game_field->is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
+			pchain.triggering_effect->handler->release_relation(pchain);
 		return TRUE;
 	}
 	return FALSE;
@@ -48,8 +49,9 @@ int32 field::disable_chain(uint8 chaincount) {
 		core.current_chain[chaincount - 1].disable_player = core.reason_player;
 		auto message = pduel->new_message(MSG_CHAIN_DISABLED);
 		message->write<uint8>(chaincount);
-		if(pchain.triggering_location == LOCATION_DECK)
-			return FALSE;
+		if(pchain.triggering_location == LOCATION_DECK
+				|| (!pduel->game_field->is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
+			pchain.triggering_effect->handler->release_relation(pchain);
 		return TRUE;
 	}
 	return FALSE;
@@ -301,6 +303,8 @@ void field::send_to(card_set* targets, effect* reason_effect, uint32 reason, uin
 			p = reason_player;
 		if(p == PLAYER_NONE)
 			p = pcard->owner;
+		if(destination == LOCATION_GRAVE && pcard->current.location == LOCATION_REMOVED)
+			pcard->current.reason |= REASON_RETURN;
 		uint32 pos = position;
 		if(destination != LOCATION_REMOVED && !ignore)
 			pos = POS_FACEUP;
@@ -2828,7 +2832,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 				pduel->lua->add_param(positions, PARAM_TYPE_INT);
 				pduel->lua->add_param(targetplayer, PARAM_TYPE_INT);
 				pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
-				if(pduel->lua->check_condition(eff->target, 7))
+				if(!pduel->lua->check_condition(eff->target, 7))
 					continue;
 			}
 			positions &= eff->get_value();
@@ -4249,7 +4253,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		core.units.begin()->ptarget = param->targets;
 		targets = param->targets;
 		delete param;
-		card_set tohand, todeck, tograve, remove, discard, released, destroyed, retgrave;
+		card_set tohand, todeck, tograve, remove, discard, released, destroyed;
 		card_set equipings, overlays;
 		for(auto& pcard : targets->container) {
 			uint8 nloc = pcard->current.location;
@@ -4282,14 +4286,9 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				todeck.insert(pcard);
 				raise_single_event(pcard, 0, EVENT_TO_DECK, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 			}
-			if(nloc == LOCATION_GRAVE) {
-				if(pcard->current.reason & REASON_RETURN) {
-					retgrave.insert(pcard);
-					raise_single_event(pcard, 0, EVENT_RETURN_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				} else {
-					tograve.insert(pcard);
-					raise_single_event(pcard, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				}
+			if(nloc == LOCATION_GRAVE && !(pcard->current.reason & REASON_RETURN)) {
+				tograve.insert(pcard);
+				raise_single_event(pcard, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 			}
 			if(nloc == LOCATION_REMOVED || ((pcard->data.type & TYPE_TOKEN) && pcard->sendto_param.location == LOCATION_REMOVED)) {
 				remove.insert(pcard);
@@ -4328,8 +4327,6 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			raise_event(&released, EVENT_RELEASE, reason_effect, reason, reason_player, 0, 0);
 		if(destroyed.size())
 			raise_event(&destroyed, EVENT_DESTROYED, reason_effect, reason, reason_player, 0, 0);
-		if(retgrave.size())
-			raise_event(&retgrave, EVENT_RETURN_TO_GRAVE, reason_effect, reason, reason_player, 0, 0);
 		raise_event(&targets->container, EVENT_MOVE, reason_effect, reason, reason_player, 0, 0);
 		process_single_event();
 		process_instant_event();

@@ -682,35 +682,54 @@ int32 field::process() {
 		uint8 sort_player = it->arg1 & 0xffff;
 		uint8 target_player = it->arg1 >> 16;
 		uint32 count = it->arg2, i = 0;
-		if(count > player[target_player].list_main.size())
-			count = player[target_player].list_main.size();
+		bool bottom = it->arg3;
+		auto& list = player[target_player].list_main;
+		if(count > list.size())
+			count = list.size();
 		if(it->step == 0) {
 			core.select_cards.clear();
-			for(auto clit = player[target_player].list_main.rbegin(); i < count; ++i, ++clit)
-				core.select_cards.push_back(*clit);
+			if(bottom) {
+				for(auto clit = list.begin(); i < count; ++i, ++clit)
+					core.select_cards.push_back(*clit);
+			} else {
+				for(auto clit = list.rbegin(); i < count; ++i, ++clit)
+					core.select_cards.push_back(*clit);
+			}
 			add_process(PROCESSOR_SORT_CARD, 0, 0, 0, sort_player, 0);
 			it->step++;
 		} else {
 			if(returns.at<int8>(0) != -1) {
 				card* tc[64];
 				for(i = 0; i < count; ++i)
-					player[target_player].list_main.pop_back();
-				for(i = 0; i < count; ++i)
-					tc[(uint8)returns.at<int8>(i)] = core.select_cards[i];
+					tc[returns.at<uint8>(i)] = core.select_cards[i];
 				for(i = 0; i < count; ++i) {
-					player[target_player].list_main.push_back(tc[count - i - 1]);
-					tc[count - i - 1]->current.sequence = player[target_player].list_main.size() - 1;
+					card* pcard = nullptr;
+					if(bottom)
+						pcard = tc[i];
+					else
+						pcard = tc[count - i - 1];
+					auto message = pduel->new_message(MSG_MOVE);
+					message->write<uint32>(0);
+					message->write(pcard->get_info_location());
+					list.erase(list.begin() + pcard->current.sequence);
+					if(bottom)
+						list.insert(list.begin(), pcard);
+					else
+						list.push_back(pcard);
+					reset_sequence(target_player, LOCATION_DECK);
+					message->write(pcard->get_info_location());
+					message->write<uint32>(pcard->current.reason);
 				}
-			}
-			if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 				if(count > 0) {
-					card* ptop = player[target_player].list_main.back();
-					if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENSE)) {
-						auto message = pduel->new_message(MSG_DECK_TOP);
-						message->write<uint8>(target_player);
-						message->write<uint32>(0);
-						message->write<uint32>(ptop->data.code);
-						message->write<uint32>(ptop->current.position);
+					if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+						card* ptop = list.back();
+						if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENSE)) {
+							auto message = pduel->new_message(MSG_DECK_TOP);
+							message->write<uint8>(target_player);
+							message->write<uint32>(0);
+							message->write<uint32>(ptop->data.code);
+							message->write<uint32>(ptop->current.position);
+						}
 					}
 				}
 			}
@@ -1203,7 +1222,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect->dec_count(check_player);
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-			if(pduel->game_field->is_flag(DUEL_INVERTED_QUICK_PRIORITY))
+			if(is_flag(DUEL_INVERTED_QUICK_PRIORITY))
 				add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, check_player);
 			else
 				add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - check_player);
@@ -1382,7 +1401,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 				clit->set_triggering_state(phandler);
 			}
 			uint8 tp = clit->triggering_player;
-			if(check_hand_trigger(*clit) && check_trigger_effect(*clit)
+			if(check_nonpublic_trigger(*clit) && check_trigger_effect(*clit)
 				&& peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
 				&& check_spself_from_hand_trigger(*clit)) {
 				if(tp == core.current_player)
@@ -1483,7 +1502,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 		infos.priorities[1] = 0;
 		if(core.current_chain.size() == 0) {
 			if(!core.hand_adjusted) {
-				if(pduel->game_field->is_flag(DUEL_INVERTED_QUICK_PRIORITY))
+				if(is_flag(DUEL_INVERTED_QUICK_PRIORITY))
 					add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, 1 - infos.turn_player);
 				else
 					add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, infos.turn_player);
@@ -1697,9 +1716,9 @@ int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priori
 				ch.triggering_player = phandler->current.controler;
 				ch.set_triggering_state(phandler);
 			}
-			if(ch.triggering_player == priority && ch.triggering_location == LOCATION_HAND
-				&& phandler->is_position(POS_FACEDOWN) && !phandler->is_status(STATUS_CHAINING) && phandler->is_has_relation(ch)
-				&& peffect->is_chainable(priority) && peffect->is_activateable(priority, ch.evt, TRUE)
+			if(ch.triggering_player == priority && !phandler->is_status(STATUS_CHAINING)
+				&& (ch.triggering_location == LOCATION_HAND && phandler->is_position(POS_FACEDOWN) || ch.triggering_location == LOCATION_DECK)
+				&& phandler->is_has_relation(ch) && peffect->is_chainable(priority) && peffect->is_activateable(priority, ch.evt, TRUE)
 				&& check_spself_from_hand_trigger(ch))
 				core.select_chains.push_back(ch);
 		}
@@ -3372,8 +3391,8 @@ int32 field::process_forced_battle(uint16 step) {
 			return TRUE;
 		}
 		core.units.begin()->arg1 = infos.phase;
-		auto tmp_attacker = pduel->game_field->core.forced_attacker;
-		auto tmp_attack_target = pduel->game_field->core.forced_attack_target;
+		auto tmp_attacker = core.forced_attacker;
+		auto tmp_attack_target = core.forced_attack_target;
 		if(!tmp_attacker->is_capable_attack_announce(infos.turn_player))
 			return TRUE;
 		card_vector cv;
@@ -4286,7 +4305,6 @@ int32 field::add_chain(uint16 step) {
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
-			break_effect();
 			int32 ecode = 0;
 			if(phandler->current.location == LOCATION_HAND) {
 				if(phandler->data.type & TYPE_TRAP)
@@ -4374,7 +4392,6 @@ int32 field::add_chain(uint16 step) {
 		message->write<uint32>(clit.triggering_sequence);
 		message->write<uint64>(peffect->description);
 		message->write<uint32>(core.current_chain.size() + 1);
-		break_effect();
 		for(auto& ch_lim : core.chain_limit)
 			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, ch_lim.function);
 		core.chain_limit.clear();
@@ -4518,13 +4535,13 @@ int32 field::add_chain(uint16 step) {
 			clit.flag |= CHAIN_CONTINUOUS_CARD;
 		core.phase_action = TRUE;
 		if(clit.opinfos.count(0x200) && clit.opinfos[0x200].op_count) {
-			if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+			if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 				core.spsummon_rst = true;
 				set_spsummon_counter(clit.triggering_player, true, true);
 				if(clit.opinfos[0x200].op_player == PLAYER_ALL)
 					set_spsummon_counter(1 - clit.triggering_player, true, true);
 			}
-			if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE)) {
+			if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE)) {
 				auto& optarget = clit.opinfos[0x200];
 				if(optarget.op_cards) {
 					if(optarget.op_player == PLAYER_ALL) {
@@ -4715,12 +4732,12 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 	switch(step) {
 	case 0: {
 		if(core.spsummon_rst) {
-			if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+			if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 				set_spsummon_counter(0, false, true);
 				set_spsummon_counter(1, false, true);
 				core.spsummon_rst = false;
 			}
-			if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
+			if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
 				for(int plr = 0; plr < 2; ++plr) {
 					for(auto& iter : core.spsummon_once_map[plr]) {
 						auto spcode = iter.first;
@@ -4817,19 +4834,19 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 	case 4: {
 		if(core.units.begin()->arg4 == 0) {
 			if(cait->opinfos.count(0x200) && cait->opinfos[0x200].op_count) {
-				if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+				if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 					if(core.spsummon_state_count_tmp[cait->triggering_player] == core.spsummon_state_count[cait->triggering_player])
 						set_spsummon_counter(cait->triggering_player);
 					if(cait->opinfos[0x200].op_player == PLAYER_ALL && core.spsummon_state_count_tmp[1 - cait->triggering_player] == core.spsummon_state_count[1 - cait->triggering_player])
 						set_spsummon_counter(1 - cait->triggering_player);
 				}
-				if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+				if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 					//sometimes it may add twice, only works for once per turn
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
 						if(optarget.op_player == PLAYER_ALL) {
 							uint32 sumplayer = optarget.op_param;
-							if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE)) {
+							if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE)) {
 								auto opit = optarget.op_cards->container.begin();
 								if((*opit)->spsummon_code)
 									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
@@ -4849,7 +4866,7 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 							if(cait->triggering_effect->is_flag(EFFECT_FLAG_CARD_TARGET) && optarget.op_player == 0x10)
 								sumplayer = 1 - sumplayer;
 							for(auto& ptarget : optarget.op_cards->container) {
-								if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && ptarget->spsummon_code)
+								if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && (core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && ptarget->spsummon_code)
 									core.spsummon_once_map[sumplayer][ptarget->spsummon_code]++;
 								check_card_counter(ptarget, 3, sumplayer);
 							}
@@ -5559,8 +5576,37 @@ int32 field::adjust_step(uint16 step) {
 int32 field::startup(uint16 step) {
 	switch(step) {
 	case 0: {
+		core.shuffle_hand_check[0] = FALSE;
+		core.shuffle_hand_check[1] = FALSE;
+		core.shuffle_deck_check[0] = FALSE;
+		core.shuffle_deck_check[1] = FALSE;
 		raise_event((card*)0, EVENT_STARTUP, 0, 0, 0, 0, 0);
 		process_instant_event();
+		return FALSE;
+	}
+	case 1: {
+		for(int p = 0; p < 2; p++) {
+			core.shuffle_hand_check[p] = FALSE;
+			core.shuffle_deck_check[p] = FALSE;
+			if(player[p].start_count > 0)
+				draw(0, REASON_RULE, PLAYER_NONE, p, player[p].start_count);
+			auto list_size = player[p].extra_lists_main.size();
+			for(size_t l = 0; l < list_size; l++) {
+				auto& main = player[p].extra_lists_main[l];
+				auto& hand = player[p].extra_lists_hand[l];
+				for(int i = 0; i < player[p].start_count && !main.empty(); ++i) {
+					card* pcard = main.back();
+					main.pop_back();
+					hand.push_back(pcard);
+					pcard->current.controler = p;
+					pcard->current.location = LOCATION_HAND;
+					pcard->current.sequence = hand.size() - 1;
+					pcard->current.position = POS_FACEDOWN;
+				}
+
+			}
+		}
+		add_process(PROCESSOR_TURN, 0, 0, 0, 0, 0);
 		return TRUE;
 	}
 	}
