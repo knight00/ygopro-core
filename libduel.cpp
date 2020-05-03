@@ -1905,13 +1905,30 @@ int32 scriptlib::duel_force_attack(lua_State *L) {
 	check_action_permission(L);
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
-	check_param(L, PARAM_TYPE_CARD, 2);
+	//////kdiy//////////
+	//check_param(L, PARAM_TYPE_CARD, 2);	
 	card* attacker = *(card**)lua_touserdata(L, 1);
-	card* attack_target = *(card**)lua_touserdata(L, 2);
-	duel* pduel = attacker->pduel;
+	//card* attack_target = *(card**)lua_touserdata(L, 2);
+	//duel* pduel = attacker->pduel;	
+	card* attack_target;	
+	duel* pduel;
+	if(check_param(L, PARAM_TYPE_CARD, 2, true)) {
+		attack_target = *(card**)lua_touserdata(L, 2);
+		pduel = attacker->pduel;
+	} else {
+		pduel = interpreter::get_duel_info(L);
+	}
+	//////kdiy//////////	
 	pduel->game_field->core.set_forced_attack = true;
 	pduel->game_field->core.forced_attacker = attacker;
+	//////kdiy//////////
+	if (attack_target)
+	//////kdiy//////////
 	pduel->game_field->core.forced_attack_target = attack_target;
+	//////kdiy//////////
+	else
+	attacker->direct_attackable = 1;
+	//////kdiy//////////
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_calculate_damage(lua_State *L) {

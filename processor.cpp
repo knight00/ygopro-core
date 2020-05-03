@@ -3376,20 +3376,22 @@ int32 field::process_battle_command(uint16 step) {
 int32 field::process_forced_battle(uint16 step) {
 	switch(step) {
 	case 0: {
-		if (is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
-			return TRUE;
-		core.battle_phase_count[infos.turn_player]++;
-		if (is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.force_turn_end) {
-			auto message = pduel->new_message(MSG_NEW_PHASE);
-			message->write<uint16>(PHASE_BATTLE_START);
-			reset_phase(PHASE_BATTLE_START);
-			reset_phase(PHASE_BATTLE_STEP);
-			reset_phase(PHASE_BATTLE);
-			adjust_all();
-			message = pduel->new_message(MSG_NEW_PHASE);
-			message->write<uint16>(infos.phase);
-			return TRUE;
-		}
+		////kdiy///////////
+		// if (is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
+		// 	return TRUE;
+		// core.battle_phase_count[infos.turn_player]++;
+		// if (is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.force_turn_end) {
+		// 	auto message = pduel->new_message(MSG_NEW_PHASE);
+		// 	message->write<uint16>(PHASE_BATTLE_START);
+		// 	reset_phase(PHASE_BATTLE_START);
+		// 	reset_phase(PHASE_BATTLE_STEP);
+		// 	reset_phase(PHASE_BATTLE);
+		// 	adjust_all();
+		// 	message = pduel->new_message(MSG_NEW_PHASE);
+		// 	message->write<uint16>(infos.phase);
+		// 	return TRUE;
+		// }
+		////kdiy///////////
 		core.units.begin()->arg1 = infos.phase;
 		auto tmp_attacker = core.forced_attacker;
 		auto tmp_attack_target = core.forced_attack_target;
@@ -3397,7 +3399,10 @@ int32 field::process_forced_battle(uint16 step) {
 			return TRUE;
 		card_vector cv;
 		get_attack_target(tmp_attacker, &cv);
-		if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
+		///////kdiy///////
+		//if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
+		if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
+		///////kdiy///////
 			return TRUE;
 		core.attacker = tmp_attacker;
 		core.attack_target = tmp_attack_target;
