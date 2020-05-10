@@ -2854,9 +2854,18 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		}
 		// replay
-		if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK))
+		///////kdiy////////////
+		//if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK))
+		if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK) && !(core.forced_attacker && !core.forced_attack_target))
+		///////kdiy////////////
 			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 30);
 		else {
+			///////kdiy////////////
+			if (core.forced_attacker && !core.forced_attack_target) {
+				core.units.begin()->step = 19;
+				return FALSE;
+			}
+			///////kdiy////////////
 			returns.at<int32>(0) = TRUE;
 			core.attack_cancelable = FALSE;
 		}
@@ -3401,9 +3410,9 @@ int32 field::process_forced_battle(uint16 step) {
 		get_attack_target(tmp_attacker, &cv);
 		///////kdiy///////
 		//if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
-		if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
-		///////kdiy///////
-			return TRUE;
+		//if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
+			//return TRUE;
+		///////kdiy///////			
 		core.attacker = tmp_attacker;
 		core.attack_target = tmp_attack_target;
 		for(uint8 p = 0; p < 2; ++p) {
