@@ -3429,7 +3429,10 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 				indestructable_set.insert(pcard);
 				continue;
 			}
-			if(!(pcard->current.reason & (REASON_RULE | REASON_COST))) {
+			////////kdiy//////////
+			//if(!(pcard->current.reason & (REASON_RULE | REASON_COST))) {
+			if(!((pcard->current.reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) || pcard->current.reason & REASON_COST)) {	
+			////////kdiy//////////	
 				bool is_destructable = true;
 				if(pcard->is_affect_by_effect(pcard->current.reason_effect)) {
 					effect* indestructable_effect = pcard->check_indestructable_by_effect(pcard->current.reason_effect, pcard->current.reason_player);
@@ -3757,7 +3760,10 @@ int32 field::release_replace(uint16 step, group* targets, card* target) {
 	}
 	if(targets->container.find(target) == targets->container.end())
 		return TRUE;
-	if(!(target->current.reason & REASON_RULE)) {
+	////////kdiy//////////	
+	//if(!(target->current.reason & REASON_RULE)) {
+	if(!(target->current.reason & REASON_RULE && !target->is_affected_by_effect(EFFECT_GOD_IMMUNE))) {
+	////////kdiy//////////
 		returns.at<int32>(0) = FALSE;
 		effect_set eset;
 		target->filter_single_continuous_effect(EFFECT_RELEASE_REPLACE, &eset);
@@ -3774,7 +3780,10 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 			card* pcard = *rm;
 			if(pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)
 				|| ((reason & REASON_SUMMON) && !pcard->is_releasable_by_summon(reason_player, pcard->current.reason_card))
-				|| (!(pcard->current.reason & (REASON_RULE | REASON_SUMMON | REASON_COST))
+				////////kdiy//////////
+				//|| (!(pcard->current.reason & (REASON_RULE | REASON_SUMMON | REASON_COST))
+				|| (!(pcard->current.reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) || pcard->current.reason & (REASON_SUMMON | REASON_COST))	
+	            ////////kdiy//////////
 					&& (!pcard->is_affect_by_effect(pcard->current.reason_effect) || !pcard->is_releasable_by_nonsummon(reason_player)))) {
 				pcard->current.reason = pcard->temp.reason;
 				pcard->current.reason_effect = pcard->temp.reason_effect;
@@ -3783,7 +3792,18 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 				continue;
 			}
 		}
-		if(reason & REASON_RULE)
+		/////////kdiy////////
+		//if(reason & REASON_RULE)
+		int rule_chk=0;
+		int tcount=targets->container.size();
+		for(auto cit = targets->container.begin(); cit != targets->container.end();) {
+		auto rm = cit++;
+		card* pcard = *rm;
+		if(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))
+		  rule_chk+=1;
+		}
+		if(rule_chk==tcount)
+		/////////kdiy////////
 			return FALSE;
 		operation_replace(EFFECT_RELEASE_REPLACE, 5, targets);
 		return FALSE;
@@ -3849,7 +3869,10 @@ int32 field::send_replace(uint16 step, group * targets, card * target) {
 		targets->container.erase(target);
 		return TRUE;
 	}
-	if(!(target->current.reason & REASON_RULE)) {
+	////////kdiy/////////
+	//if(!(target->current.reason & REASON_RULE)) {
+	if(!(target->current.reason & REASON_RULE) && !target->is_affected_by_effect(EFFECT_GOD_IMMUNE)) {
+	////////kdiy/////////
 		returns.at<int32>(0) = FALSE;
 		effect_set eset;
 		target->filter_single_continuous_effect(EFFECT_SEND_REPLACE, &eset);
@@ -3873,7 +3896,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			auto rm = cit++;
 			card* pcard = *rm;
 			uint8 dest = pcard->sendto_param.location;
-			if(!(reason & REASON_RULE) &&
+			/////////kdiy////////
+			//if(!(reason & REASON_RULE) &&
+			if(!(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) &&
+			/////////kdiy////////
 				(pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)
 					|| (!(pcard->current.reason & REASON_COST) && !pcard->is_affect_by_effect(pcard->current.reason_effect))
 					|| (dest == LOCATION_HAND && !pcard->is_capable_send_to_hand(core.reason_player))
@@ -3888,7 +3914,18 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				continue;
 			}
 		}
-		if(reason & REASON_RULE)
+		/////////kdiy////////
+		//if(reason & REASON_RULE)
+		int rule_chk=0;
+		int tcount=targets->container.size();
+		for(auto cit = targets->container.begin(); cit != targets->container.end();) {
+		auto rm = cit++;
+		card* pcard = *rm;
+		if(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))
+		  rule_chk+=1;
+		}
+		if(rule_chk==tcount)
+		/////////kdiy////////
 			return FALSE;
 		operation_replace(EFFECT_SEND_REPLACE, 5, targets);
 		return FALSE;
@@ -3908,7 +3945,11 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		card_set leave_p, destroying;
 		for(auto& pcard : targets->container) {
-			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)) {
+			/////////kdiy///////////////
+			//if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)) {
+			uint32 dest = pcard->sendto_param.location;	
+			if((pcard->current.location & LOCATION_ONFIELD) && !(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && dest & LOCATION_ONFIELD && !pcard->is_status(STATUS_SUMMON_DISABLED) && !pcard->is_status(STATUS_ACTIVATE_DISABLED))) {
+			/////////kdiy///////////////	
 				raise_single_event(pcard, 0, EVENT_LEAVE_FIELD_P, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 				leave_p.insert(pcard);
 			}
@@ -4071,14 +4112,14 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pcard->previous.location = pcard->current.location;
 			pcard->previous.sequence = pcard->current.sequence;
 			pcard->previous.position = pcard->current.position;
-			pcard->previous.pzone = pcard->current.pzone;
-			pcard->current.reason &= ~REASON_TEMPORARY;
+			pcard->previous.pzone = pcard->current.pzone;	
+			pcard->current.reason &= ~REASON_TEMPORARY;		
 			pcard->fieldid = infos.field_id++;
 			pcard->fieldid_r = pcard->fieldid;
 			pcard->reset(RESET_LEAVE, RESET_EVENT);
 			pcard->clear_relate_effect();
 			remove_card(pcard);
-			param->leave.insert(pcard);
+			param->leave.insert(pcard);		
 			++param->cvit;
 			core.units.begin()->step = 4;
 			return FALSE;
@@ -4130,7 +4171,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		if(pcard->status & (STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED)) {
 			pcard->set_status(STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED, FALSE);
 			pcard->previous.location = 0;
-		} else if(oloc & LOCATION_ONFIELD) {
+		///////kdiy///////////	
+		//} else if(oloc & LOCATION_ONFIELD) {
+        } else if(oloc & LOCATION_ONFIELD && !(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && dest & LOCATION_ONFIELD)) {
+        ///////kdiy///////////	
 			pcard->reset(RESET_LEAVE, RESET_EVENT);
 			param->leave.insert(pcard);
 		}
@@ -4162,10 +4206,17 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard->data.code);
 		message->write(pcard->get_info_location());
+		///////kdiy///////////
+		uint32 dest = pcard->sendto_param.location;
+        if(pcard->current.location & LOCATION_ONFIELD && !(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && dest & LOCATION_ONFIELD)) {
+		///////kdiy///////////	
 		if(pcard->overlay_target) {
 			param->detach.insert(pcard->overlay_target);
 			pcard->overlay_target->xyz_remove(pcard);
 		}
+		///////kdiy///////////
+		}
+		///////kdiy///////////
 		move_card(pcard->current.controler, pcard, LOCATION_SZONE, seq);
 		pcard->current.position = POS_FACEUP;
 		message->write(pcard->get_info_location());
@@ -4175,9 +4226,16 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pcard->set_status(STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED, FALSE);
 			pcard->previous.location = 0;
 		} else if(oloc & LOCATION_ONFIELD) {
+			///////kdiy///////////	
+			uint32 dest = pcard->sendto_param.location;
+            if(pcard->current.location & LOCATION_ONFIELD && !(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && dest & LOCATION_ONFIELD)) {	
+			///////kdiy///////////	
 			pcard->reset(RESET_LEAVE + RESET_MSCHANGE, RESET_EVENT);
 			pcard->clear_card_target();
 			param->leave.insert(pcard);
+			///////kdiy///////////	
+			}
+			///////kdiy///////////
 		}
 		if(param->predirect->operation) {
 			tevent e;
