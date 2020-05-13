@@ -740,7 +740,10 @@ uint32 card::get_type(card* scard, uint64 sumtype, uint8 playerid) {
 int32 card::get_base_attack() {
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	////////kdiy////////	
+	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	////////kdiy////////
 		return data.attack;
 	if (temp.base_attack != -1)
 		return temp.base_attack;
@@ -830,7 +833,10 @@ int32 card::get_attack() {
 		return assume[ASSUME_ATTACK];
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	////////kdiy////////	
+	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	////////kdiy////////
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
@@ -1023,7 +1029,10 @@ int32 card::get_base_defense() {
 		return 0;
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	////////kdiy////////	
+	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	////////kdiy////////	
 		return data.defense;
 	if (temp.base_defense != -1)
 		return temp.base_defense;
@@ -1113,7 +1122,10 @@ int32 card::get_defense() {
 		return assume[ASSUME_DEFENSE];
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	////////kdiy////////	
+	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	////////kdiy////////	
 		return data.defense;
 	if (temp.defense != -1)
 		return temp.defense;
