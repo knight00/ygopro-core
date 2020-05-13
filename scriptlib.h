@@ -24,6 +24,7 @@ public:
 	static int32 card_is_able_to_decrease_defense_as_cost(lua_State *L);	
 	static int32 effect_set_owner(lua_State *L);
 	static int32 effect_get_range(lua_State *L);
+	static int32 effect_get_target_range(lua_State *L);
 	static int32 duel_select_field(lua_State *L);
 	static int32 duel_get_master_rule(lua_State *L);
 	static int32 duel_read_card(lua_State *L);

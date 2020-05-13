@@ -291,6 +291,7 @@ static const struct luaL_Reg effectlib[] = {
 /////////////kdiy/////////////////
 	{ "SetOwner", scriptlib::effect_set_owner },
 	{ "GetRange", scriptlib::effect_get_range },
+	{ "GetTargetRange", scriptlib::effect_get_target_range },
 /////////////kdiy/////////////////
 	{ "CreateEffect", scriptlib::effect_new },
 	{ "GlobalEffect", scriptlib::effect_newex },
