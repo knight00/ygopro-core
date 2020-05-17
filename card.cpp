@@ -20,7 +20,6 @@ uint32 card::get_ritual_type() {
 }
 uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace) {
 	card_data dat;
-	//::read_card(entity_code, &dat);
 	pduel->read_card(entity_code, &dat);
 	uint32 code = dat.code;
 	if (!code)
@@ -28,11 +27,6 @@ uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace
 	if (remove_alias && dat.alias)
 		dat.alias = 0;
 	data = dat;
-	// pduel->write_buffer8(MSG_MOVE);
-	// pduel->write_buffer32(code);
-	// pduel->write_buffer32(get_info_locationk());
-	// pduel->write_buffer32(get_info_locationk());
-	// pduel->write_buffer32(0);
 	auto message = pduel->new_message(MSG_MOVE);
 	message->write<uint32>(code);
 	message->write(get_info_location());
@@ -105,7 +99,7 @@ int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 		return FALSE;
 	////////kdiy////////		
 	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN))
-	if (!(current.location & LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || is_position(POS_FACEDOWN))	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN))	
 	////////kdiy////////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_ATTACK_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
@@ -119,7 +113,7 @@ int32 card::is_defense_decreasable_as_cost(uint8 playerid, int32 val) {
 		return FALSE;
 	////////kdiy////////		
 	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))
-	if (!(current.location & LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || is_position(POS_FACEDOWN) ||  || (data.type & TYPE_LINK))	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))	
 	////////kdiy////////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_DEFENSE_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
@@ -748,7 +742,7 @@ int32 card::get_base_attack() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.base_attack != -1)
@@ -841,7 +835,7 @@ int32 card::get_attack() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.attack != -1)
@@ -1037,7 +1031,7 @@ int32 card::get_base_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.base_defense != -1)
@@ -1130,7 +1124,7 @@ int32 card::get_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.defense != -1)
@@ -1393,7 +1387,7 @@ int32 card::get_rank() {
 		return assume[ASSUME_RANK];
 	////////kdiy////////			
 	//if(!(current.location & LOCATION_MZONE))
-	if (!(current.location & LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))))	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
 	////////kdiy////////
 		return data.level;
 	if (temp.level != 0xffffffff)
@@ -1454,7 +1448,7 @@ uint32 card::get_link() {
 		return assume[ASSUME_LINK];
 	////////kdiy////////			
 	//if(!(current.location & LOCATION_MZONE))
-	if (!(current.location & LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))))	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
 	////////kdiy////////
 		return data.level;
 	if (temp.level != 0xffffffff)
@@ -3681,7 +3675,7 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 	}
 	////////kdiy////////
 	//if(current.location == LOCATION_MZONE) {
-	if (current.location == LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA)))) {
+	if ((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 	////////kdiy////////	
 		if(is_position(POS_FACEDOWN)
 		        || !is_affected_by_effect(EFFECT_GEMINI_SUMMONABLE)
@@ -3770,7 +3764,7 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 	if(announce_count > 0)
 		return FALSE;
 	//if(current.location != LOCATION_MZONE)
-	if (!(current.location == LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))))
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))
 	////////kdiy////////		
 		return FALSE;
 	if(!(current.position & POS_FACEDOWN))
@@ -3820,8 +3814,8 @@ int32 card::is_can_be_special_summoned(effect* reason_effect, uint32 sumtype, ui
 	if(reason_effect->get_handler() == this)
 		reason_effect->status |= EFFECT_STATUS_SPSELF;
 	////////kdiy////////
-	//if(current.location == LOCATION_MZONE) {
-	if (current.location == LOCATION_MZONE || (current.location & LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA)))) {
+	//if(current.location == LOCATION_MZONE)
+	if ((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE)))
 	////////kdiy////////	
 		return FALSE;
 	if(current.location == LOCATION_REMOVED && (current.position & POS_FACEDOWN))
@@ -4295,16 +4289,10 @@ int32 card::is_control_can_be_changed(int32 ignore_mzone, uint32 zone) {
 		return FALSE;
 	///////////kdiy/////	
 	//if(current.location != LOCATION_MZONE)		
-	if (!(current.location == LOCATION_MZONE || (current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))))	
+	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
 	////////kdiy////////
-		return FALSE;
-	///////////kdiy/////////		
-	//if(!ignore_mzone && pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL, zone) <= 0)
-	int mszon=pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL, zone);
-	if (pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))
-	mszon+=pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_CONTROL, zone);
-	if(!ignore_mzone && mszon <= 0)	
-	///////////kdiy/////////
+		return FALSE;	
+	if(!ignore_mzone && pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL, zone) <= 0)
 		return FALSE;
 	if(!pduel->game_field->is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && ((get_type() & TYPE_TRAPMONSTER)
 											 && pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_CONTROL) <= 0))
@@ -4390,7 +4378,7 @@ int32 card::is_can_be_synchro_material(card* scard, uint8 playerid, card* tuner)
 		return FALSE;
 	////////kdiy////////		
 	//if(scard && current.location == LOCATION_MZONE && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
-	if ((scard && current.location == LOCATION_MZONE || (scard && current.location == LOCATION_SZONE && pduel->game_field->is_player_affected_by_effect(current.controler,EFFECT_ORICA))) && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
+	if ((scard && current.location == LOCATION_MZONE || (scard && current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
 	////////kdiy////////
 		return FALSE;
 	if(is_status(STATUS_FORBIDDEN))

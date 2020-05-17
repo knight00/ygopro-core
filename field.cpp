@@ -662,6 +662,10 @@ int32 field::get_useable_count_fromex(card* pcard, uint8 playerid, uint8 uplayer
 		useable_count = get_useable_count_other(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
 	if(use_temp_card)
 		pcard->current.location = 0;
+	////////////kdiy//////////
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+	useable_count+=get_useable_count_other(pcard, playerid, LOCATION_SZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
+	////////////kdiy//////////
 	return useable_count;
 }
 int32 field::get_spsummonable_count(card* pcard, uint8 playerid, uint32 zone, uint32* list) {
@@ -690,6 +694,11 @@ int32 field::get_useable_count_other(card* pcard, uint8 playerid, uint8 location
 	int32 count = get_tofield_count(pcard, playerid, location, uplayer, reason, zone, list);
 	int32 limit;
 	if(location == LOCATION_MZONE)
+		///////////kdiy////////
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		   limit = get_mzone_limit(playerid, uplayer, reason)+get_szone_limit(playerid, uplayer, reason);
+		else
+	    ///////////kdiy////////	
 		limit = get_mzone_limit(playerid, uplayer, reason);
 	else
 		limit = get_szone_limit(playerid, uplayer, reason);
@@ -711,6 +720,10 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		flag |= (1u << 5) | (1u << 6);
 	if(list)
 		*list = flag;
+	///////////kdiy////////
+	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, reason,zone,list);
+	///////////kdiy////////			
 	return count;
 }
 int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
@@ -718,6 +731,10 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 	int32 limit = get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
 	if(count > limit)
 		count = limit;
+	///////////kdiy////////
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, LOCATION_REASON_TOFIELD,zone,list);
+	///////////kdiy////////			
 	return count;
 }
 int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
@@ -744,6 +761,10 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	int32 count = 5 - field_used_count[flag & 0x1f];
 	if(~flag & ((1u << 5) | (1u << 6)))
 		count++;
+	///////////kdiy////////
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,LOCATION_REASON_TOFIELD,zone,list);
+	///////////kdiy////////			
 	return count;
 }
 int32 field::get_mzone_limit(uint8 playerid, uint8 uplayer, uint32 reason) {

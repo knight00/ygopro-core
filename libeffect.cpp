@@ -39,7 +39,7 @@ int32 scriptlib::effect_get_target_range(lua_State *L) {
 	if (peffect) {
 		lua_pushinteger(L, peffect->s_range);
 		lua_pushinteger(L, peffect->o_range);
-		return 1;
+		return 2;
 	}
 	return 0;
 }

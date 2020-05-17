@@ -3228,7 +3228,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		///////////kdiy//////////				
 		//if((target->current.location == LOCATION_MZONE)
 		if((target->current.location == LOCATION_MZONE) 
-			|| (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+			|| (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		//////////kdiy//////////		
 			|| check_unique_onfield(target, playerid, LOCATION_MZONE)
 			|| !is_player_can_spsummon(core.reason_effect, target->summon_info & 0xff00ffff, positions, target->summon_player, playerid, target)
@@ -4255,7 +4255,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		message->write(pcard->get_info_location());
 		///////kdiy///////////
 		uint32 dest = pcard->sendto_param.location;
-        if(pcard->current.location & LOCATION_ONFIELD && !(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && dest & LOCATION_ONFIELD)) {
+        if(pcard->current.location & LOCATION_MZONE &&  is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA)) {
 		///////kdiy///////////	
 		if(pcard->overlay_target) {
 			param->detach.insert(pcard->overlay_target);
@@ -4265,7 +4265,11 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		///////kdiy///////////
 		move_card(pcard->current.controler, pcard, LOCATION_SZONE, seq);
-		pcard->current.position = POS_FACEUP;
+		pcard->current.position = POS_FACEUP;	
+		///////kdiy///////////
+		if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+		   pcard->current.position = POS_FACEUP_ATTACK;
+		///////kdiy///////////				
 		message->write(pcard->get_info_location());
 		message->write<uint32>(pcard->current.reason);
 		pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
@@ -4621,7 +4625,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			uint32 flag;
 			///////////kdiy//////////				
 			//uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
-			uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+			uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 			//////////kdiy//////////			
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
 			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
@@ -4781,7 +4785,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					continue;
 				///////////kdiy//////////				
 				//uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
-				uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+				uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 				//////////kdiy//////////				
 				if(eset[i]->operation) {
 					pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT, TRUE);
