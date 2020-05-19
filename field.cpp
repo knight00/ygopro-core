@@ -664,7 +664,7 @@ int32 field::get_useable_count_fromex(card* pcard, uint8 playerid, uint8 uplayer
 		pcard->current.location = 0;
 	////////////kdiy//////////
 	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-	useable_count+=get_useable_count_other(pcard, playerid, LOCATION_SZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
+	   useable_count+=get_useable_count_other(pcard, playerid, LOCATION_SZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
 	////////////kdiy//////////
 	return useable_count;
 }

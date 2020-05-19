@@ -531,7 +531,10 @@ int32 field::process() {
 			if(!attacker
 			        || core.effect_damage_step != 0
 			        || (attacker->fieldid_r != core.pre_field[0])
-			        || (attacker->current.location != LOCATION_MZONE)
+					/////////kdiy////////
+			        //|| (attacker->current.location != LOCATION_MZONE)
+			        || !(attacker->current.location == LOCATION_MZONE || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))					
+					/////////kdiy////////
 			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)
 					|| attacker->is_affected_by_effect(EFFECT_UNSTOPPABLE_ATTACK)) {
@@ -1483,7 +1486,10 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 				++eit;
 				card* phandler = peffect->get_handler();
 				e.event_code = peffect->code;
-				if(phandler->current.location == LOCATION_MZONE && peffect->is_chainable(infos.turn_player)
+				/////kdiy//////////
+				//if(phandler->current.location == LOCATION_MZONE && peffect->is_chainable(infos.turn_player)
+				if((phandler->current.location == LOCATION_MZONE && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (phandler->current.location == LOCATION_SZONE && phandler->is_affected_by_effect(EFFECT_ORICA_SZONE))) && peffect->is_chainable(infos.turn_player)
+				/////kdiy//////////
 				        && peffect->is_activateable(infos.turn_player, e)) {
 					newchain.flag = 0;
 					newchain.chain_id = infos.field_id++;
@@ -2123,11 +2129,22 @@ int32 field::process_idle_command(uint16 step) {
 			core.to_bp = FALSE;
 		if(infos.phase == PHASE_MAIN1) {
 			for(auto& pcard : player[infos.turn_player].list_mzone) {
-				if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK)) {
+				/////kdiy//////////
+				//if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK)) {
+				if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {					
+				/////kdiy//////////	
 					must_attack = true;
 					break;
 				}
 			}
+			/////kdiy//////////
+			for(auto& pcard : player[infos.turn_player].list_szone) {
+				if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
+					must_attack = true;
+					break;
+				}
+			}	
+			/////kdiy//////////
 			if(core.to_bp && (must_attack || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_EP)))
 				core.to_ep = FALSE;
 		}
@@ -2199,6 +2216,12 @@ int32 field::process_idle_command(uint16 step) {
 			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(pcard);
 		}
+		/////kdiy//////////
+		for(auto& pcard : player[infos.turn_player].list_szone) {
+			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
+				core.summonable_cards.push_back(pcard);
+		}		
+		/////kdiy//////////
 		core.spsummonable_cards.clear();
 		effect_set eset;
 		filter_field_effect(EFFECT_SPSUMMON_PROC, &eset);
@@ -2232,10 +2255,20 @@ int32 field::process_idle_command(uint16 step) {
 		}
 		core.repositionable_cards.clear();
 		for(auto& pcard : player[infos.turn_player].list_mzone) {
-			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
+			//////kdiy//////////////
+			//if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
+			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))			
+			//////kdiy//////////////
 		        || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))))
 				core.repositionable_cards.push_back(pcard);
 		}
+		//////kdiy//////////////
+		for(auto& pcard : player[infos.turn_player].list_szone) {
+			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+		        || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))))
+				core.repositionable_cards.push_back(pcard);
+		}
+		//////kdiy//////////////
 		core.msetable_cards.clear();
 		core.ssetable_cards.clear();
 		for(auto& pcard : player[infos.turn_player].list_hand) {
@@ -2515,6 +2548,10 @@ int32 field::process_battle_command(uint16 step) {
 					continue;
 				if(!pcard->is_capable_attack_announce(infos.turn_player))
 					continue;
+				//////////kdiy//////
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+					continue;				
+				//////////kdiy//////				
 				uint8 chain_attack = FALSE;
 				if(core.chain_attack && core.chain_attacker_id == pcard->fieldid)
 					chain_attack = TRUE;
@@ -2528,6 +2565,28 @@ int32 field::process_battle_command(uint16 step) {
 				if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK))
 					must_attack.push_back(pcard);
 			}
+			//////////kdiy//////	
+			for(auto& pcard : player[infos.turn_player].list_szone) {
+				if(!pcard)
+					continue;
+				if(!pcard->is_capable_attack_announce(infos.turn_player))
+					continue;
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+					continue;						
+				uint8 chain_attack = FALSE;
+				if(core.chain_attack && core.chain_attacker_id == pcard->fieldid)
+					chain_attack = TRUE;
+				card_vector cv;
+				get_attack_target(pcard, &cv, chain_attack);
+				if(cv.size() == 0 && pcard->direct_attackable == 0)
+					continue;
+				core.attackable_cards.push_back(pcard);
+				if(pcard->is_affected_by_effect(EFFECT_FIRST_ATTACK))
+					first_attack.push_back(pcard);
+				if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK))
+					must_attack.push_back(pcard);
+			}
+			//////////kdiy//////	
 			if(first_attack.size())
 				core.attackable_cards = first_attack;
 		}
@@ -3151,8 +3210,11 @@ int32 field::process_battle_command(uint16 step) {
 	case 28: {
 		card_set des;
 		effect* peffect;
-		if(core.attacker->is_status(STATUS_BATTLE_RESULT)
-		        && core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
+		if(core.attacker->is_status(STATUS_BATTLE_RESULT)	
+		///////////kdiy///////////
+		        //&& core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
+		        && ((core.attacker->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) && core.attacker->fieldid_r == core.pre_field[0]) {					
+		///////////kdiy///////////					
 			des.insert(core.attacker);
 			core.attacker->temp.reason = core.attacker->current.reason;
 			core.attacker->temp.reason_card = core.attacker->current.reason_card;
@@ -3265,7 +3327,10 @@ int32 field::process_battle_command(uint16 step) {
 		if(des) {
 			for(auto cit = des->container.begin(); cit != des->container.end();) {
 				auto rm = cit++;
-				if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
+				//////kdiy///////////
+				//if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
+				if(!(((*rm)->current.location == LOCATION_MZONE && !(*rm)->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((*rm)->current.location == LOCATION_SZONE && (*rm)->is_affected_by_effect(EFFECT_ORICA_SZONE))) || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
+				//////kdiy///////////
 					des->container.erase(rm);
 			}
 			add_process(PROCESSOR_DESTROY, 3, 0, des, REASON_BATTLE, PLAYER_NONE);
@@ -3419,6 +3484,10 @@ int32 field::process_forced_battle(uint16 step) {
 			for(auto& pcard : player[p].list_mzone) {
 				if(!pcard)
 					continue;
+			///////kdiy//////////
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+					continue;			
+			///////kdiy//////////							
 				pcard->attack_announce_count = 0;
 				pcard->announce_count = 0;
 				pcard->attacked_count = 0;
@@ -3426,6 +3495,20 @@ int32 field::process_forced_battle(uint16 step) {
 				pcard->attacked_cards.clear();
 				pcard->battled_cards.clear();
 			}
+			///////kdiy//////////
+			for(auto& pcard : player[p].list_szone) {
+				if(!pcard)
+					continue;
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+					continue;					
+				pcard->attack_announce_count = 0;
+				pcard->announce_count = 0;
+				pcard->attacked_count = 0;
+				pcard->announced_cards.clear();
+				pcard->attacked_cards.clear();
+				pcard->battled_cards.clear();
+			}			
+			///////kdiy//////////			
 		}
 		core.forced_attack = true;
 		core.attack_cancelable = TRUE;
@@ -3457,6 +3540,10 @@ int32 field::process_forced_battle(uint16 step) {
 			for(auto& pcard : player[p].list_mzone) {
 				if(!pcard)
 					continue;
+			///////kdiy//////////
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+					continue;			
+			///////kdiy//////////							
 				pcard->attack_announce_count = 0;
 				pcard->announce_count = 0;
 				pcard->attacked_count = 0;
@@ -3464,6 +3551,20 @@ int32 field::process_forced_battle(uint16 step) {
 				pcard->attacked_cards.clear();
 				pcard->battled_cards.clear();
 			}
+			///////kdiy//////////
+			for(auto& pcard : player[p].list_szone) {
+				if(!pcard)
+					continue;
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+					continue;					
+				pcard->attack_announce_count = 0;
+				pcard->announce_count = 0;
+				pcard->attacked_count = 0;
+				pcard->announced_cards.clear();
+				pcard->attacked_cards.clear();
+				pcard->battled_cards.clear();
+			}			
+			///////kdiy//////////	
 		}
 		core.attacker = 0;
 		core.attack_target = 0;
@@ -3487,7 +3588,10 @@ int32 field::process_damage_step(uint16 step, uint32 new_attack) {
 		core.attack_target = (card*)core.units.begin()->ptarget;
 		core.units.begin()->ptarget = (group*)tmp;
 		core.units.begin()->arg1 = infos.phase;
-		if(core.attacker->current.location != LOCATION_MZONE || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		///////////kdiy/////////
+		//if(core.attacker->current.location != LOCATION_MZONE || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		if(!((core.attacker->current.location = LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		///////////kdiy/////////	
 			core.units.begin()->step = 2;
 			return FALSE;
 		}
@@ -3965,6 +4069,12 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			for(auto& pcard : player[p].list_mzone) {
 				if(!pcard)
 					continue;
+				////////////kdiy/////////	
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+					pcard->set_status(STATUS_SET_TURN, FALSE);
+					pcard->indestructable_effects.clear();	continue;		
+				}
+				////////////kdiy/////////	
 				pcard->set_status(STATUS_SUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_SPSUMMON_TURN, FALSE);
@@ -3982,6 +4092,24 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			for(auto& pcard : player[p].list_szone) {
 				if(!pcard)
 					continue;
+				////////////kdiy/////////	
+				if(!pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+					pcard->set_status(STATUS_SUMMON_TURN, FALSE);
+					pcard->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
+					pcard->set_status(STATUS_SPSUMMON_TURN, FALSE);
+					pcard->set_status(STATUS_SET_TURN, FALSE);
+					pcard->set_status(STATUS_FORM_CHANGED, FALSE);
+					pcard->indestructable_effects.clear();
+					pcard->attack_announce_count = 0;
+					pcard->announce_count = 0;
+					pcard->attacked_count = 0;
+					pcard->announced_cards.clear();
+					pcard->attacked_cards.clear();
+					pcard->battled_cards.clear();
+					pcard->attack_all_target = TRUE;	
+					continue;		
+				}
+				////////////kdiy/////////				
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 				pcard->indestructable_effects.clear();
 			}
@@ -4207,6 +4335,10 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 				for(auto& pcard : player[p].list_mzone) {
 					if(!pcard)
 						continue;
+					////////////kdiy/////////	
+					if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) 	
+					    continue;		
+					////////////kdiy/////////		
 					pcard->attack_announce_count = 0;
 					pcard->announce_count = 0;
 					pcard->attacked_count = 0;
@@ -4215,6 +4347,22 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 					pcard->battled_cards.clear();
 				}
 			}
+			////////////kdiy/////////	
+			for(uint8 p = 0; p < 2; ++p) {
+				for(auto& pcard : player[p].list_szone) {
+					if(!pcard)
+						continue;	
+					if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 	
+					    continue;
+					pcard->attack_announce_count = 0;
+					pcard->announce_count = 0;
+					pcard->attacked_count = 0;
+					pcard->announced_cards.clear();
+					pcard->attacked_cards.clear();
+					pcard->battled_cards.clear();
+				}
+			}
+			////////////kdiy/////////	
 			return FALSE;
 		}
 		if(is_flag(DUEL_NO_MAIN_PHASE_2)) {
@@ -4343,12 +4491,23 @@ int32 field::add_chain(uint16 step) {
 				else if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK))
 				        && infos.turn_player != phandler->current.controler)
 					ecode = EFFECT_QP_ACT_IN_NTPHAND;
-			} else if(phandler->current.location == LOCATION_SZONE) {
+			//////////kdiy//////////		
+			//} else if(phandler->current.location == LOCATION_SZONE) {
+			} else if(phandler->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {				
+			//////////kdiy//////////		
 				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
 				if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_QP_ACT_IN_SET_TURN;
 			}
+			//////////kdiy//////////		
+			else if(phandler->current.location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {					
+				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
+					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
+				if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && phandler->get_status(STATUS_SET_TURN))
+					ecode = EFFECT_QP_ACT_IN_SET_TURN;
+			}	
+			//////////kdiy//////////						
 			if(ecode) {
 				eset.clear();
 				phandler->filter_effect(ecode, &eset);
@@ -4368,7 +4527,10 @@ int32 field::add_chain(uint16 step) {
 					}
 				}
 			}
-			if(phandler->current.location == LOCATION_SZONE) {
+			/////////kdiy//////////
+			//if(phandler->current.location == LOCATION_SZONE) {
+			if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {				
+			/////////kdiy//////////	
 				phandler->set_status(STATUS_ACT_FROM_HAND, FALSE);
 				change_position(phandler, 0, phandler->current.controler, POS_FACEUP, 0);
 			} else {
@@ -4391,6 +4553,11 @@ int32 field::add_chain(uint16 step) {
 					if(phandler->data.type & TYPE_PENDULUM) {
 						loc = LOCATION_PZONE;
 					} else {
+						///////////kdiy/////////
+						if(is_player_affected_by_effect(0, EFFECT_SANCT))
+						loc = LOCATION_ONFIELD;
+						else
+						///////////kdiy/////////
 						loc = LOCATION_SZONE;
 					}
 				}
@@ -5347,6 +5514,14 @@ int32 field::adjust_step(uint16 step) {
 					core.trap_monster_adjust_set[p].insert(pcard);
 				}
 			}
+			////////kdiy//////
+			for(auto& pcard : player[p].list_szone) {
+				if(!pcard) continue;
+				if((pcard->get_type() & TYPE_TRAPMONSTER) && pcard->is_affected_by_effect(EFFECT_DISABLE_TRAPMONSTER)) {
+					core.trap_monster_adjust_set[p].insert(pcard);
+				}
+			}
+			////////kdiy//////			
 		}
 		if(core.trap_monster_adjust_set[0].size() || core.trap_monster_adjust_set[1].size()) {
 			core.re_adjust = TRUE;
@@ -5362,6 +5537,9 @@ int32 field::adjust_step(uint16 step) {
 		for(uint8 p = 0; p < 2; ++p) {
 			for(auto& pcard : player[p].list_mzone) {
 				if(!pcard) continue;
+				/////////kdiy///////
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) continue;
+				/////////kdiy///////
 				uint8 cur = pcard->current.controler;
 				auto res = pcard->refresh_control_status();
 				uint8 ref = std::get<uint8>(res);
@@ -5373,6 +5551,23 @@ int32 field::adjust_step(uint16 step) {
 				}
 			}
 		}
+		////////kdiy/////////
+		for(uint8 p = 0; p < 2; ++p) {
+			for(auto& pcard : player[p].list_szone) {
+				if(!pcard) continue;
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) continue;
+				uint8 cur = pcard->current.controler;
+				auto res = pcard->refresh_control_status();
+				uint8 ref = std::get<uint8>(res);
+				effect* peffect = std::get<effect*>(res);
+				if(cur != ref && pcard->is_capable_change_control()) {
+					core.control_adjust_set[p].insert(pcard);
+					if(peffect && (!(peffect->type & EFFECT_TYPE_SINGLE) || peffect->condition))
+						reason_cards.insert(peffect->get_handler());
+				}
+			}
+		}	
+		////////kdiy/////////			
 		if(core.control_adjust_set[0].size() || core.control_adjust_set[1].size()) {
 			core.re_adjust = TRUE;
 			get_control(&core.control_adjust_set[1 - infos.turn_player], 0, PLAYER_NONE, infos.turn_player, 0, 0, 0xff);
@@ -5397,6 +5592,9 @@ int32 field::adjust_step(uint16 step) {
 			if(res) {
 				for(uint8 p = 0; p < 2; ++p) {
 					for(auto& pcard : player[p].list_mzone) {
+						///////kdiy/////////
+						if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) continue;
+						///////kdiy/////////	
 						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
 							//the opposite of pcard->check_control_effect()
 							auto pr = pcard->single_effect.equal_range(EFFECT_SET_CONTROL);
@@ -5410,6 +5608,23 @@ int32 field::adjust_step(uint16 step) {
 								core.control_adjust_set[p].insert(pcard);
 						}
 					}
+					/////////kdiy///////
+					for(auto& pcard : player[p].list_szone) {
+						if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) continue;
+						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
+							//the opposite of pcard->check_control_effect()
+							auto pr = pcard->single_effect.equal_range(EFFECT_SET_CONTROL);
+							for(auto eit = pr.first; eit != pr.second;) {
+								effect* peffect = eit->second;
+								++eit;
+								if(!peffect->condition)
+									peffect->handler->remove_effect(peffect);
+							}
+							if(p != pcard->owner && pcard->is_capable_change_control())
+								core.control_adjust_set[p].insert(pcard);
+						}
+					}
+					/////////kdiy//////					
 				}
 			}
 			core.remove_brainwashing = res;
@@ -5463,6 +5678,10 @@ int32 field::adjust_step(uint16 step) {
 			for(auto& pcard : player[tp].list_mzone) {
 				if(!pcard || ((pcard->data.type & TYPE_LINK) && (pcard->data.type & TYPE_MONSTER)) || pcard->is_affected_by_effect(EFFECT_CANNOT_CHANGE_POS_E))
 					continue;
+				///////kdiy/////
+				if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+					continue;				
+				///////kdiy/////					
 				eset.clear();
 				pcard->filter_effect(EFFECT_SET_POSITION, &eset);
 				if(eset.size()) {
@@ -5479,6 +5698,29 @@ int32 field::adjust_step(uint16 step) {
 					pcard->set_status(STATUS_JUST_POS, FALSE);
 				}
 			}
+			/////////kdiy///////////
+			for(auto& pcard : player[tp].list_szone) {
+				if(!pcard || ((pcard->data.type & TYPE_LINK) && (pcard->data.type & TYPE_MONSTER)) || pcard->is_affected_by_effect(EFFECT_CANNOT_CHANGE_POS_E))
+					continue;
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+					continue;
+				eset.clear();
+				pcard->filter_effect(EFFECT_SET_POSITION, &eset);
+				if(eset.size()) {
+					pos = eset.back()->get_value();
+					if((pos & 0xff) != pcard->current.position) {
+						pos_adjust.insert(pcard);
+						pcard->position_param = pos;
+						if(pcard->is_status(STATUS_JUST_POS))
+							pcard->set_status(STATUS_CONTINUOUS_POS, TRUE);
+						else
+							pcard->set_status(STATUS_CONTINUOUS_POS, FALSE);
+					} else
+						pcard->set_status(STATUS_CONTINUOUS_POS, FALSE);
+					pcard->set_status(STATUS_JUST_POS, FALSE);
+				}
+			}
+			/////////kdiy///////////			
 			tp = 1 - tp;
 		}
 		if(pos_adjust.size()) {
@@ -5564,13 +5806,25 @@ int32 field::adjust_step(uint16 step) {
 				return FALSE;
 			std::set<uint16> fidset;
 			for(auto& pcard : player[1 - infos.turn_player].list_mzone) {
-				if(pcard)
+				/////////kdiy//////
+				//if(pcard)
+				if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+				/////////kdiy//////				
 					fidset.insert(pcard->fieldid_r);
 			}
+			/////////kdiy//////	
+			for(auto& pcard : player[1 - infos.turn_player].list_szone) {
+				if(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))			
+					fidset.insert(pcard->fieldid_r);
+			}			
+			/////////kdiy//////	
 			if(fidset != core.opp_mzone || !confirm_attack_target())
 				core.attack_rollback = TRUE;
 		} else {
-			if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+			/////////kdiy//////	
+			//if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+			if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || core.attacker->fieldid_r != core.pre_field[0]
+			/////////kdiy//////	
 				|| ((core.attacker->current.position & POS_DEFENSE) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
 				|| core.attacker->current.controler != core.attacker->attack_controler
 				|| (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE

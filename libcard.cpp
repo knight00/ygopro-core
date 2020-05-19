@@ -2595,7 +2595,7 @@ int32 scriptlib::card_is_location(lua_State *L) {
 			lua_pushboolean(L, 0);
 	//////kdiy/////////		
 	//} else if(pcard->current.location == LOCATION_SZONE) {
-	} else if(pcard->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || (pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) {	
+	} else if(pcard->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || (pcard->current.location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) {	
 	//////kdiy/////////		
 		if(pcard->current.is_location(loc) && !pcard->is_status(STATUS_ACTIVATE_DISABLED))
 			lua_pushboolean(L, 1);
@@ -2622,7 +2622,7 @@ int32 scriptlib::card_is_level_below(lua_State *L) {
 		|| (pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)	
 	//////kdiy/////////	
 		//|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
-		|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
+		|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
 	//////kdiy/////////		
 		lua_pushboolean(L, 0);		
 	else
@@ -2638,7 +2638,7 @@ int32 scriptlib::card_is_level_above(lua_State *L) {
 		|| (pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
 		//|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
-		|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
+		|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
 	//////kdiy/////////		
 		lua_pushboolean(L, 0);		
 	else
@@ -2653,7 +2653,7 @@ int32 scriptlib::card_is_rank_below(lua_State *L) {
 	if(((!(pcard->data.type & TYPE_XYZ) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S))) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
 	        //|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))) || (pcard->data.type & TYPE_LINK))
-		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))) || (pcard->data.type & TYPE_LINK))
+		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))) || (pcard->data.type & TYPE_LINK))
 	//////kdiy/////////				
 		lua_pushboolean(L, 0);
 	else
@@ -2668,7 +2668,7 @@ int32 scriptlib::card_is_rank_above(lua_State *L) {
 	if(((!(pcard->data.type & TYPE_XYZ) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S))) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
 	        //|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))) || (pcard->data.type & TYPE_LINK))
-		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))) || (pcard->data.type & TYPE_LINK))
+		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))) || (pcard->data.type & TYPE_LINK))
 	//////kdiy/////////				
 		lua_pushboolean(L, 0);
 	else
@@ -2683,7 +2683,7 @@ int32 scriptlib::card_is_link_below(lua_State *L) {
 	if(!(pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
 	        //|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
-		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
+		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
 	//////kdiy/////////					
 		lua_pushboolean(L, 0);
 	else
@@ -2698,7 +2698,7 @@ int32 scriptlib::card_is_link_above(lua_State *L) {
 	if(!(pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
 	        //|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
-		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
+		    || (!(pcard->data.type & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))))
 	//////kdiy/////////				
 		lua_pushboolean(L, 0);
 	else
@@ -2712,7 +2712,7 @@ int32 scriptlib::card_is_attack_below(lua_State *L) {
 	int32 atk = lua_tointeger(L, 2);
 	//////kdiy/////////	
 	//if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))	
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !((pcard->current.location & LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
 	//////kdiy/////////		
 		lua_pushboolean(L, 0);
 	else {
@@ -2878,10 +2878,12 @@ int32 scriptlib::card_enable_counter_permit(lua_State *L) {
 	/////////KDIY//////////	
 	//else if(pcard->data.type & TYPE_MONSTER)	
 	//	prange = LOCATION_MZONE;
-	else if(pcard->data.type & TYPE_MONSTER && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+	else if(pcard->data.type & TYPE_MONSTER && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
         prange = LOCATION_MZONE | LOCATION_SZONE;
-	else if(pcard->data.type & TYPE_MONSTER && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+	else if(pcard->data.type & TYPE_MONSTER && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 		prange = LOCATION_MZONE;
+	else if(pcard->data.type & TYPE_MONSTER && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+		prange = LOCATION_SZONE;		
 	/////////KDIY//////////					
 	else
 		prange = LOCATION_SZONE | LOCATION_FZONE;
