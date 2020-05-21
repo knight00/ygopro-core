@@ -4253,15 +4253,19 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard->data.code);
 		message->write(pcard->get_info_location());
-		///////kdiy///////////
-		uint32 dest = pcard->sendto_param.location;
-        if(oloc == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
-		///////kdiy///////////	
 		if(pcard->overlay_target) {
+			///////kdiy///////////
+			uint32 dest = pcard->sendto_param.location;
+			if(oloc == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
+			///////kdiy///////////				
 			param->detach.insert(pcard->overlay_target);
 			pcard->overlay_target->xyz_remove(pcard);
 		}
 		///////kdiy///////////
+		    // else {
+			// 	card_set overlays;
+			// 	overlays.insert(pcard->overlay_target.begin(), pcard->overlay_target.end());
+			// }
 		}
 		///////kdiy///////////
 		move_card(pcard->current.controler, pcard, LOCATION_SZONE, seq);
@@ -4279,7 +4283,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		} else if(oloc & LOCATION_ONFIELD) {
 			///////kdiy///////////	
 			uint32 dest = pcard->sendto_param.location;
-            if(!(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {	
+            if(!(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {	
 			///////kdiy///////////	
 			pcard->reset(RESET_LEAVE + RESET_MSCHANGE, RESET_EVENT);
 			pcard->clear_card_target();
@@ -4686,9 +4690,15 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		if(ret != 1) {
 			if(location != target->current.location) {
 				uint32 resetflag = 0;
-				if(location & LOCATION_ONFIELD)
+				///kdiy////////
+				//if(location & LOCATION_ONFIELD)		
+				if(location & LOCATION_ONFIELD && !(target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+				///kdiy////////						
 					resetflag |= RESET_TOFIELD;
-				if(target->current.location & LOCATION_ONFIELD)
+				///kdiy////////	
+				//if(target->current.location & LOCATION_ONFIELD)
+				if(target->current.location & LOCATION_ONFIELD && !(location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
+				///kdiy////////				
 					resetflag |= RESET_LEAVE;
 				effect* peffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER);
 				if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD)

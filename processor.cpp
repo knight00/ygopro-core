@@ -1488,7 +1488,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 				e.event_code = peffect->code;
 				/////kdiy//////////
 				//if(phandler->current.location == LOCATION_MZONE && peffect->is_chainable(infos.turn_player)
-				if((phandler->current.location == LOCATION_MZONE && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (phandler->current.location == LOCATION_SZONE && phandler->is_affected_by_effect(EFFECT_ORICA_SZONE))) && peffect->is_chainable(infos.turn_player)
+				if(((phandler->current.location == LOCATION_MZONE && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (phandler->current.location == LOCATION_SZONE && phandler->is_affected_by_effect(EFFECT_ORICA_SZONE))) && peffect->is_chainable(infos.turn_player)
 				/////kdiy//////////
 				        && peffect->is_activateable(infos.turn_player, e)) {
 					newchain.flag = 0;
@@ -3213,7 +3213,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.attacker->is_status(STATUS_BATTLE_RESULT)	
 		///////////kdiy///////////
 		        //&& core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
-		        && ((core.attacker->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) && core.attacker->fieldid_r == core.pre_field[0]) {					
+		        && ((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) && core.attacker->fieldid_r == core.pre_field[0]) {
 		///////////kdiy///////////					
 			des.insert(core.attacker);
 			core.attacker->temp.reason = core.attacker->current.reason;
@@ -4493,7 +4493,7 @@ int32 field::add_chain(uint16 step) {
 					ecode = EFFECT_QP_ACT_IN_NTPHAND;
 			//////////kdiy//////////		
 			//} else if(phandler->current.location == LOCATION_SZONE) {
-			} else if(phandler->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {				
+			} else if(phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 			//////////kdiy//////////		
 				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
@@ -4501,7 +4501,7 @@ int32 field::add_chain(uint16 step) {
 					ecode = EFFECT_QP_ACT_IN_SET_TURN;
 			}
 			//////////kdiy//////////		
-			else if(phandler->current.location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {					
+			else if(phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
 				if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && phandler->get_status(STATUS_SET_TURN))
