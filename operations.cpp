@@ -4752,7 +4752,10 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(target->data.code);
 		message->write(target->get_info_location());
-		if(target->overlay_target)
+		////kdiy///////		
+		//if(target->overlay_target)
+		if(target->overlay_target && location & LOCATION_ONFIELD && target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE))		
+		////kdiy///////		
 			target->overlay_target->xyz_remove(target);
 		// call move_card()
 		////kdiy///////		
