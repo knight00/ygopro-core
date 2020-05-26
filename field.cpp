@@ -662,10 +662,6 @@ int32 field::get_useable_count_fromex(card* pcard, uint8 playerid, uint8 uplayer
 		useable_count = get_useable_count_other(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
 	if(use_temp_card)
 		pcard->current.location = 0;
-	////////////kdiy//////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-	   useable_count+=get_useable_count_other(pcard, playerid, LOCATION_SZONE, uplayer, LOCATION_REASON_TOFIELD, zone, list);
-	////////////kdiy//////////
 	return useable_count;
 }
 int32 field::get_spsummonable_count(card* pcard, uint8 playerid, uint32 zone, uint32* list) {
@@ -695,7 +691,7 @@ int32 field::get_useable_count_other(card* pcard, uint8 playerid, uint8 location
 	int32 limit;
 	if(location == LOCATION_MZONE)
 		///////////kdiy////////
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		   limit = get_mzone_limit(playerid, uplayer, reason)+get_szone_limit(playerid, uplayer, reason);
 		else
 	    ///////////kdiy////////	
@@ -712,6 +708,11 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
+		///////////kdiy////////
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		  flag |= ((flag | ~zone) & 0x1f) | (((flag >> 8) | ~zone) & 0x1f);
+		else
+		///////////kdiy////////
 		flag = (flag | ~zone) & 0x1f;
 	} else
 		flag = ((flag >> 8) | ~zone) & 0x1f;
@@ -721,20 +722,20 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	if(list)
 		*list = flag;
 	///////////kdiy////////
-	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA))
-		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, reason,zone,list);
+	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, reason,zone);
 	///////////kdiy////////			
 	return count;
 }
 int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
 	int32 count = get_spsummonable_count_fromex_rule4(pcard, playerid, uplayer, zone, list);
 	int32 limit = get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
-	if(count > limit)
-		count = limit;
 	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, LOCATION_REASON_TOFIELD,zone,list);
-	///////////kdiy////////			
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		limit += get_szone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
+	///////////kdiy////////		
+	if(count > limit)
+		count = limit;		
 	return count;
 }
 int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
@@ -753,17 +754,22 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 			flag |= 1u << 5;
 		if(!is_location_useable(playerid, LOCATION_MZONE, 6))
 			flag |= 1u << 6;
-	}
+	}	
 	uint32 rule_zone = get_rule_zone_fromex(playerid, pcard);
-	flag = flag | ~zone | ~rule_zone;
+	flag = flag | ~zone | ~rule_zone;	
 	if(list)
-		*list = flag & 0x7f;
+	///////////kdiy////////		
+	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))	
+		*list = (flag & 0x7f) | (flag>>8 & 0x1f);
+		else
+	///////////kdiy////////	
+	    *list = flag & 0x7f;	
 	int32 count = 5 - field_used_count[flag & 0x1f];
 	if(~flag & ((1u << 5) | (1u << 6)))
 		count++;
 	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,LOCATION_REASON_TOFIELD,zone,list);
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,LOCATION_REASON_TOFIELD,zone);
 	///////////kdiy////////			
 	return count;
 }
@@ -1538,6 +1544,9 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 		//if(location & LOCATION_MZONE) CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP));
 		//if(location & LOCATION_SZONE)
 			//CHECKL(player[self].list_szone, !pcard->is_status(STATUS_ACTIVATE_DISABLED));
+		if(location == LOCATION_RMZONE) CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP));
+		if(location == LOCATION_RSZONE)
+			CHECKL(player[self].list_szone, !pcard->is_status(STATUS_ACTIVATE_DISABLED));			
 		if(location & LOCATION_MZONE)
 		    CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE));
 		if(location & LOCATION_MZONE)
@@ -1579,6 +1588,26 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 	uint32 location = location1;
 	uint32 count = 0;
 	for(uint32 p = 0; p < 2; ++p, location = location2, self = 1 - self) {
+		////kdiy////////
+		if(location == LOCATION_RMZONE) {
+			for(auto& pcard : player[self].list_mzone) { 
+				if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)) {					
+					if(pgroup)
+						pgroup->container.insert(pcard);
+					count++;
+				}
+			}
+		}
+		if(location == LOCATION_RSZONE) {
+			for(auto& pcard : player[self].list_szone) {
+				if(pcard) {
+					if(pgroup)
+						pgroup->container.insert(pcard);
+					count++;
+				}
+			}
+		}		
+		////kdiy////////		
 		if(location & LOCATION_MZONE) {
 			for(auto& pcard : player[self].list_mzone) { 
 				//////////kdiy/////////

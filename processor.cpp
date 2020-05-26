@@ -2131,7 +2131,7 @@ int32 field::process_idle_command(uint16 step) {
 			for(auto& pcard : player[infos.turn_player].list_mzone) {
 				/////kdiy//////////
 				//if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK)) {
-				if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {					
+				if(pcard && pcard->is_capable_attack() && pcard->is_affected_by_effect(EFFECT_MUST_ATTACK) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 				/////kdiy//////////	
 					must_attack = true;
 					break;

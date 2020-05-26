@@ -2585,9 +2585,13 @@ int32 scriptlib::card_is_location(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 loc = lua_tointeger(L, 2);
-	//////kdiy/////////	
+	//////kdiy/////////
+	if(pcard->current.location == LOCATION_MZONE && loc == LOCATION_RMZONE && !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP))
+        lua_pushboolean(L, 1);
+	else if(pcard->current.location == LOCATION_SZONE && loc == LOCATION_RSZONE && !pcard->is_status(STATUS_ACTIVATE_DISABLED))
+        lua_pushboolean(L, 1);	
 	//if(pcard->current.location == LOCATION_MZONE) {
-	if((pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+	else if((pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 	//////kdiy/////////	
 		if((loc & LOCATION_MZONE) && !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP))
 			lua_pushboolean(L, 1);
