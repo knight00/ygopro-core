@@ -4732,7 +4732,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					flag = ((flag & 0xff) << 8) | 0xffff00ff;
 				else
 				    //////kdiy/////	
-					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 					flag = (flag & 0xffff) | 0xffff0000;
 					else
 				    //////kdiy/////
@@ -4742,7 +4742,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					flag = ((flag & 0xff) << 24) | 0xffffff;
 				else
 				    //////kdiy/////	
-					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 					flag = ((flag & 0xffff) << 16) | 0x0000ffff;
 					else
 				    //////kdiy/////	
