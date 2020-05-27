@@ -710,7 +710,7 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		///////////kdiy////////
 		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		  flag = ((flag | ~zone) & 0x1f) | (((flag >> 8) | ~zone) & 0x1f);
+		  flag = ((flag | ~zone) & 0x1f) | ((((flag >> 8) | ~zone) & 0x1f) >> 8);
 		else
 		///////////kdiy////////
 		flag = (flag | ~zone) & 0x1f;
@@ -760,7 +760,7 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	if(list)
 	///////////kdiy////////		
 	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))	
-		*list = (flag & 0x7f) | (flag>>8 & 0x1f);
+		*list = (flag & 0x7f) | ((flag>>8 & 0x1f) >> 8);
 		else
 	///////////kdiy////////	
 	    *list = flag & 0x7f;	

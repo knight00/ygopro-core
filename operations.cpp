@@ -2362,7 +2362,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 				int32 ct = get_tofield_count(target, setplayer, LOCATION_MZONE, setplayer, LOCATION_REASON_TOFIELD, zone);
 				int32 fcount = get_mzone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////
-				fcount += get_szone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);				
+				fcount += get_szone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////				
 				if(min == 0 && ct > 0 && fcount > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 90);
