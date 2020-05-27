@@ -2876,7 +2876,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		std::vector<int32> retval;
 		peffect->get_value(target, 0, &retval);
 		uint32 summon_info = retval.size() > 0 ? retval[0] : 0;
-		uint32 zone = retval.size() > 1 ? retval[1] : 0xff;
+		/////kdiy/////////
+		//uint32 zone = retval.size() > 1 ? retval[1] : 0xff;
+		uint32 zone = retval.size() > 1 ? retval[1] : 0xffff;
+		/////kdiy/////////		
 		target->summon_info = (summon_info & 0xf00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
 		target->enable_field_effect(false);
 		effect_set eset;
