@@ -2876,9 +2876,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		std::vector<int32> retval;
 		peffect->get_value(target, 0, &retval);
 		uint32 summon_info = retval.size() > 0 ? retval[0] : 0;
-		/////kdiy/////////
-		//uint32 zone = retval.size() > 1 ? retval[1] : 0xff;
-		uint32 zone = retval.size() > 1 ? retval[1] : 0xffff;
+
+		uint32 zone = retval.size() > 1 ? retval[1] : 0xff;
+		/////kdiy/////////	
+		if(is_player_affected_by_effect(targetplayer, EFFECT_ORICA))	
+		zone = retval.size() > 1 ? retval[1] : 0xffff;
 		/////kdiy/////////		
 		target->summon_info = (summon_info & 0xf00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
 		target->enable_field_effect(false);
@@ -3124,6 +3126,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 			check_card_counter(pcard, 3, sumplayer);
 		}
 		uint32 zone = 0xff;
+		////kdiy///////
+		if(is_player_affected_by_effect(sumplayer, EFFECT_ORICA))	
+		    zone = 0xffff;		
+		////kdiy///////		
 		uint32 flag1, flag2;
 		int32 ct1 = get_tofield_count(pcard, sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag1);
 		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, zone, &flag2);
@@ -3143,7 +3149,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		///////kdiy///////
 		if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+			deffect->owner = pduel->game_field->player[sumplayer].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -3329,6 +3335,10 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		// UNUSED VARIABLE	
 		// uint32 move_player = (target->data.type & TYPE_TOKEN) ? target->owner : target->summon_player;
 		bool extra = !(zone & 0xff);
+		///////kdiy/////
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		    extra = !(zone & 0xffff);	
+		///////kdiy/////
 		if(targets && pduel->game_field->is_flag(DUEL_EMZONE)) {
 			uint32 flag1, flag2;
 			int32 ct1 = get_tofield_count(target, playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag1);
@@ -3355,7 +3365,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		///////kdiy///////
 		if(!target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[target->current.controler].list_szone[5];
+			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
