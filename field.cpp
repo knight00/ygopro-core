@@ -723,7 +723,7 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		*list = flag;
 	///////////kdiy////////
 	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer, reason,zone);
+		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,reason,zone);
 	///////////kdiy////////			
 	return count;
 }
