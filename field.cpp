@@ -1702,7 +1702,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	uint32 rcount = 0;
 	for(auto& pcard : player[playerid].list_mzone) {
 		///////kdiy//////
-		if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))
+		if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 		  continue;		
 		///////kdiy//////			
 		if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && pcard->is_releasable_by_nonsummon(playerid)
