@@ -1612,7 +1612,7 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 			for(auto& pcard : player[self].list_mzone) { 
 				//////////kdiy/////////
 				//if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)) {
-				if(pcard && (!pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP) || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
+				if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 			    //////////kdiy/////////						
 					if(pgroup)
 						pgroup->container.insert(pcard);
@@ -1624,7 +1624,7 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 			for(auto& pcard : player[self].list_szone) {
 				//////////kdiy/////////	
 				//if(pcard) {
-				if(pcard && (!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))) {					
+				if(pcard && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)) {
 				//////////kdiy/////////		
 					if(pgroup)
 						pgroup->container.insert(pcard);
@@ -1702,8 +1702,8 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	uint32 rcount = 0;
 	for(auto& pcard : player[playerid].list_mzone) {
 		///////kdiy//////
-		// if(!(pcard && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))
-		//   continue;		
+		if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))
+		  continue;		
 		///////kdiy//////			
 		if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {		  	
@@ -1741,8 +1741,8 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	if(use_oppo) {
 		for(auto& pcard : player[1 - playerid].list_mzone) {
 			///////kdiy//////
-			// if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-			//   continue;		
+			if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+			  continue;		
 			///////kdiy//////			
 			if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && (pcard->is_position(POS_FACEUP) || !use_con)
 			   && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {					   
@@ -1768,8 +1768,8 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	} else {
 		for(auto& pcard : player[1 - playerid].list_mzone) {
 			///////kdiy//////
-			// if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-			//   continue;		
+			if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+			  continue;		
 			///////kdiy//////				
 			if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && (pcard->is_position(POS_FACEUP) || !use_con)
 			   && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {   
@@ -1929,7 +1929,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	////////kdiy//////
 	for(auto& pcard : player[p].list_szone) {
 		////////kdiy//////
-		if(!(pcard && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		  continue;
 		////////kdiy//////		
 		if(pcard && ((releasable >> pcard->current.sequence) & 1) && pcard->is_releasable_by_summon(p, target)) {
@@ -1948,7 +1948,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	}
 	for(auto& pcard : player[1 - p].list_szone) {
 		////////kdiy//////
-		if(!(pcard && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		  continue;
 		////////kdiy//////		
 		if(!pcard || !((releasable >> (pcard->current.sequence + 16)) & 1) || !pcard->is_releasable_by_summon(p, target))
