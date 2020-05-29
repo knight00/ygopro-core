@@ -1580,7 +1580,9 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			return TRUE;
 		if(target->is_affected_by_effect(EFFECT_CANNOT_SUMMON))
 			return TRUE;
-		///////////kdiy//////////				
+		///////////kdiy//////////	
+		if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA) && zone==0xff)
+			zone=0xffff;			
 		//if(target->current.location == LOCATION_MZONE) {
 		if((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		///////////kdiy//////////				
@@ -1673,6 +1675,11 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 				int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 				uint32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
 				int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+				  new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
+				  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;  
+				///////kdiy///////
 				if (proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
 					new_zone = (new_zone >> 16) | (new_zone & 0xffff << 16);
 				new_zone &= zone;
@@ -1716,6 +1723,11 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
 			releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+              new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
+			  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;
+			///////kdiy///////						
 			if((int32)min_tribute < new_min_tribute)
 				min_tribute = new_min_tribute;
 			if (proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
@@ -1750,7 +1762,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 				int32 ct = get_tofield_count(target, sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone);
 				int32 fcount = get_mzone_limit(sumplayer, sumplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////
-				fcount += get_szone_limit(sumplayer, sumplayer, LOCATION_REASON_TOFIELD);
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+				  fcount += get_szone_limit(sumplayer, sumplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////					
 				if(min == 0 && ct > 0 && fcount > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 90);
@@ -2227,6 +2240,10 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 		if(target->is_affected_by_effect(EFFECT_CANNOT_MSET))
 			return TRUE;
 		effect_set eset;
+		///////////kdiy//////////	
+		if(is_player_affected_by_effect(setplayer,EFFECT_ORICA) && zone==0xff)
+			zone=0xffff;
+		///////////kdiy//////////						
 		int32 res = target->filter_set_procedure(setplayer, &eset, ignore_count, min_tribute, zone);
 		if(proc) {
 			if(res < 0)
@@ -2285,6 +2302,11 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 				int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 				uint32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
 				int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			    ///////kdiy///////
+			    if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))
+				  new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
+				  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;
+			    ///////kdiy///////							
 				if(proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
 					new_zone = (new_zone >> 16) | (new_zone & 0xffff << 16);
 				new_zone &= zone;
@@ -2362,7 +2384,8 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 				int32 ct = get_tofield_count(target, setplayer, LOCATION_MZONE, setplayer, LOCATION_REASON_TOFIELD, zone);
 				int32 fcount = get_mzone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////
-				fcount += get_szone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);
+			    if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))				
+				  fcount += get_szone_limit(setplayer, setplayer, LOCATION_REASON_TOFIELD);
 				////////kdiy/////				
 				if(min == 0 && ct > 0 && fcount > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 90);
@@ -2880,7 +2903,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		uint32 zone = retval.size() > 1 ? retval[1] : 0xff;
 		/////kdiy/////////	
 		if(is_player_affected_by_effect(targetplayer, EFFECT_ORICA))	
-		zone = retval.size() > 1 ? retval[1] : 0xffff;
+		  zone = retval.size() > 1 ? retval[1] : 0xffff;
 		/////kdiy/////////		
 		target->summon_info = (summon_info & 0xf00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
 		target->enable_field_effect(false);
@@ -3275,6 +3298,10 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 	uint8 nocheck = (target->spsummon_param >> 16) & 0xff;
 	uint8 nolimit = (target->spsummon_param >> 8) & 0xff;
 	uint8 positions = target->spsummon_param & 0xff;
+	///////////kdiy//////////	
+	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
+		zone=0xffff;
+	///////////kdiy//////////		
 	switch(step) {
 	case 0: {
 		effect_set eset;
@@ -3401,6 +3428,10 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 	return TRUE;
 }
 int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_player, group* targets, uint32 zone) {
+	///////////kdiy//////////	
+	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
+		zone=0xffff;
+	///////////kdiy//////////		
 	switch(step) {
 	case 0: {
 		card_vector cvs, cvo;
