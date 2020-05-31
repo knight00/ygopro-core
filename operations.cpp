@@ -906,6 +906,10 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 reason_player
 			if(!change)
 				targets->container.erase(pcard);
 		}
+		///////kdiy//////
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && zone==0xff)
+		  zone=0xffff;
+		///////kdiy//////		
 		int32 fcount = get_useable_count(NULL, playerid, LOCATION_MZONE, playerid, LOCATION_REASON_CONTROL, zone);
 		if(fcount <= 0) {
 			destroy_set->swap(targets->container);
@@ -948,6 +952,17 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 reason_player
 			return FALSE;
 		}
 		card* pcard = *targets->it;
+		///////kdiy///////
+		if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
+			effect* deffect = pduel->new_effect();
+			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+			deffect->code = EFFECT_ORICA_SZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			pcard->add_effect(deffect);
+		}	
+		///////kdiy///////			
 		move_to_field(pcard, playerid, playerid, LOCATION_MZONE, pcard->current.position, FALSE, 0, FALSE, zone);
 		return FALSE;
 	}
@@ -1082,8 +1097,14 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p1 = pcard1->current.controler;
 		uint8 s1 = pcard1->current.sequence;
 		uint32 flag;
-		get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
-		flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
+		///////////kdiy//////////	
+		//get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
+		//flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;		
+		if(is_player_affected_by_effect(p1,EFFECT_ORICA)) {
+		  get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xffff, &flag);
+		  flag = (flag & ~(1 << s1) & 0xffff) | ~0x1f1f;  
+		}
+		///////////kdiy//////////				
 		card* pcard2 = *targets2->it;
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
@@ -1093,14 +1114,20 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		return FALSE;
 	}
 	case 2: {
-		core.units.begin()->arg4 = returns.at<int8>(2);
+		core.units.begin()->arg4 = returns.at<int8>(2);		
 		card* pcard2 = *targets2->it;
 		uint8 p2 = pcard2->current.controler;
 		uint8 s2 = pcard2->current.sequence;
 		uint32 flag;
-		get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
-		flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
-		card* pcard1 = *targets1->it;
+		///////////kdiy//////////	
+		//get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
+		//flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;		
+		if(is_player_affected_by_effect(p2,EFFECT_ORICA)) {
+		  get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xffff, &flag);
+		  flag = (flag & ~(1 << s2) & 0xffff) | ~0x1f1f;  
+		}
+		///////////kdiy//////////		
+		card* pcard1 = *targets1->it;			
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p2);
@@ -3313,7 +3340,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		}
 		///////////kdiy//////////				
 		//if((target->current.location == LOCATION_MZONE)
-		if((target->current.location == LOCATION_MZONE) 
+		if((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) 
 			|| (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		//////////kdiy//////////		
 			|| check_unique_onfield(target, playerid, LOCATION_MZONE)
@@ -3371,7 +3398,10 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 			int32 ct1 = get_tofield_count(target, playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag1);
 			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, zone, &flag2);
 			for(auto& pcard : targets->container) {
-				if(pcard->current.location == LOCATION_MZONE)
+				///////////kdiy//////////				
+				//if(pcard->current.location == LOCATION_MZONE)
+				if((pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+				//////////kdiy//////////	
 					continue;
 				if(pcard->current.location != LOCATION_EXTRA)
 					ct1--;
@@ -3427,11 +3457,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 	}
 	return TRUE;
 }
-int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_player, group* targets, uint32 zone) {
-	///////////kdiy//////////	
-	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
-		zone=0xffff;
-	///////////kdiy//////////		
+int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_player, group* targets, uint32 zone) {	
 	switch(step) {
 	case 0: {
 		card_vector cvs, cvo;
@@ -3452,7 +3478,7 @@ int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_pla
 			if(cvo.size() > 1)
 				std::sort(cvo.begin(), cvo.end(), card::card_operation_sort);
 			core.hint_timing[1 - infos.turn_player] |= TIMING_SPSUMMON;
-			for(auto& pcard : cvo)
+			for(auto& pcard : cvo)			
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, NULL, targets, zone, 0, 0, 0, pcard);
 		}
 		return FALSE;
@@ -4804,7 +4830,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 	case 1: {
 		uint32 seq = returns.at<int8>(2);
 		//kdiy///////
-		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && !(target->current.location & LOCATION_ONFIELD)) {		
+		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && target->current.location != LOCATION_SZONE) {		
 		    location = returns.at<int8>(1);
 		    target->temp.location = returns.at<int8>(1);
 		}
@@ -4864,7 +4890,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 	}
 	case 2: {
 		//kdiy///////
-		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && !(target->current.location & LOCATION_ONFIELD))
+		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && target->current.location != LOCATION_SZONE)
 		    location = target->temp.location;
 		//kdiy///////				
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
@@ -4925,7 +4951,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		//if(target->current.location == LOCATION_MZONE) {
 		if((target->previous.location == LOCATION_SZONE) && !target->is_affected_by_effect(EFFECT_SANCT_MZONE) && target->equiping_target)
 			target->unequip();			
-		if(target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+		if((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		////kdiy///////				
 			effect_set eset;
 			filter_player_effect(0, EFFECT_MUST_USE_MZONE, &eset, FALSE);
@@ -4937,7 +4963,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					continue;
 				///////////kdiy//////////				
 				//uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
-				uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+				uint32 lreason = reason ? reason : ((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 				//////////kdiy//////////				
 				if(eset[i]->operation) {
 					pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT, TRUE);

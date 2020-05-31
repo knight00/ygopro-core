@@ -72,28 +72,28 @@ uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace
 	}
 	return code;
 }
-uint32 card::get_summon_info() {
-	effect_set effects;
-	effect_set effects2;
-	uint32 res = summon_info;
-	//filter_effect(EFFECT_ADD_SUMMON_TYPE_KOISHI, &effects, FALSE);
-	//filter_effect(EFFECT_REMOVE_SUMMON_TYPE_KOISHI, &effects);
-	//filter_effect(EFFECT_CHANGE_SUMMON_TYPE_KOISHI, &effects2, FALSE);
-	//filter_effect(EFFECT_CHANGE_SUMMON_LOCATION_KOISHI, &effects2);
-	for (int32 i = 0; i < effects.size(); ++i) {
-		//if (effects[i]->code == EFFECT_ADD_SUMMON_TYPE_KOISHI)
-			//res |= (effects[i]->get_value(this) & 0xff00ffff);
-		//else
-			res &= ~(effects[i]->get_value(this) & 0xff00ffff);
-	}
-	for (int32 i = 0; i < effects2.size(); ++i) {
-		//if (effects2[i]->code == EFFECT_CHANGE_SUMMON_TYPE_KOISHI)
-			//res = (res & 0xff0000) | (effects2[i]->get_value(this) & 0xff00ffff);
-		//else
-			res = ((effects2[i]->get_value(this) & 0xff) << 16) | (res & 0xff00ffff);
-	}
-	return res;
-}
+// uint32 card::get_summon_info() {
+// 	effect_set effects;
+// 	effect_set effects2;
+// 	uint32 res = summon_info;
+// 	//filter_effect(EFFECT_ADD_SUMMON_TYPE_KOISHI, &effects, FALSE);
+// 	//filter_effect(EFFECT_REMOVE_SUMMON_TYPE_KOISHI, &effects);
+// 	//filter_effect(EFFECT_CHANGE_SUMMON_TYPE_KOISHI, &effects2, FALSE);
+// 	//filter_effect(EFFECT_CHANGE_SUMMON_LOCATION_KOISHI, &effects2);
+// 	for (int32 i = 0; i < effects.size(); ++i) {
+// 		//if (effects[i]->code == EFFECT_ADD_SUMMON_TYPE_KOISHI)
+// 			//res |= (effects[i]->get_value(this) & 0xff00ffff);
+// 		//else
+// 			res &= ~(effects[i]->get_value(this) & 0xff00ffff);
+// 	}
+// 	for (int32 i = 0; i < effects2.size(); ++i) {
+// 		//if (effects2[i]->code == EFFECT_CHANGE_SUMMON_TYPE_KOISHI)
+// 			//res = (res & 0xff0000) | (effects2[i]->get_value(this) & 0xff00ffff);
+// 		//else
+// 			res = ((effects2[i]->get_value(this) & 0xff) << 16) | (res & 0xff00ffff);
+// 	}
+// 	return res;
+// }
 int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return FALSE;
@@ -3675,7 +3675,12 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 	}
 	////////kdiy////////
 	//if(current.location == LOCATION_MZONE) {
-	if ((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+	if (current.location == LOCATION_MZONE || current.location == LOCATION_SZONE) {
+		if((current.location == LOCATION_MZONE && is_affected_by_effect(EFFECT_SANCT_MZONE))
+		    || (current.location == LOCATION_SZONE && !is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+			pduel->game_field->restore_lp_cost();
+			return FALSE;		
+			}
 	////////kdiy////////	
 		if(is_position(POS_FACEDOWN)
 		        || !is_affected_by_effect(EFFECT_GEMINI_SUMMONABLE)

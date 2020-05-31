@@ -5812,12 +5812,6 @@ int32 field::adjust_step(uint16 step) {
 				/////////kdiy//////				
 					fidset.insert(pcard->fieldid_r);
 			}
-			/////////kdiy//////	
-			for(auto& pcard : player[1 - infos.turn_player].list_szone) {
-				if(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))			
-					fidset.insert(pcard->fieldid_r);
-			}			
-			/////////kdiy//////	
 			if(fidset != core.opp_mzone || !confirm_attack_target())
 				core.attack_rollback = TRUE;
 		} else {
