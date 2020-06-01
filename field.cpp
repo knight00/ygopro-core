@@ -709,11 +709,14 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
+	///////////kdiy////////
+	uint32 flag2 = flag;
+	///////////kdiy////////
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		///////////kdiy////////
-		uint32 flag2 = flag;
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+		flag2 = flag;
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		  flag2 = (flag | ~zone) & 0x1f1f;
 		  flag = (flag | ~zone) & 0x1f;
 		}
@@ -724,7 +727,8 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		flag = ((flag >> 8) | ~zone) & 0x1f;
 	int32 count = 5 - field_used_count[flag];
 	///////////kdiy////////
-    flag = flag2;
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
+      flag = flag2;
 	///////////kdiy////////		
 	if(location == LOCATION_MZONE)
 		flag |= (1u << 5) | (1u << 6);
