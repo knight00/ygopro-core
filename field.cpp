@@ -643,7 +643,10 @@ int32 field::is_location_useable(uint32 playerid, uint32 location, uint32 sequen
 // list: store local flag in list
 // return: usable count of LOCATION_MZONE or real LOCATION_SZONE of playerid requested by uplayer (may be negative)
 int32 field::get_useable_count(card* pcard, uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32 zone, uint32* list) {
-	if(location == LOCATION_MZONE && pcard && pcard->current.location == LOCATION_EXTRA)
+	///kdiy///////
+	//if(location == LOCATION_MZONE && pcard && pcard->current.location == LOCATION_EXTRA)
+	if(pcard && ((location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) && pcard->current.location == LOCATION_EXTRA)	
+	///kdiy///////	
 		return get_useable_count_fromex(pcard, playerid, uplayer, zone, list);
 	else
 		return get_useable_count_other(pcard, playerid, location, uplayer, reason, zone, list);
@@ -709,14 +712,20 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		///////////kdiy////////
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		  flag = ((flag | ~zone) & 0x1f) | ((((flag >> 8) | ~zone) & 0x1f) >> 8);
+		uint32 flag2 = flag;
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+		  flag2 = (flag | ~zone) & 0x1f1f;
+		  flag = (flag | ~zone) & 0x1f;
+		}
 		else
 		///////////kdiy////////
 		flag = (flag | ~zone) & 0x1f;
 	} else
 		flag = ((flag >> 8) | ~zone) & 0x1f;
 	int32 count = 5 - field_used_count[flag];
+	///////////kdiy////////
+    flag = flag2;
+	///////////kdiy////////		
 	if(location == LOCATION_MZONE)
 		flag |= (1u << 5) | (1u << 6);
 	if(list)
@@ -760,7 +769,7 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	if(list)
 	///////////kdiy////////		
 	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))	
-		*list = (flag & 0x7f) | ((flag>>8 & 0x1f) >> 8);
+		*list = flag & 0x7f1f;
 		else
 	///////////kdiy////////	
 	    *list = flag & 0x7f;	
