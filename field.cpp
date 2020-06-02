@@ -713,8 +713,12 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	uint32 flag2 = flag;
 	///////////kdiy////////
 	if(location == LOCATION_MZONE) {
-		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		///////////kdiy////////
+		//flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+          flag |= ~get_forced_zones(pcard, playerid, LOCATION_ONFIELD, uplayer, reason);
+		else
+		  flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		flag2 = flag;
 		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		  flag2 = (flag | ~zone) & 0x1f1f;
@@ -753,7 +757,13 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 }
 int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
-	flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);
+	///////////kdiy////////		
+	//flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+	  flag |= ~get_forced_zones(pcard, playerid, LOCATION_ONFIELD, uplayer, LOCATION_REASON_TOFIELD);
+	else
+	  flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);
+	///////////kdiy////////		  
 	if(player[playerid].list_mzone[5] && is_location_useable(playerid, LOCATION_MZONE, 6)
 		&& check_extra_link(playerid, pcard, 6)) {
 		flag |= 1u << 5;
@@ -1845,7 +1855,13 @@ int32 field::check_release_list(uint8 playerid, int32 min, int32 max, int32 use_
 	uint32 rcount = get_release_list(playerid, &relcard, &relcard, &relcard_oneof, use_con, use_hand, fun, exarg, exc, exg, use_oppo);
 	if(check_field) {
 		uint32 ct = 0;
-		zone &= (0x1f & get_forced_zones(to_check, playerid, LOCATION_MZONE, to_player, LOCATION_REASON_TOFIELD));
+	    ///////////kdiy////////		
+	    //zone &= (0x1f & get_forced_zones(to_check, playerid, LOCATION_MZONE, to_player, LOCATION_REASON_TOFIELD));
+	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA))		
+		  zone &= (0x1f1f & get_forced_zones(to_check, playerid, LOCATION_ONFIELD, to_player, LOCATION_REASON_TOFIELD));
+		else
+		  zone &= (0x1f & get_forced_zones(to_check, playerid, LOCATION_MZONE, to_player, LOCATION_REASON_TOFIELD));
+	    ///////////kdiy////////		
 		ct = get_useable_count(to_check, playerid, LOCATION_MZONE, to_player, LOCATION_REASON_TOFIELD, zone);
 		if(ct < min) {
 			has_to_choose_one = true;
@@ -2698,7 +2714,13 @@ int32 field::check_tribute(card* pcard, int32 min, int32 max, group* mg, uint8 t
 		max = m;
 	if(min > max)
 		return FALSE;
-	zone &= (0x1f & get_forced_zones(pcard, toplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD));
+	///////kdiy///////////
+	//zone &= (0x1f & get_forced_zones(pcard, toplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD));	
+	if(is_player_affected_by_effect(toplayer, EFFECT_ORICA))
+	  zone &= (0x1f1f & get_forced_zones(pcard, toplayer, LOCATION_ONFIELD, sumplayer, LOCATION_REASON_TOFIELD));	
+	else
+	  zone &= (0x1f & get_forced_zones(pcard, toplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD));
+	///////kdiy///////////	
 	int32 s = 0;
 	int32 ct = get_tofield_count(pcard, toplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone);
 	if(ct <= 0 && max <= 0)
