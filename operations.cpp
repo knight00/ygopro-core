@@ -1097,14 +1097,17 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p1 = pcard1->current.controler;
 		uint8 s1 = pcard1->current.sequence;
 		uint32 flag;
-		///////////kdiy//////////	
-		//get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
-		//flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;		
+		///////////kdiy//////////			
 		if(is_player_affected_by_effect(p1,EFFECT_ORICA)) {
-		  get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xffff, &flag);
-		  flag = (flag & ~(1 << s1) & 0xffff) | ~0x1f1f;  
-		}
-		///////////kdiy//////////				
+		  get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0x1fff, &flag);
+		  flag = (flag & ~(1 << s1) & 0x1fff) | ~0x1f1f;  
+		} else {
+		///////////kdiy//////////	
+		get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
+		flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;	
+		///////////kdiy//////////	
+	    }		
+		///////////kdiy//////////			
 		card* pcard2 = *targets2->it;
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
@@ -1119,14 +1122,17 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p2 = pcard2->current.controler;
 		uint8 s2 = pcard2->current.sequence;
 		uint32 flag;
-		///////////kdiy//////////	
-		//get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
-		//flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;		
+		///////////kdiy//////////			
 		if(is_player_affected_by_effect(p2,EFFECT_ORICA)) {
-		  get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xffff, &flag);
-		  flag = (flag & ~(1 << s2) & 0xffff) | ~0x1f1f;  
-		}
+		  get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0x1fff, &flag);
+		  flag = (flag & ~(1 << s2) & 0x1fff) | ~0x1f1f;  
+		} else {
 		///////////kdiy//////////		
+		get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
+		flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
+		///////////kdiy//////////
+	    }	
+		///////////kdiy//////////			
 		card* pcard1 = *targets1->it;			
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
@@ -1701,11 +1707,22 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 				eset[i]->get_value(target, 0, &retval);
 				int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 				uint32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+				///////kdiy///////
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA) && retval.size()<2)
+				    new_zone+ = 0x1f00;
+				if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA) && retval.size()<2)
+				    new_zone+ = 0x1f0000;				  
+				///////kdiy///////
 				int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
 				///////kdiy///////
-				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
-				  new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
-				  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;  
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f000000; 
+				}
 				///////kdiy///////
 				if (proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
 					new_zone = (new_zone >> 16) | (new_zone & 0xffff << 16);
@@ -1749,12 +1766,23 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			pextra->get_value(target, 0, &retval);
 			int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+			///////kdiy///////
+			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA) && retval.size()<2)
+				new_zone+ = 0x1f00;
+			if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA) && retval.size()<2)
+				new_zone+ = 0x1f0000;				  
+			///////kdiy///////			
 			releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
 			///////kdiy///////
-			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
-              new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
-			  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;
-			///////kdiy///////						
+			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+ = 0x1f00;  
+			}
+			if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+ = 0x1f000000; 
+			}
+			///////kdiy///////					
 			if((int32)min_tribute < new_min_tribute)
 				min_tribute = new_min_tribute;
 			if (proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
@@ -1920,10 +1948,26 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		if(proc->target) {
 			effect* pextra = (effect*)core.units.begin()->ptr1;
 			int32 releasable = 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+			    releasable+ = 0x1f00;
+			if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA))
+			    releasable+ = 0x1f000000;				
+			///////kdiy///////				
 			if(pextra) {
 				std::vector<int32> retval;
 				pextra->get_value(target, 0, &retval);
 				releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f000000; 
+			    }
+			    ///////kdiy///////			
 			}
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(min_tribute, PARAM_TYPE_INT);
@@ -2328,11 +2372,22 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 				eset[i]->get_value(target, 0, &retval);
 				int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 				uint32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+				///////kdiy///////
+				if(is_player_affected_by_effect(setplayer,EFFECT_ORICA) && retval.size()<2)
+				    new_zone+ = 0x1f00;
+				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA) && retval.size()<2)
+				    new_zone+ = 0x1f0000;				  
+				///////kdiy///////				
 				int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
-			    ///////kdiy///////
-			    if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))
-				  new_zone = retval.size() > 1 ? retval[1] : 0x1fff1f;
-				  releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xffffff + retval[2] : retval[2]) : 0xffffff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f000000; 
+			    }
 			    ///////kdiy///////							
 				if(proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
 					new_zone = (new_zone >> 16) | (new_zone & 0xffff << 16);
@@ -2376,7 +2431,23 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 			pextra->get_value(target, 0, &retval);
 			int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+			///////kdiy///////
+			if(is_player_affected_by_effect(setplayer,EFFECT_ORICA) && retval.size()<2)
+				new_zone+ = 0x1f00;
+			if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA) && retval.size()<2)
+				new_zone+ = 0x1f0000;				  
+			///////kdiy///////			
 			releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(setplayer,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+ = 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f000000; 
+			    }
+			///////kdiy///////				
 			if((int32)min_tribute < new_min_tribute)
 				min_tribute = new_min_tribute;
 			if(proc && proc->is_flag(EFFECT_FLAG_SPSUM_PARAM) && proc->o_range)
@@ -2513,6 +2584,16 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 				std::vector<int32> retval;
 				pextra->get_value(target, 0, &retval);
 				releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+ = 0x1f000000; 
+			    }
+			    ///////kdiy///////						
 			}
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(min_tribute, PARAM_TYPE_INT);
@@ -3154,6 +3235,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		pcard->current.reason_player = sumplayer;
 		pcard->summon_player = sumplayer;
 		auto summon_type = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL;
+		///////kdiy///////
+		if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA))	
+		   summon_type = (peffect->get_value(pcard) & 0xffffffff) | SUMMON_TYPE_SPECIAL;
+		///////kdiy///////		   
 		pcard->summon_info = summon_type | ((uint32)pcard->current.location << 16);
 		effect_set eset;
 		uint8 positions = POS_FACEUP;
@@ -4802,8 +4887,8 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					flag = ((flag & 0xff) << 8) | 0xffff00ff;
 				else
 				    //////kdiy/////	
-					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-					flag = (flag & 0xffff) | 0xffff0000;
+					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+					flag = (flag & 0x1fff) | 0xffffe000;
 					else
 				    //////kdiy/////
 					flag = (flag & 0xff) | 0xffffff00;
@@ -4813,7 +4898,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				else
 				    //////kdiy/////	
 					if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-					flag = ((flag & 0xffff) << 16) | 0x0000ffff;
+					flag = ((flag & 0x1fff) << 16) | 0xe000ffff;
 					else
 				    //////kdiy/////	
 					flag = ((flag & 0xff) << 16) | 0xff00ffff;			
@@ -4890,7 +4975,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 	}
 	case 2: {
 		//kdiy///////
-		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && target->current.location != LOCATION_SZONE)
+		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && target->current.controler == playerid && target->current.location != LOCATION_SZONE)
 		    location = target->temp.location;
 		//kdiy///////				
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
@@ -4930,7 +5015,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		message->write<uint32>(target->current.reason);
 		////kdiy///////
 		//if((target->current.location != LOCATION_MZONE)) {
-		if(!(target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))) {
+		if(!((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))) {
 		////kdiy///////			
 			if(target->equiping_cards.size()) {
 				destroy(&target->equiping_cards, 0, REASON_LOST_TARGET + REASON_RULE, PLAYER_NONE);
