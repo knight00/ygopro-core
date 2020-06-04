@@ -5632,13 +5632,7 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 	case 0: {
 		if(check_field) {
 			uint32 ct = 0;
-			///////kdiy///////////
-			//zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
-			if(is_player_affected_by_effect(playerid, EFFECT_ORICA))	
-			  zone &= (0x1f1f & get_forced_zones(to_check, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
-	        else
-	          zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
-	        ///////kdiy///////////				
+			zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));			
 			ct = get_useable_count(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 			if(ct < min) {
 				card_set* must_choose_one = new card_set;
@@ -5794,13 +5788,7 @@ int32 field::select_tribute_cards(int16 step, card* target, uint8 playerid, uint
 	switch(step) {
 	case 0: {
 		core.operated_set.clear();
-		///////kdiy///////////
-		//zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-			 zone &= (0x1f1f & get_forced_zones(target, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
-	    else
-	        zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
-	    ///////kdiy///////////			
+		zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
 		int32 ct = get_tofield_count(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 		if(ct > 0) {
 			auto message = pduel->new_message(MSG_HINT);
@@ -5826,13 +5814,7 @@ int32 field::select_tribute_cards(int16 step, card* target, uint8 playerid, uint
 	}
 	case 1: {
 		int32 rmax = 0;
-		///////kdiy///////////
-		//zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))	
-			 zone &= (0x1f1f & get_forced_zones(target, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
-	    else
-	        zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
-	    ///////kdiy///////////			
+		zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
 		int32 ct = get_tofield_count(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 		card_set* must_choose_one = new card_set;
 		for(auto& pcard : core.release_cards) {
