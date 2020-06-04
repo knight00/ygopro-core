@@ -4851,7 +4851,10 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 			//////////kdiy//////////			
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
-			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
+			//////////kdiy//////////				
+			//if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
+			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff || zone != 0xffff) && !rule) {
+			//////////kdiy//////////					
 				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
 					flag = flag & ~(1u << 5);
 					ct++;
