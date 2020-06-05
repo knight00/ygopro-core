@@ -4853,7 +4853,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
 			//////////kdiy//////////				
 			//if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
-			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff || zone != 0xffff) && !rule) {
+			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff && zone != 0xffff) && !rule) {
 			//////////kdiy//////////					
 				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
 					flag = flag & ~(1u << 5);
