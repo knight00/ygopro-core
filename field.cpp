@@ -644,6 +644,8 @@ int32 field::is_location_useable(uint32 playerid, uint32 location, uint32 sequen
 // return: usable count of LOCATION_MZONE or real LOCATION_SZONE of playerid requested by uplayer (may be negative)
 int32 field::get_useable_count(card* pcard, uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32 zone, uint32* list) {
 	///kdiy///////
+	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
+		zone=0xffff;		
 	//if(location == LOCATION_MZONE && pcard && pcard->current.location == LOCATION_EXTRA)
 	if(pcard && ((location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) && pcard->current.location == LOCATION_EXTRA)	
 	///kdiy///////	
@@ -668,6 +670,10 @@ int32 field::get_useable_count_fromex(card* pcard, uint8 playerid, uint8 uplayer
 	return useable_count;
 }
 int32 field::get_spsummonable_count(card* pcard, uint8 playerid, uint32 zone, uint32* list) {
+	///kdiy///////
+	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
+		zone=0xffff;	
+	///kdiy///////			
 	if(pcard->current.location == LOCATION_EXTRA)
 		return get_spsummonable_count_fromex(pcard, playerid, playerid, zone, list);
 	else
@@ -709,14 +715,16 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
-	///////////kdiy////////
+	///kdiy///////
+	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
+		zone=0xffff;
 	uint32 flag2 = flag;
 	///////////kdiy////////
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		flag2 = flag;
 		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
-		  flag2 = (flag | ~zone) & 0x1f;
+		  flag2 = (flag | ~zone) & 0x1f1f;
 		  flag = (flag | ~zone) & 0x1f;
 		}
 		else

@@ -905,11 +905,7 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 reason_player
 				change = false;
 			if(!change)
 				targets->container.erase(pcard);
-		}
-		///////kdiy//////
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && zone==0xff)
-		  zone=0xffff;
-		///////kdiy//////		
+		}		
 		int32 fcount = get_useable_count(NULL, playerid, LOCATION_MZONE, playerid, LOCATION_REASON_CONTROL, zone);
 		if(fcount <= 0) {
 			destroy_set->swap(targets->container);
@@ -1613,9 +1609,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			return TRUE;
 		if(target->is_affected_by_effect(EFFECT_CANNOT_SUMMON))
 			return TRUE;
-		///////////kdiy//////////	
-		if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA) && zone==0xff)
-			zone=0xffff;			
+		///////////kdiy//////////			
 		//if(target->current.location == LOCATION_MZONE) {
 		if((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		///////////kdiy//////////				
@@ -2310,11 +2304,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 			return TRUE;
 		if(target->is_affected_by_effect(EFFECT_CANNOT_MSET))
 			return TRUE;
-		effect_set eset;
-		///////////kdiy//////////	
-		if(is_player_affected_by_effect(setplayer,EFFECT_ORICA) && zone==0xff)
-			zone=0xffff;
-		///////////kdiy//////////						
+		effect_set eset;					
 		int32 res = target->filter_set_procedure(setplayer, &eset, ignore_count, min_tribute, zone);
 		if(proc) {
 			if(res < 0)
@@ -3409,11 +3399,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 	uint8 playerid = (target->spsummon_param >> 24) & 0xf;
 	uint8 nocheck = (target->spsummon_param >> 16) & 0xff;
 	uint8 nolimit = (target->spsummon_param >> 8) & 0xff;
-	uint8 positions = target->spsummon_param & 0xff;
-	///////////kdiy//////////	
-	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
-		zone=0xffff;
-	///////////kdiy//////////		
+	uint8 positions = target->spsummon_param & 0xff;	
 	switch(step) {
 	case 0: {
 		effect_set eset;
