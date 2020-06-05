@@ -4851,10 +4851,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			uint32 lreason = reason ? reason : (target->current.location == LOCATION_MZONE || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 			//////////kdiy//////////			
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
-			//////////kdiy//////////				
-			//if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
-			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff || zone != 0xffff) && !rule) {
-			//////////kdiy//////////					
+			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {
 				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
 					flag = flag & ~(1u << 5);
 					ct++;
@@ -5632,7 +5629,13 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 	case 0: {
 		if(check_field) {
 			uint32 ct = 0;
-			zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));			
+			///////kdiy///////////
+			//zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
+			if(is_player_affected_by_effect(playerid, EFFECT_ORICA))	
+			  zone &= (0x1f1f & get_forced_zones(to_check, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
+	        else
+	          zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
+	        ///////kdiy///////////				
 			ct = get_useable_count(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 			if(ct < min) {
 				card_set* must_choose_one = new card_set;
@@ -5788,7 +5791,13 @@ int32 field::select_tribute_cards(int16 step, card* target, uint8 playerid, uint
 	switch(step) {
 	case 0: {
 		core.operated_set.clear();
-		zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
+		///////kdiy///////////
+		//zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+			 zone &= (0x1f1f & get_forced_zones(target, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
+	    else
+	        zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
+	    ///////kdiy///////////			
 		int32 ct = get_tofield_count(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 		if(ct > 0) {
 			auto message = pduel->new_message(MSG_HINT);
@@ -5814,7 +5823,13 @@ int32 field::select_tribute_cards(int16 step, card* target, uint8 playerid, uint
 	}
 	case 1: {
 		int32 rmax = 0;
-		zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
+		///////kdiy///////////
+		//zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));	
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA))	
+			 zone &= (0x1f1f & get_forced_zones(target, toplayer, LOCATION_ONFIELD, playerid, LOCATION_REASON_TOFIELD));	
+	    else
+	        zone &= (0x1f & get_forced_zones(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
+	    ///////kdiy///////////			
 		int32 ct = get_tofield_count(target, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 		card_set* must_choose_one = new card_set;
 		for(auto& pcard : core.release_cards) {
