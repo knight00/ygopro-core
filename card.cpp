@@ -99,7 +99,7 @@ int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 		return FALSE;
 	////////kdiy////////		
 	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN))
-	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN))	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN))	
 	////////kdiy////////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_ATTACK_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
@@ -113,7 +113,7 @@ int32 card::is_defense_decreasable_as_cost(uint8 playerid, int32 val) {
 		return FALSE;
 	////////kdiy////////		
 	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))
-	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))	
+	if (!(((current.location & LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))	
 	////////kdiy////////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_DEFENSE_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
@@ -742,7 +742,7 @@ int32 card::get_base_attack() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.base_attack != -1)
@@ -835,7 +835,7 @@ int32 card::get_attack() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.attack != -1)
@@ -1031,7 +1031,7 @@ int32 card::get_base_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.base_defense != -1)
@@ -1124,7 +1124,7 @@ int32 card::get_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.defense != -1)
@@ -1387,7 +1387,7 @@ int32 card::get_rank() {
 		return assume[ASSUME_RANK];
 	////////kdiy////////			
 	//if(!(current.location & LOCATION_MZONE))
-	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
+	if (!(((current.location & LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
 	////////kdiy////////
 		return data.level;
 	if (temp.level != 0xffffffff)
@@ -1448,7 +1448,7 @@ uint32 card::get_link() {
 		return assume[ASSUME_LINK];
 	////////kdiy////////			
 	//if(!(current.location & LOCATION_MZONE))
-	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location & LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
+	if (!(((current.location & LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))))	
 	////////kdiy////////
 		return data.level;
 	if (temp.level != 0xffffffff)

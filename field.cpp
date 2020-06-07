@@ -643,9 +643,7 @@ int32 field::is_location_useable(uint32 playerid, uint32 location, uint32 sequen
 // list: store local flag in list
 // return: usable count of LOCATION_MZONE or real LOCATION_SZONE of playerid requested by uplayer (may be negative)
 int32 field::get_useable_count(card* pcard, uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32 zone, uint32* list) {
-	///kdiy///////
-	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
-		zone=0xffff;		
+	///kdiy///////		
 	//if(location == LOCATION_MZONE && pcard && pcard->current.location == LOCATION_EXTRA)
 	if(pcard && ((location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) && pcard->current.location == LOCATION_EXTRA)	
 	///kdiy///////	
@@ -669,11 +667,7 @@ int32 field::get_useable_count_fromex(card* pcard, uint8 playerid, uint8 uplayer
 		pcard->current.location = 0;
 	return useable_count;
 }
-int32 field::get_spsummonable_count(card* pcard, uint8 playerid, uint32 zone, uint32* list) {
-	///kdiy///////
-	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
-		zone=0xffff;	
-	///kdiy///////			
+int32 field::get_spsummonable_count(card* pcard, uint8 playerid, uint32 zone, uint32* list) {		
 	if(pcard->current.location == LOCATION_EXTRA)
 		return get_spsummonable_count_fromex(pcard, playerid, playerid, zone, list);
 	else
@@ -700,7 +694,7 @@ int32 field::get_useable_count_other(card* pcard, uint8 playerid, uint8 location
 	int32 limit;
 	if(location == LOCATION_MZONE)
 		///////////kdiy////////
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		   limit = get_mzone_limit(playerid, uplayer, reason)+get_szone_limit(playerid, uplayer, reason);
 		else
 	    ///////////kdiy////////	
@@ -715,34 +709,18 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
-	///kdiy///////
-	if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && zone==0xff)
-		zone=0xffff;
-	uint32 flag2 = flag;
-	///////////kdiy////////
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
-		flag2 = flag;
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
-		  flag2 = (flag | ~zone) & 0x1f1f;
-		  flag = (flag | ~zone) & 0x1f;
-		}
-		else
-		///////////kdiy////////
 		flag = (flag | ~zone) & 0x1f;
 	} else
 		flag = ((flag >> 8) | ~zone) & 0x1f;
-	int32 count = 5 - field_used_count[flag];
-	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
-      flag = flag2;
-	///////////kdiy////////		
+	int32 count = 5 - field_used_count[flag];	
 	if(location == LOCATION_MZONE)
 		flag |= (1u << 5) | (1u << 6);
 	if(list)
 		*list = flag;
 	///////////kdiy////////
-	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,reason,zone);
 	///////////kdiy////////			
 	return count;
@@ -751,7 +729,7 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 	int32 count = get_spsummonable_count_fromex_rule4(pcard, playerid, uplayer, zone, list);
 	int32 limit = get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
 	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		limit += get_szone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
 	///////////kdiy////////		
 	if(count > limit)
@@ -778,17 +756,12 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	uint32 rule_zone = get_rule_zone_fromex(playerid, pcard);
 	flag = flag | ~zone | ~rule_zone;	
 	if(list)
-	///////////kdiy////////		
-	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))	
-		*list = flag & 0x1f1f;
-		else
-	///////////kdiy////////	
 	    *list = flag & 0x7f;	
 	int32 count = 5 - field_used_count[flag & 0x1f];
 	if(~flag & ((1u << 5) | (1u << 6)))
 		count++;
 	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && pcard->current.location & LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,LOCATION_REASON_TOFIELD,zone);
 	///////////kdiy////////			
 	return count;
