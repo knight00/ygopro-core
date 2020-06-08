@@ -1082,6 +1082,27 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p1 = pcard1->current.controler;
 		uint8 s1 = pcard1->current.sequence;
 		uint32 flag;
+	    ///////kdiy///////
+		card* pcard2 = *targets2->it;	
+	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard1->current.location == LOCATION_SZONE) {
+			effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->code = EFFECT_ORICA_SZONE;
+		    deffect->type = EFFECT_TYPE_SINGLE;
+		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+		    deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+		    pcard2->add_effect(deffect);
+	    }	
+	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard2->current.location == LOCATION_SZONE) {
+		    effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+			deffect->code = EFFECT_ORICA_SZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			pcard1->add_effect(deffect);
+        }		
+	    ///////kdiy///////		
 		get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
 		///////////kdiy//////////	
 		//flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
@@ -1091,9 +1112,10 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		  flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
 		else
 		  flag2 = (flag2 & ~(100 << s1) & 0x1f00) | ~0x1f00;
-		flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;
+		if(is_player_affected_by_effect(p1, EFFECT_ORICA))  
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;
+		//card* pcard2 = *targets2->it;		
 		///////////kdiy//////////  			
-		card* pcard2 = *targets2->it;
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p1);
@@ -1106,19 +1128,20 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		card* pcard2 = *targets2->it;
 		uint8 p2 = pcard2->current.controler;
 		uint8 s2 = pcard2->current.sequence;
-		uint32 flag;
+		uint32 flag;		
 		get_useable_count(NULL, p2, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag);
 		///////////kdiy//////////	
-		//flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;	
+		//flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
 		uint32 flag2;
 		get_useable_count(NULL, p2, LOCATION_SZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag2);
 		if(pcard2->current.location == LOCATION_MZONE)
 		  flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
 		else					
 		  flag2 = (flag2 & ~(100 << s2) & 0x1f00) | ~0x1f00;
-		flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;
-		///////////kdiy//////////  				
-		card* pcard1 = *targets1->it;			
+		if(is_player_affected_by_effect(p2, EFFECT_ORICA))
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;		  
+		///////////kdiy//////////  	
+		card* pcard1 = *targets1->it;
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p2);
@@ -4820,13 +4843,13 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					flag = ((flag & 0xff) << 8) | 0xffff00ff;
 				else
 				    //////kdiy/////	
-					//flag = (flag & 0xff) | 0xffffff00;					
+					//flag = (flag & 0xff) | 0xffffff00;
 					{					
 					flag2 = ((flag2 & 0x1f) << 8) | 0xffffe0ff;	
 					// if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 					//    flag = (flag & 0x1fff) | 0xffffe000;
 					// else
-					   flag = (flag & 0xff) | 0xffffff00;					
+					   flag = (flag & 0xff) | 0xffffff00;
 				    }
 				    //////kdiy/////				
 			} else {

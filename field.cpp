@@ -440,27 +440,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
 		return;
 	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
-		return;
-	///////kdiy///////
-	if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard1->current.location == LOCATION_SZONE) {
-		effect* deffect = pduel->new_effect();
-		deffect->owner = pduel->game_field->player[p1].list_szone[5];
-		deffect->code = EFFECT_ORICA_SZONE;
-		deffect->type = EFFECT_TYPE_SINGLE;
-		deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-		deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
-		pcard2->add_effect(deffect);
-	}	
-	if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard2->current.location == LOCATION_SZONE) {
-		effect* deffect = pduel->new_effect();
-		deffect->owner = pduel->game_field->player[p1].list_szone[5];
-		deffect->code = EFFECT_ORICA_SZONE;
-		deffect->type = EFFECT_TYPE_SINGLE;
-		deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-		deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
-		pcard1->add_effect(deffect);
-	}		
-	///////kdiy///////		
+		return;		
 	if(l1 == l2) {
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
