@@ -1141,9 +1141,10 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		  flag2 = (flag2 & ~(100 << s2) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p2, EFFECT_ORICA))
 		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
-		pcard1->temp.location = returns.at<int8>(1);	  
+		card* pcard1 = *targets1->it;				
+		pcard1->temp.location = returns.at<int8>(1);	
+		//card* pcard1 = *targets1->it;				  
 		///////////kdiy//////////  	
-		card* pcard1 = *targets1->it;		
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p2);
