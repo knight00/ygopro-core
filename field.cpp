@@ -441,14 +441,11 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	uint32 loc2 = pcard2->temp.location;				
 	//if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
 		//|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
-	if((new_sequence1 != s1 && !is_location_useable(p1, loc1, new_sequence1))	
-		|| (new_sequence2 != s2 && !is_location_useable(p2, loc2, new_sequence2)))		
+	if((new_sequence1 != s1 && !is_location_useable(p1, loc2, new_sequence1))
+		|| (new_sequence2 != s2 && !is_location_useable(p2, loc1, new_sequence2)))		
 	//////kdiy///////////			
 		return;
-	//////kdiy///////////			
-	//if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
-	if(p1 == p2 && loc1 == loc2 && (new_sequence1 == s2 || new_sequence2 == s1))	
-	//////kdiy///////////		
+	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
 		return;		
 	//////kdiy///////////	
 	//if(l1 == l2) {
@@ -539,13 +536,19 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		add_card(p2, pcard1, l2, new_sequence2);
 		add_card(p1, pcard2, l1, new_sequence1);
 	}
-	if(s1 == new_sequence1 && s2 == new_sequence2) {
+	//////kdiy//////////
+	//if(s1 == new_sequence1 && s2 == new_sequence2) {
+	if(s1 == new_sequence1 && l1 == loc1 && s2 == new_sequence2 && l2 == loc2) {		
+	//////kdiy//////////	
 		auto message = pduel->new_message(MSG_SWAP);
 		message->write<uint32>(pcard1->data.code);
 		message->write(info1);
 		message->write<uint32>(pcard2->data.code);
 		message->write(info2);
-	} else if(s1 == new_sequence1) {
+	//////kdiy//////////		
+	//} else if(s1 == new_sequence1) {
+	} else if(s1 == new_sequence1 && l1 == loc1) {		
+	//////kdiy//////////		
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard1->data.code);
 		message->write(info1);

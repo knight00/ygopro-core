@@ -1104,7 +1104,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 			pcard1->add_effect(deffect);
         }		
 	    ///////kdiy///////		
-		get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0xff, &flag);
+		get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag);
 		///////////kdiy//////////	
 		//flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
 		uint32 flag2;
@@ -1156,7 +1156,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		card* pcard1 = *targets1->it;
 		card* pcard2 = *targets2->it;
 		uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
-		uint8 new_s1 = core.units.begin()->arg4, new_s2 = returns.at<int8>(2);	
+		uint8 new_s1 = core.units.begin()->arg4, new_s2 = returns.at<int8>(2);
 		//kdiy///////
 		pcard1->temp.location = returns.at<int8>(1);
 		//kdiy///////					
@@ -4761,13 +4761,13 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		if((ret == 1) && (!(target->current.reason & REASON_TEMPORARY) || (target->current.reason_effect->owner != core.reason_effect->owner)))
 			return TRUE;
 	    ///////kdiy///////
-	    if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
+	    if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE) && location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && target->current.controler == playerid)) {
 		    effect* deffect = pduel->new_effect();
 			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
 			target->add_effect(deffect);
 		}	
 		///////kdiy///////				
@@ -4901,12 +4901,12 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				uint32 resetflag = 0;
 				///kdiy////////
 				//if(location & LOCATION_ONFIELD)		
-				if(location & LOCATION_ONFIELD && !(target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+				if((location & LOCATION_ONFIELD) && !(target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 				///kdiy////////						
 					resetflag |= RESET_TOFIELD;
 				///kdiy////////	
 				//if(target->current.location & LOCATION_ONFIELD)
-				if(target->current.location & LOCATION_ONFIELD && !(location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
+				if((target->current.location & LOCATION_ONFIELD) && !(location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
 				///kdiy////////				
 					resetflag |= RESET_LEAVE;
 				effect* peffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER);
