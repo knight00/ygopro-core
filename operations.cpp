@@ -1112,7 +1112,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		if(pcard1->current.location == LOCATION_MZONE)
 		  flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
 		else
-		  flag2 = (flag2 & ~(100 << s1) & 0x1f00) | ~0x1f00;
+		  flag2 = (flag2 & ~(256 << s1) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p1, EFFECT_ORICA))  
 		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
 		//card* pcard2 = *targets2->it;		
@@ -1138,11 +1138,11 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		if(pcard2->current.location == LOCATION_MZONE)
 		  flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
 		else					
-		  flag2 = (flag2 & ~(100 << s2) & 0x1f00) | ~0x1f00;
+		  flag2 = (flag2 & ~(256 << s2) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p2, EFFECT_ORICA))
 		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
 		card* pcard1 = *targets1->it;				
-		pcard1->temp.location = returns.at<int8>(1);	
+		pcard2->temp.location = returns.at<int8>(1);	
 		//card* pcard1 = *targets1->it;				  
 		///////////kdiy//////////  	
 		auto message = pduel->new_message(MSG_HINT);
@@ -1158,7 +1158,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
 		uint8 new_s1 = core.units.begin()->arg4, new_s2 = returns.at<int8>(2);	
 		//kdiy///////
-		pcard2->temp.location = returns.at<int8>(1);
+		pcard1->temp.location = returns.at<int8>(1);
 		//kdiy///////					
 		swap_card(pcard1, pcard2, new_s1, new_s2);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);

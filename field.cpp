@@ -436,16 +436,23 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	loc_info info1 = pcard1->get_info_location(), info2 = pcard2->get_info_location();
 	if(!(l1 & LOCATION_ONFIELD) || !(l2 & LOCATION_ONFIELD))
 		return;
-	if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
-		|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
-		return;
-	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
-		return;		
 	//////kdiy///////////	
 	uint32 loc1 = pcard1->temp.location;
-	uint32 loc2 = pcard2->temp.location;	
+	uint32 loc2 = pcard2->temp.location;				
+	//if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
+		//|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
+	if((new_sequence1 != s1 && !is_location_useable(p1, loc1, new_sequence1))	
+		|| (new_sequence2 != s2 && !is_location_useable(p2, loc2, new_sequence2)))		
+	//////kdiy///////////			
+		return;
+	//////kdiy///////////			
+	//if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
+	if(p1 == p2 && loc1 == loc2 && (new_sequence1 == s2 || new_sequence2 == s1))	
+	//////kdiy///////////		
+		return;		
+	//////kdiy///////////	
 	//if(l1 == l2) {
-    if(l1 == l2 || (loc1 && loc2)) {
+    if(l1 == l2 && (is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA))) {
 	//////kdiy///////////		
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
@@ -453,7 +460,10 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		pcard1->previous.position = pcard1->current.position;
 		pcard1->previous.pzone = pcard1->current.pzone;
 		pcard1->current.controler = p2;
-		pcard1->current.location = l2;
+		//////kdiy///////////	
+		//pcard1->current.location = l2;
+		pcard1->current.location = loc1;		
+		//////kdiy///////////	
 		pcard1->current.sequence = new_sequence2;
 		pcard2->previous.controler = p2;
 		pcard2->previous.location = l2;
@@ -461,50 +471,69 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		pcard2->previous.position = pcard2->current.position;
 		pcard2->previous.pzone = pcard2->current.pzone;
 		pcard2->current.controler = p1;
-		pcard2->current.location = l1;
+		//////kdiy///////////	
+		//pcard2->current.location = l1;
+		pcard2->current.location = loc2;	
+		//////kdiy///////////	
 		pcard2->current.sequence = new_sequence1;
 		if(p1 != p2) {
 			pcard1->fieldid = infos.field_id++;
 			pcard2->fieldid = infos.field_id++;
 		}		
+		//////kdiy//////////
+		// if(l1 == LOCATION_MZONE) {
+		// 	player[p1].list_mzone[s1] = 0;
+		// 	player[p1].used_location &= ~(1 << s1);
+		// 	player[p2].list_mzone[s2] = 0;
+		// 	player[p2].used_location &= ~(1 << s2);	
+		// 	player[p2].list_mzone[new_sequence2] = pcard1;
+		// 	player[p2].used_location |= 1 << new_sequence2;
+		// 	player[p1].list_mzone[new_sequence1] = pcard2;
+		// 	player[p1].used_location |= 1 << new_sequence1;
+		// } else if(l1 == LOCATION_SZONE) {
+		// 	player[p1].list_szone[s1] = 0;
+		// 	player[p1].used_location &= ~(256 << s1);
+		// 	player[p2].list_szone[s2] = 0;
+		// 	player[p2].used_location &= ~(256 << s2);
+		// 	player[p2].list_szone[new_sequence2] = pcard1;
+		// 	player[p2].used_location |= 256 << new_sequence2;
+		// 	player[p1].list_szone[new_sequence1] = pcard2;
+		// 	player[p1].used_location |= 256 << new_sequence1;
+		// }
+		l1 = new_l1; l2 = new_l2;
 		if(l1 == LOCATION_MZONE) {
 			player[p1].list_mzone[s1] = 0;
 			player[p1].used_location &= ~(1 << s1);
-			player[p2].list_mzone[s2] = 0;
-			player[p2].used_location &= ~(1 << s2);
-			//////kdiy///////////	
-			if(loc1 && loc1 == LOCATION_MZONE) {
-			//////kdiy///////////	
-			player[p2].list_mzone[new_sequence2] = pcard1;
-			player[p2].used_location |= 1 << new_sequence2;
-			//////kdiy///////////	
-			}
-			else {
-			player[p2].list_szone[new_sequence2] = pcard1;
-			player[p2].used_location |= 100 << new_sequence2;
-			}
-			//////kdiy///////////	
-			if(loc2 && loc2 == LOCATION_MZONE) {
-			//////kdiy///////////
-			player[p1].list_mzone[new_sequence1] = pcard2;
-			player[p1].used_location |= 1 << new_sequence1;
-			//////kdiy///////////	
-			}
-			else {
-			player[p1].list_szone[new_sequence1] = pcard2;
-			player[p1].used_location |= 100 << new_sequence1;
-			}
-			//////kdiy///////////				
-		} else if(l1 == LOCATION_SZONE) {
+		}
+		else {
 			player[p1].list_szone[s1] = 0;
 			player[p1].used_location &= ~(256 << s1);
+		}
+		if(l2 == LOCATION_MZONE) {
+			player[p2].list_mzone[s2] = 0;
+			player[p2].used_location &= ~(1 << s2);
+		}
+		else {
 			player[p2].list_szone[s2] = 0;
 			player[p2].used_location &= ~(256 << s2);
-			player[p2].list_szone[new_sequence2] = pcard1;
-			player[p2].used_location |= 256 << new_sequence2;
+		}	
+		if(loc2 == LOCATION_MZONE) {
+			player[p1].list_mzone[new_sequence1] = pcard2;
+			player[p1].used_location |= 1 << new_sequence1;
+		}	
+		else {	
 			player[p1].list_szone[new_sequence1] = pcard2;
 			player[p1].used_location |= 256 << new_sequence1;
 		}
+		if(loc1 == LOCATION_MZONE) {			
+			player[p2].list_mzone[new_sequence2] = pcard1;
+			player[p2].used_location |= 1 << new_sequence2;
+		}
+		else {			
+			player[p2].list_szone[new_sequence2] = pcard1;
+			player[p2].used_location |= 256 << new_sequence2;
+		}		
+		//////kdiy//////////		
 	} else {
 		remove_card(pcard1);
 		remove_card(pcard2);
