@@ -1114,7 +1114,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		else
 		  flag2 = (flag2 & ~(100 << s1) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p1, EFFECT_ORICA))  
-		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
 		//card* pcard2 = *targets2->it;		
 		///////////kdiy//////////  			
 		auto message = pduel->new_message(MSG_HINT);
@@ -1125,7 +1125,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		return FALSE;
 	}
 	case 2: {
-		core.units.begin()->arg4 = returns.at<int8>(2);		
+		core.units.begin()->arg4 = returns.at<int8>(2);
 		card* pcard2 = *targets2->it;
 		uint8 p2 = pcard2->current.controler;
 		uint8 s2 = pcard2->current.sequence;
@@ -1140,9 +1140,10 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		else					
 		  flag2 = (flag2 & ~(100 << s2) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p2, EFFECT_ORICA))
-		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f1f1f;		  
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
+		pcard1->temp.location = returns.at<int8>(1);	  
 		///////////kdiy//////////  	
-		card* pcard1 = *targets1->it;
+		card* pcard1 = *targets1->it;		
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_SELECTMSG);
 		message->write<uint8>(p2);
@@ -1154,7 +1155,10 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		card* pcard1 = *targets1->it;
 		card* pcard2 = *targets2->it;
 		uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
-		uint8 new_s1 = core.units.begin()->arg4, new_s2 = returns.at<int8>(2);			
+		uint8 new_s1 = core.units.begin()->arg4, new_s2 = returns.at<int8>(2);	
+		//kdiy///////
+		pcard2->temp.location = returns.at<int8>(1);
+		//kdiy///////					
 		swap_card(pcard1, pcard2, new_s1, new_s2);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
 		pcard2->reset(RESET_CONTROL, RESET_EVENT);

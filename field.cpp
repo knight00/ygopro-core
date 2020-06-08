@@ -429,7 +429,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	}
 	add_card(playerid, pcard, location, sequence, pzone);
 }
-void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new_sequence2) {
+void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new_sequence2) {	
 	uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
 	uint8 l1 = pcard1->current.location, l2 = pcard2->current.location;
 	uint8 s1 = pcard1->current.sequence, s2 = pcard2->current.sequence;
@@ -441,7 +441,12 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		return;
 	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
 		return;		
-	if(l1 == l2) {
+	//////kdiy///////////	
+	uint32 loc1 = pcard1->temp.location;
+	uint32 loc2 = pcard2->temp.location;	
+	//if(l1 == l2) {
+    if(l1 == l2 || (loc1 && loc2)) {
+	//////kdiy///////////		
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
 		pcard1->previous.sequence = s1;
@@ -461,16 +466,35 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		if(p1 != p2) {
 			pcard1->fieldid = infos.field_id++;
 			pcard2->fieldid = infos.field_id++;
-		}
+		}		
 		if(l1 == LOCATION_MZONE) {
 			player[p1].list_mzone[s1] = 0;
 			player[p1].used_location &= ~(1 << s1);
 			player[p2].list_mzone[s2] = 0;
 			player[p2].used_location &= ~(1 << s2);
+			//////kdiy///////////	
+			if(loc1 && loc1 == LOCATION_MZONE) {
+			//////kdiy///////////	
 			player[p2].list_mzone[new_sequence2] = pcard1;
 			player[p2].used_location |= 1 << new_sequence2;
+			//////kdiy///////////	
+			}
+			else {
+			player[p2].list_szone[new_sequence2] = pcard1;
+			player[p2].used_location |= 100 << new_sequence2;
+			}
+			//////kdiy///////////	
+			if(loc2 && loc2 == LOCATION_MZONE) {
+			//////kdiy///////////
 			player[p1].list_mzone[new_sequence1] = pcard2;
 			player[p1].used_location |= 1 << new_sequence1;
+			//////kdiy///////////	
+			}
+			else {
+			player[p1].list_szone[new_sequence1] = pcard2;
+			player[p1].used_location |= 100 << new_sequence1;
+			}
+			//////kdiy///////////				
 		} else if(l1 == LOCATION_SZONE) {
 			player[p1].list_szone[s1] = 0;
 			player[p1].used_location &= ~(256 << s1);
