@@ -1084,6 +1084,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint32 flag;
 	    ///////kdiy///////
 		card* pcard2 = *targets2->it;	
+		uint8 p2 = pcard2->current.controler;		
 	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard1->current.location == LOCATION_SZONE) {
 			effect* deffect = pduel->new_effect();
 		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
