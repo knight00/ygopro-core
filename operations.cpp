@@ -1085,7 +1085,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 	    ///////kdiy///////
 		card* pcard2 = *targets2->it;	
 		uint8 p2 = pcard2->current.controler;		
-	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard1->current.location == LOCATION_SZONE) {
+	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA)) {
 			effect* deffect = pduel->new_effect();
 		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
 		    deffect->code = EFFECT_ORICA_SZONE;
@@ -1094,7 +1094,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		    deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
 		    pcard2->add_effect(deffect);
 	    }	
-	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard2->current.location == LOCATION_SZONE) {
+	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA)) {
 		    effect* deffect = pduel->new_effect();
 		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
@@ -1114,7 +1114,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		else
 		  flag2 = (flag2 & ~(256 << s1) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p1, EFFECT_ORICA))  
-		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) | ~0x1f1f;
 		//card* pcard2 = *targets2->it;		
 		///////////kdiy//////////  			
 		auto message = pduel->new_message(MSG_HINT);
@@ -1140,7 +1140,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		else					
 		  flag2 = (flag2 & ~(256 << s2) & 0x1f00) | ~0x1f00;
 		if(is_player_affected_by_effect(p2, EFFECT_ORICA))
-		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) & 0x1f1f;
+		  flag = ((flag & 0x1f) | (flag2 & 0x1f00)) | ~0x1f1f;
 		card* pcard1 = *targets1->it;				
 		pcard2->temp.location = returns.at<int8>(1);	
 		//card* pcard1 = *targets1->it;				  

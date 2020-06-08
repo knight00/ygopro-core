@@ -500,7 +500,6 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		// 	player[p1].list_szone[new_sequence1] = pcard2;
 		// 	player[p1].used_location |= 256 << new_sequence1;
 		// }
-		l1 = new_l1; l2 = new_l2;
 		if(l1 == LOCATION_MZONE) {
 			player[p1].list_mzone[s1] = 0;
 			player[p1].used_location &= ~(1 << s1);
