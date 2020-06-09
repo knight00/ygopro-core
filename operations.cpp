@@ -5000,12 +5000,12 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				uint32 resetflag = 0;
 				///kdiy////////
 				//if(location & LOCATION_ONFIELD)		
-				if((location & LOCATION_ONFIELD) && !(target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+				if((location & LOCATION_ONFIELD) && !((target->current.location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 				///kdiy////////						
 					resetflag |= RESET_TOFIELD;
 				///kdiy////////	
 				//if(target->current.location & LOCATION_ONFIELD)
-				if((target->current.location & LOCATION_ONFIELD) && !(location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
+				if((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
 				///kdiy////////				
 					resetflag |= RESET_LEAVE;
 				effect* peffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER);
@@ -5051,7 +5051,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 	}
 	case 2: {
 		//kdiy///////
-		if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid,EFFECT_ORICA) && target->current.controler == playerid && target->current.location != LOCATION_SZONE)
+		if(location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))))
 		    location = target->temp.location;
 		//kdiy///////				
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
