@@ -3530,7 +3530,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, zone, &flag2);	
 			/////kdiy/////
 		    uint32 flag3;
-			int32 ct3 = get_tofield_count(pcard, sumplayer, LOCATION_SZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag3);	
+			int32 ct3 = get_tofield_count(target, playerid, LOCATION_SZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag3);
 			flag3 |= ~zone;
 			flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
 			flag2 = ((flag2 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;		
