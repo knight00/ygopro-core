@@ -1119,7 +1119,8 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		///////////kdiy//////////	
 		//flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
 		uint32 flag2;
-		get_useable_count(NULL, p1, LOCATION_SZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag2);						
+		get_useable_count(NULL, p1, LOCATION_SZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag2);	
+		flag2 = flag2 | ~0x1f;					
 		if(pcard1->current.location == LOCATION_MZONE)
 		  flag = (flag & ~(1 << s1) & 0xff) | ~0x1f;
 		else
@@ -1146,6 +1147,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		//flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
 		uint32 flag2;
 		get_useable_count(NULL, p2, LOCATION_SZONE, reason_player, LOCATION_REASON_CONTROL, 0x1f, &flag2);
+		flag2 = flag2 | ~0x1f;
 		if(pcard2->current.location == LOCATION_MZONE)
 		  flag = (flag & ~(1 << s2) & 0xff) | ~0x1f;
 		else					
@@ -3314,11 +3316,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		uint32 zone = 0xff;
 		uint32 flag1, flag2;
 		int32 ct1 = get_tofield_count(pcard, sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag1);
-		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, zone, &flag2);
+		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, 0x1f, &flag2);
 		/////kdiy/////
 		uint32 flag3;
 		int32 ct3 = get_tofield_count(pcard, sumplayer, LOCATION_SZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag3);	
-		flag3 |= ~zone;
+		flag3 = flag3 | ~0x1f;
 		flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
 		flag2 = ((flag2 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;		
 		/////kdiy/////		
@@ -3527,11 +3529,10 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		if(targets && pduel->game_field->is_flag(DUEL_EMZONE)) {
 			uint32 flag1, flag2;
 			int32 ct1 = get_tofield_count(target, playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag1);
-			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, zone, &flag2);	
+			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, 0x1f, &flag2);	
 			/////kdiy/////
 		    uint32 flag3;
 			int32 ct3 = get_tofield_count(target, playerid, LOCATION_SZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag3);
-			flag3 |= ~zone;
 			flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
 			flag2 = ((flag2 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;		
 			/////kdiy/////			
@@ -4906,7 +4907,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
 			//////////kdiy//////////		
 			uint32 flag2;						
-			int32 ct2 = get_useable_count(target, playerid, LOCATION_SZONE, move_player, lreason, zone, &flag2);	
+			int32 ct2 = get_useable_count(target, playerid, LOCATION_SZONE, move_player, lreason, 0x1f, &flag2);	
 			//////////kdiy//////////						
 			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {				
 				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
