@@ -449,8 +449,12 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		return;		
 	//////kdiy///////////	
 	//if(l1 == l2) {
-    if(l1 == l2 && (is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA))) {
-	//////kdiy///////////		
+    if(l1 == l2 && is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA)) {
+	//////kdiy///////////
+	    if(!is_player_affected_by_effect(p1,EFFECT_ORICA) && !(loc2 & LOCATION_ONFIELD))
+		   loc2 = LOCATION_MZONE;
+	    if(!is_player_affected_by_effect(p2,EFFECT_ORICA) && !(loc1 & LOCATION_ONFIELD))
+		   loc1 = LOCATION_MZONE;		   
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
 		pcard1->previous.sequence = s1;

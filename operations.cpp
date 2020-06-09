@@ -1102,7 +1102,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		    deffect->code = EFFECT_ORICA_SZONE;
 		    deffect->type = EFFECT_TYPE_SINGLE;
 		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-		    deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+		    deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
 		    pcard2->add_effect(deffect);
 	    }	
 	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA)) {
@@ -1111,7 +1111,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
 			pcard1->add_effect(deffect);
         }		
 	    ///////kdiy///////		
@@ -1316,7 +1316,7 @@ int32 field::control_adjust(uint16 step) {
 				deffect->code = EFFECT_ORICA_SZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-				deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+				deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
 				pcard1->add_effect(deffect);
             }		
 	        ///////kdiy///////					
@@ -1345,7 +1345,7 @@ int32 field::control_adjust(uint16 step) {
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
 			pcard->add_effect(deffect);
 		}	
 		///////kdiy///////				
