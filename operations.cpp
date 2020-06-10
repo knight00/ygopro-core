@@ -4912,8 +4912,8 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			//////////kdiy//////////			
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
 			//////////kdiy//////////		
-			uint32 flag2;						
-			int32 ct2 = get_useable_count(target, playerid, LOCATION_SZONE, move_player, lreason, 0x1f, &flag2);	
+			// uint32 flag2;						
+			// get_useable_count(target, playerid, LOCATION_SZONE, move_player, lreason, 0x1f, &flag2);	
 			//////////kdiy//////////						
 			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {				
 				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
@@ -4928,7 +4928,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			if(location == LOCATION_SZONE)
 				flag = flag | ~zone;
 			//////////kdiy//////////		
-			flag2 = flag2 | ~zone;
+			// flag2 = flag2 | ~zone;
 			//////////kdiy//////////
 			if((ret == 1) && (ct <= 0 || target->is_status(STATUS_FORBIDDEN) || check_unique_onfield(target, playerid, location))) {
 				core.units.begin()->step = 3;
@@ -4956,7 +4956,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				    //////kdiy/////	
 					//flag = (flag & 0xff) | 0xffffff00;
 					{					
-					   flag2 = ((flag2 & 0x1f) << 8) | 0xffffe0ff;	
+					   //flag2 = ((flag2 & 0x1f) << 8) | 0xffffe0ff;	
 					   flag = (flag & 0xff) | 0xffffff00;
 				    }
 				    //////kdiy/////				
@@ -4967,14 +4967,14 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				    //////kdiy/////	
 					//flag = ((flag & 0xff) << 16) | 0xff00ffff;		
 			        {
-						flag2 = ((flag2 & 0x1f) << 24) | 0xe0ffffff;
+						//flag2 = ((flag2 & 0x1f) << 24) | 0xe0ffffff;
 					    flag = ((flag & 0xff) << 16) | 0xff00ffff;	
 					}	
 				    //////kdiy/////							
 			}
 			//////kdiy/////	
-			if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
-				flag= ((flag & 0x00ff00ff) | (flag2 & 0x1f001f00)) | 0xe000e000;
+			// if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
+			// 	flag= ((flag & 0x00ff00ff) | (flag2 & 0x1f001f00)) | 0xe000e000;
 			//////kdiy/////			
 			flag |= 0xe080e080;			
 			auto message = pduel->new_message(MSG_HINT);
