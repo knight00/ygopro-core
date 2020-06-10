@@ -5079,7 +5079,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		////kdiy///////		
 			pzone = TRUE;
 		//kdiy///////
-		if(location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
 		move_card(playerid, target, target->temp.location, target->temp.sequence, pzone);
 		else
 		//kdiy///////											
