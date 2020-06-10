@@ -437,15 +437,20 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	if(!(l1 & LOCATION_ONFIELD) || !(l2 & LOCATION_ONFIELD))
 		return;
 	//////kdiy///////////	
-	uint32 loc1 = pcard1->temp.location;
-	uint32 loc2 = pcard2->temp.location;				
+	uint32 loc1 = 0;
+	if(pcard1->temp.location) loc1 = pcard1->temp.location;
+	uint32 loc2 = 0;
+	if(pcard2->temp.location) loc2 = pcard2->temp.location;	
 	//if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
 		//|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
-	if((new_sequence1 != s1 && !is_location_useable(p1, loc2, new_sequence1))
-		|| (new_sequence2 != s2 && !is_location_useable(p2, loc1, new_sequence2)))		
+	if((new_sequence1 != s1 && ((!is_location_useable(p1, loc2, new_sequence1) && loc2 == 0) || !is_location_useable(p1, loc2, new_sequence1)))
+		|| (new_sequence2 != s2 && ((!is_location_useable(p2, loc1, new_sequence1) && loc1 == 0) || !is_location_useable(p2, loc1, new_sequence2))))
 	//////kdiy///////////			
 		return;
-	if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
+	//////kdiy///////////			
+	//if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
+	if(p1 == p2 && (loc1 == 0 || loc1 == loc2) && (new_sequence1 == s2 || new_sequence2 == s1))	
+	//////kdiy///////////		
 		return;		
 	//////kdiy///////////	
 	//if(l1 == l2) {
@@ -542,7 +547,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	}
 	//////kdiy//////////
 	//if(s1 == new_sequence1 && s2 == new_sequence2) {
-	if(s1 == new_sequence1 && l1 == loc1 && s2 == new_sequence2 && l2 == loc2) {		
+	if((s1 == new_sequence1 && s2 == new_sequence2 && loc1 == 0) || (s1 == new_sequence1 && l1 == loc1 && s2 == new_sequence2 && l2 == loc2)) {		
 	//////kdiy//////////	
 		auto message = pduel->new_message(MSG_SWAP);
 		message->write<uint32>(pcard1->data.code);
@@ -551,7 +556,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		message->write(info2);
 	//////kdiy//////////		
 	//} else if(s1 == new_sequence1) {
-	} else if(s1 == new_sequence1 && l1 == loc1) {		
+	} else if(s1 == new_sequence1 && (loc1 == 0 || l1 == loc1)) {		
 	//////kdiy//////////		
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard1->data.code);
@@ -910,11 +915,27 @@ int32 field::get_forced_zones(card* pcard, uint8 playerid, uint8 location, uint3
 uint32 field::get_rule_zone_fromex(int32 playerid, card* pcard) {
 	if(is_flag(DUEL_EMZONE)) {
 		if(is_flag(DUEL_FSX_MMZONE) && pcard && pcard->is_position(POS_FACEDOWN) && (pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)))
-			return 0x7f;
+		    ////////kdiy////////
+			//return 0x7f;	
+			{
+			if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+               return 0x1f7f;	
+			else
+			   return 0x7f;			
+			}
+		    ////////kdiy////////
 		else
 			return get_linked_zone(playerid) | (1u << 5) | (1u << 6);
 	} else {
-		return 0x1f;
+		    ////////kdiy////////
+			//return 0x7f;	
+			{
+			if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+               return 0x1f7f;	
+			else
+			   return 0x7f;			
+			}
+		    ////////kdiy////////
 	}
 }
 uint32 field::get_linked_zone(int32 playerid, bool free) {
@@ -943,6 +964,11 @@ uint32 field::get_linked_zone(int32 playerid, bool free) {
 	for (effect_set::size_type i = 0; i < eset.size(); ++i) {
 		value = eset[i]->get_value();
 		if (value) {
+			////////kdiy////////
+			if(is_player_affected_by_effect(playerid, EFFECT_ORICA_SZONE))
+			zones |= (value >> (16 * playerid)) & 0x1f7f;
+			else
+			////////kdiy////////			
 			zones |= (value >> (16 * playerid)) & 0x7f;
 		}
 	}
