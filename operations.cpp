@@ -4988,10 +4988,10 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 	case 1: {
 		uint32 seq = returns.at<int8>(2);
 		//kdiy///////
-		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE) {		
-		    location = returns.at<int8>(1);
-		    target->temp.location = returns.at<int8>(1);
-		}
+		// if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(target->current.location & LOCATION_SZONE && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE) {
+		//     location = returns.at<int8>(1);
+		//     target->temp.location = returns.at<int8>(1);
+		// }
 		//kdiy///////		
 		if(!is_equip && location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))
 			seq = 5;
@@ -5001,18 +5001,18 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				///kdiy////////
 				//if(location & LOCATION_ONFIELD)		
 				if((location & LOCATION_ONFIELD) && !((target->current.location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-				///kdiy////////						
+				///kdiy////////			
 					resetflag |= RESET_TOFIELD;
-				///kdiy////////	
+				///kdiy////////
 				//if(target->current.location & LOCATION_ONFIELD)
-				if((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))				
+				if((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 				///kdiy////////				
 					resetflag |= RESET_LEAVE;
 				effect* peffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER);
-				///kdiy////////					
+				///kdiy////////	
 				//if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD)
-				if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)				
-				///kdiy////////					
+				if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)
+				///kdiy////////
 					&& !(peffect && (peffect->value & TYPE_TRAP)) && ret != 2)
 					resetflag |= RESET_MSCHANGE;
 				target->reset(resetflag, RESET_EVENT);
@@ -5049,11 +5049,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		add_process(PROCESSOR_SELECT_POSITION, 0, 0, 0, (positions << 16) + move_player, target->data.code);
 		return FALSE;
 	}
-	case 2: {
-		//kdiy///////
-		if(location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))))
-		    location = target->temp.location;
-		//kdiy///////				
+	case 2: {			
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			if(target->current.location == LOCATION_DECK) {
 				uint32 curp = target->current.controler;
@@ -5075,7 +5071,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		message->write(target->get_info_location());
 		////kdiy///////		
 		//if(target->overlay_target)
-		if(target->overlay_target && location & LOCATION_ONFIELD && target->current.location & LOCATION_ONFIELD && target->is_affected_by_effect(EFFECT_ORICA_SZONE))		
+		if(target->overlay_target && (location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		////kdiy///////		
 			target->overlay_target->xyz_remove(target);
 		// call move_card()
@@ -5083,7 +5079,11 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		//if(!is_equip && location == LOCATION_SZONE && (target->data.type & TYPE_PENDULUM) && zone == 0xff && pduel->game_field->is_flag(DUEL_PZONE))
 		if(!is_equip && location == LOCATION_SZONE && !target->is_affected_by_effect(EFFECT_ORICA_SZONE) && (target->data.type & TYPE_PENDULUM) && zone == 0xff && pduel->game_field->is_flag(DUEL_PZONE))		
 		////kdiy///////		
-			pzone = TRUE;								
+			pzone = TRUE;
+		//kdiy///////
+		// if(location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+		//     location = target->temp.location;
+		//kdiy///////											
 		move_card(playerid, target, location, target->temp.sequence, pzone);
 		target->current.position = returns.at<int32>(0);
 		target->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
