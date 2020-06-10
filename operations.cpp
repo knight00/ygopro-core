@@ -4989,7 +4989,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 		uint32 seq = returns.at<int8>(2);
 		//kdiy///////
 		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
-		    target->temp.location = returns.at<int32>(1);
+		    target->temp.location = returns.at<int8>(1);
 		//kdiy///////		
 		if(!is_equip && location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))
 			seq = 5;
@@ -5080,7 +5080,8 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			pzone = TRUE;
 		//kdiy///////
 		if(location == LOCATION_MZONE && !((target->current.location & LOCATION_ONFIELD) && !((location & LOCATION_ONFIELD) && target->is_affected_by_effect(EFFECT_ORICA_SZONE))))
-		    location = target->temp.location;
+		move_card(playerid, target, target->temp.location, target->temp.sequence, pzone);
+		else
 		//kdiy///////											
 		move_card(playerid, target, location, target->temp.sequence, pzone);
 		target->current.position = returns.at<int32>(0);
