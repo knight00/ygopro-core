@@ -823,11 +823,7 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	    *list = flag & 0x7f;	
 	int32 count = 5 - field_used_count[flag & 0x1f];
 	if(~flag & ((1u << 5) | (1u << 6)))
-		count++;
-	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		count+= get_tofield_count(pcard,playerid,LOCATION_SZONE,uplayer,LOCATION_REASON_TOFIELD,zone);
-	///////////kdiy////////			
+		count++;		
 	return count;
 }
 int32 field::get_mzone_limit(uint8 playerid, uint8 uplayer, uint32 reason) {
