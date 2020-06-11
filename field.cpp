@@ -820,8 +820,16 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	uint32 rule_zone = get_rule_zone_fromex(playerid, pcard);
 	flag = flag | ~zone | ~rule_zone;	
 	if(list)
-	    *list = flag & 0x7f;	
+	    *list = flag & 0x7f;
+	///////////kdiy////////
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && list)
+	    *list = flag & 0x1f7f;
+	///////////kdiy////////
 	int32 count = 5 - field_used_count[flag & 0x1f];
+	///////////kdiy////////
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
+		count += 5 - field_used_count[(flag & 0x1f00) >> 8];
+	///////////kdiy////////		
 	if(~flag & ((1u << 5) | (1u << 6)))
 		count++;		
 	return count;

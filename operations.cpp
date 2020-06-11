@@ -1182,6 +1182,26 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		swap_card(pcard1, pcard2, new_s1, new_s2);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
 		pcard2->reset(RESET_CONTROL, RESET_EVENT);
+		//kdiy///////			
+	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard2->current.location == LOCATION_SZONE) {
+			effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->code = EFFECT_ORICA_SZONE;
+		    deffect->type = EFFECT_TYPE_SINGLE;
+		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+		    deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+		    pcard2->add_effect(deffect);
+	    }	
+	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard1->current.location == LOCATION_SZONE) {
+		    effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+			deffect->code = EFFECT_ORICA_SZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+			pcard1->add_effect(deffect);
+        }		
+	    ///////kdiy///////				
 		set_control(pcard1, p2, reset_phase, reset_count);
 		set_control(pcard2, p1, reset_phase, reset_count);
 		pcard1->set_status(STATUS_ATTACK_CANCELED, TRUE);
@@ -1323,6 +1343,26 @@ int32 field::control_adjust(uint16 step) {
 			swap_card(pcard1, pcard2);
 			pcard1->reset(RESET_CONTROL, RESET_EVENT);
 			pcard2->reset(RESET_CONTROL, RESET_EVENT);
+		    //kdiy///////			
+	        if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard2->current.location == LOCATION_SZONE) {
+			effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->code = EFFECT_ORICA_SZONE;
+		    deffect->type = EFFECT_TYPE_SINGLE;
+		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+		    deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+		    pcard2->add_effect(deffect);
+	    }	
+	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard1->current.location == LOCATION_SZONE) {
+		    effect* deffect = pduel->new_effect();
+		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+			deffect->code = EFFECT_ORICA_SZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+			pcard1->add_effect(deffect);
+        }		
+	    ///////kdiy///////			
 		}
 		card_set* adjust_set = new card_set;
 		core.units.begin()->ptarget = (group*)adjust_set;
@@ -3325,10 +3365,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, 0x1f, &flag2);
 		/////kdiy/////
 		uint32 flag3;
-		int32 ct3 = get_tofield_count(pcard, sumplayer, LOCATION_SZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag3);	
+		int32 ct3 = get_tofield_count(pcard, sumplayer, LOCATION_SZONE, sumplayer, LOCATION_REASON_TOFIELD, 0x1f, &flag3);	
 		flag3 = flag3 | ~0x1f;
-		flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
-		flag2 = ((flag2 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
+		if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+		  flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
 		/////kdiy/////		
 		for(auto it = pgroup->it; it != pgroup->container.end(); ++it) {
 			if((*it)->current.location != LOCATION_EXTRA)
@@ -3539,8 +3579,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 			/////kdiy/////
 		    uint32 flag3;
 			int32 ct3 = get_tofield_count(target, playerid, LOCATION_SZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag3);
-			flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;
-			flag2 = ((flag2 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;		
+			flag1 = ((flag1 & 0x00ff00ff) | (flag3 & 0x1f001f00)) & 0x1fff1fff;	
 			/////kdiy/////			
 			for(auto& pcard : targets->container) {
 				///////////kdiy//////////				
