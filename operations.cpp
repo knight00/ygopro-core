@@ -4996,7 +4996,11 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					//flag = (flag & 0xff) | 0xffffff00;
 					{					
 					   flag2 = ((flag2 & 0x1f) << 8) | 0xffffe0ff;	
-					   flag = (flag & 0xff) | 0xffffff00;
+					   //////kdiy/////	
+					   if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
+					     flag = (flag & 0x1fff) | 0xffffe000;
+					   else
+					     flag = (flag & 0xff) | 0xffffff00;
 				    }
 				    //////kdiy/////				
 			} else {
@@ -5007,13 +5011,17 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 					//flag = ((flag & 0xff) << 16) | 0xff00ffff;		
 			        {
 						flag2 = ((flag2 & 0x1f) << 24) | 0xe0ffffff;
-					    flag = ((flag & 0xff) << 16) | 0xff00ffff;	
+					   //////kdiy/////	
+					   if(is_player_affected_by_effect(1-playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
+					     flag = (flag & 0x1fff0000) | 0xe000ffff;
+					   else						
+					      flag = ((flag & 0xff) << 16) | 0xff00ffff;	
 					}	
 				    //////kdiy/////							
 			}
 			//////kdiy/////	
-			if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
-				flag= ((flag & 0x00ff00ff) | (flag2 & 0x1f001f00)) | 0xe000e000;
+			// if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
+			// 	flag= ((flag & 0x00ff00ff) | (flag2 & 0x1f001f00)) | 0xe000e000;
 			//////kdiy/////			
 			flag |= 0xe080e080;			
 			auto message = pduel->new_message(MSG_HINT);

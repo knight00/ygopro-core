@@ -775,6 +775,11 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	if(location == LOCATION_MZONE) {
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
+		///////////kdiy////////	
+	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		flag = (flag | ~((zone & 0xff) | 0x1f00)) & 0x1f;
+		else
+		///////////kdiy////////			
 		flag = (flag | ~zone) & 0x1f;
 	} else
 		flag = ((flag >> 8) | ~zone) & 0x1f;
