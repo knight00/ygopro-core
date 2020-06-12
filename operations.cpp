@@ -4987,8 +4987,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				else
 				    //////kdiy/////	
 					//flag = (flag & 0xff) | 0xffffff00;
-					{					
-					   //////kdiy/////	
+					{						
 					   if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
 					     flag = (flag & 0x1fff) | 0xffffe000;
 					   else
@@ -5002,7 +5001,6 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				    //////kdiy/////	
 					//flag = ((flag & 0xff) << 16) | 0xff00ffff;		
 			        {
-					   //////kdiy/////	
 					   if(is_player_affected_by_effect(1-playerid, EFFECT_ORICA) && !((target->current.location & LOCATION_SZONE) && target->current.controler == playerid && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) && location == LOCATION_MZONE)
 					     flag = (flag & 0x1fff0000) | 0xe000ffff;
 					   else						
