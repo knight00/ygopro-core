@@ -806,6 +806,9 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 }
 int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
+	///////////kdiy////////	
+	if(!(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+	///////////kdiy////////			
 	flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);  
 	if(player[playerid].list_mzone[5] && is_location_useable(playerid, LOCATION_MZONE, 6)
 		&& check_extra_link(playerid, pcard, 6)) {
@@ -836,8 +839,9 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	///////////kdiy////////
 	int32 count = 5 - field_used_count[flag & 0x1f];
 	///////////kdiy////////
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 		count += 5 - field_used_count[(flag & 0x1f00) >> 8];
+	}
 	///////////kdiy////////		
 	if(~flag & ((1u << 5) | (1u << 6)))
 		count++;		
