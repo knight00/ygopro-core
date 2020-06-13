@@ -175,8 +175,6 @@ public:
 	static int32 card_get_owner_target_count(lua_State *L);
 	static int32 card_get_activate_effect(lua_State *L);
 	static int32 card_check_activate_effect(lua_State *L);
-	static int32 card_get_tuner_limit(lua_State * L);
-	static int32 card_get_hand_synchro(lua_State * L);
 	static int32 card_register_effect(lua_State *L);
 	static int32 card_is_has_effect(lua_State *L);
 	static int32 card_get_card_effect(lua_State *L);
@@ -204,7 +202,7 @@ public:
 	static int32 card_is_disabled(lua_State *L);
 	static int32 card_is_destructable(lua_State *L);
 	static int32 card_is_summonable(lua_State *L);
-	static int32 card_is_fusion_summonable_card(lua_State* L);
+	static int32 card_is_fusion_summonable_card(lua_State *L);
 	static int32 card_is_msetable(lua_State *L);
 	static int32 card_is_ssetable(lua_State *L);
 	static int32 card_is_special_summonable(lua_State *L);
@@ -551,10 +549,10 @@ public:
 	static int32 duel_select_target(lua_State *L);
 	static int32 duel_select_fusion_material(lua_State *L);
 	static int32 duel_set_fusion_material(lua_State *L);
-	static int32 duel_set_synchro_material(lua_State *L);
 	static int32 duel_get_ritual_material(lua_State *L);
 	static int32 duel_release_ritual_material(lua_State *L);
 	static int32 duel_get_fusion_material(lua_State *L);
+	static int32 duel_is_summon_cancelable(lua_State *L);
 	static int32 duel_set_must_select_cards(lua_State *L);
 	static int32 duel_grab_must_select_cards(lua_State *L);
 	static int32 duel_set_target_card(lua_State *L);
@@ -576,7 +574,6 @@ public:
 	static int32 duel_select_effect_yesno(lua_State *L);
 	static int32 duel_select_yesno(lua_State *L);
 	static int32 duel_select_option(lua_State *L);
-	static int32 duel_select_sequence(lua_State *L);
 	static int32 duel_select_position(lua_State *L);
 	static int32 duel_select_disable_field(lua_State *L);
 	static int32 duel_select_field_zone(lua_State *L);
@@ -629,8 +626,6 @@ public:
 	static int32 duel_get_card_from_cardid(lua_State *L);
 	static int32 duel_load_script(lua_State *L);
 
-	//specific card functions
-	static int32 duel_venom_swamp_check(lua_State *L);
 	static int32 duel_tag_swap(lua_State *L);
 	static int32 duel_get_player_count(lua_State *L);
 	static int32 duel_swap_deck_and_grave(lua_State *L);

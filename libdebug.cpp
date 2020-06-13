@@ -38,7 +38,7 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 	if(pduel->game_field->is_location_useable(playerid, location, sequence)) {
 		card* pcard = pduel->new_card(code);
 		pcard->owner = owner;
-		if(location == LOCATION_EXTRA && position == 0)
+		if(location == LOCATION_EXTRA && (position == 0 || (pcard->data.type & TYPE_PENDULUM) == 0))
 			position = POS_FACEDOWN_DEFENSE;
 		pcard->sendto_param.position = position;
 		if(location == LOCATION_PZONE) {
@@ -164,10 +164,6 @@ int32 scriptlib::debug_reload_field_begin(lua_State *L) {
 		CHECK(5)
 		}
 #undef CHECK
-	} else if (flag & DUEL_OBSOLETE_RULING) {
-		flag |= DUEL_MODE_MR1;
-		pduel->game_field->core.duel_options = flag;
-		return 0;
 	}
 	pduel->game_field->core.duel_options = flag;
 	return 0;
