@@ -4397,7 +4397,7 @@ int32 card::is_can_be_synchro_material(card* scard, uint8 playerid, card* tuner)
 		return FALSE;
 	////////kdiy////////		
 	//if(scard && current.location == LOCATION_MZONE && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
-	if ((scard && current.location == LOCATION_MZONE || (scard && current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
+	if ((scard && (current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (scard && current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
 	////////kdiy////////
 		return FALSE;
 	if(is_status(STATUS_FORBIDDEN))

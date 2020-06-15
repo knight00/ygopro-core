@@ -438,28 +438,39 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		return;
 	//////kdiy///////////	
 	uint32 loc1 = 0;
-	if(pcard1->temp.location) loc1 = pcard1->temp.location;
+	if(pcard1->temp.location) 
+	   loc1 = pcard1->temp.location;
+	else
+	   loc1 = l2;
 	uint32 loc2 = 0;
-	if(pcard2->temp.location) loc2 = pcard2->temp.location;	
-	//if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
-		//|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
-	if((new_sequence1 != s1 && ((!is_location_useable(p1, loc2, new_sequence1) && loc2 == 0) || !is_location_useable(p1, loc2, new_sequence1)))
-		|| (new_sequence2 != s2 && ((!is_location_useable(p2, loc1, new_sequence1) && loc1 == 0) || !is_location_useable(p2, loc1, new_sequence2))))
-	//////kdiy///////////			
+	if(pcard2->temp.location) 
+	   loc2 = pcard2->temp.location;
+	else
+	   loc2 = l1;
+	//////kdiy///////////	  
+	// if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
+	// 	|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
+	if((new_sequence1 != s1 && !is_location_useable(p1, loc1, new_sequence1))
+		|| (new_sequence2 != s2 && !is_location_useable(p2, loc2, new_sequence2)))
+	//////kdiy///////////		
 		return;
-	//////kdiy///////////			
+	//////kdiy///////////	
 	//if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
-	if(p1 == p2 && (loc1 == 0 || loc1 == loc2) && (new_sequence1 == s2 || new_sequence2 == s1))	
+	if(p1 == p2 && loc1 == loc2 && (new_sequence1 == s2 || new_sequence2 == s1))	
 	//////kdiy///////////		
 		return;		
 	//////kdiy///////////	
 	//if(l1 == l2) {
-    if(l1 == l2 && is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA)) {
+    if(l1 == l2 || is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA) || is_player_affected_by_effect(p1,EFFECT_SANCT) || is_player_affected_by_effect(p2,EFFECT_SANCT)) {
 	//////kdiy///////////
 	    if(!is_player_affected_by_effect(p1,EFFECT_ORICA) && !(loc2 & LOCATION_ONFIELD))
 		   loc2 = LOCATION_MZONE;
 	    if(!is_player_affected_by_effect(p2,EFFECT_ORICA) && !(loc1 & LOCATION_ONFIELD))
-		   loc1 = LOCATION_MZONE;		   
+		   loc1 = LOCATION_MZONE;	
+	    if(!is_player_affected_by_effect(p1,EFFECT_ORICA) && !(loc2 & EFFECT_SANCT))
+		   loc2 = LOCATION_SZONE;
+	    if(!is_player_affected_by_effect(p2,EFFECT_ORICA) && !(loc1 & EFFECT_SANCT))
+		   loc1 = LOCATION_SZONE;			   	   
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
 		pcard1->previous.sequence = s1;
@@ -547,7 +558,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	}
 	//////kdiy//////////
 	//if(s1 == new_sequence1 && s2 == new_sequence2) {
-	if((s1 == new_sequence1 && s2 == new_sequence2 && loc1 == 0) || (s1 == new_sequence1 && l1 == loc1 && s2 == new_sequence2 && l2 == loc2)) {		
+	if(s1 == new_sequence1 && s2 == new_sequence2 && loc1 == l1 && loc2 == l2) {		
 	//////kdiy//////////	
 		auto message = pduel->new_message(MSG_SWAP);
 		message->write<uint32>(pcard1->data.code);
@@ -556,7 +567,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		message->write(info2);
 	//////kdiy//////////		
 	//} else if(s1 == new_sequence1) {
-	} else if(s1 == new_sequence1 && (loc1 == 0 || l1 == loc1)) {		
+	} else if(s1 == new_sequence1 && l1 == loc1) {		
 	//////kdiy//////////		
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard1->data.code);
@@ -759,11 +770,16 @@ int32 field::get_useable_count_other(card* pcard, uint8 playerid, uint8 location
 	if(location == LOCATION_MZONE)
 		///////////kdiy////////
 		if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		   limit = get_mzone_limit(playerid, uplayer, reason)+get_szone_limit(playerid, uplayer, reason);
+		   limit = get_mzone_limit(playerid, uplayer, reason)+ get_szone_limit(playerid, uplayer, reason);
 		else
 	    ///////////kdiy////////	
 		limit = get_mzone_limit(playerid, uplayer, reason);
 	else
+		///////////kdiy////////
+		if(is_player_affected_by_effect(playerid, EFFECT_SANCT) && !(pcard && (pcard->current.location & LOCATION_MZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))
+		   limit = get_mzone_limit(playerid, uplayer, reason)+ get_szone_limit(playerid, uplayer, reason);
+		else
+	    ///////////kdiy////////		
 		limit = get_szone_limit(playerid, uplayer, reason);
 	if(count > limit)
 		count = limit;
@@ -786,6 +802,12 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		count += 5 - ct2;
 		flag = ((flag & 0x1f) | ((flag2 & 0x1f) << 8)) & 0x1f1f;
 	}
+	if(location == LOCATION_SZONE && !is_player_affected_by_effect(playerid, EFFECT_ORICA) && is_player_affected_by_effect(playerid, EFFECT_SANCT) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
+	    uint32 flag2;
+	    int32 ct2 = get_tofield_count(pcard, playerid, LOCATION_MZONE, uplayer, reason, 0x1f, &flag2);		
+		count += 5 - ct2;
+		flag = ((flag2 & 0x1f) | ((flag & 0x1f) << 8)) & 0x1f1f;
+	}	
 	///////////kdiy////////		
 	if(location == LOCATION_MZONE)
 		flag |= (1u << 5) | (1u << 6);
@@ -798,7 +820,7 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 	int32 limit = get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
 	///////////kdiy////////
 	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !(pcard && (pcard->current.location & LOCATION_SZONE) && pcard->current.controler == playerid && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
-		limit += get_szone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
+		limit += get_szone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);		
 	///////////kdiy////////		
 	if(count > limit)
 		count = limit;		

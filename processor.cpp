@@ -533,7 +533,7 @@ int32 field::process() {
 			        || (attacker->fieldid_r != core.pre_field[0])
 					/////////kdiy////////
 			        //|| (attacker->current.location != LOCATION_MZONE)
-			        || !(attacker->current.location == LOCATION_MZONE || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))					
+			        || !((attacker->current.location == LOCATION_MZONE && !attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))					
 					/////////kdiy////////
 			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)
