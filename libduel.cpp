@@ -1965,11 +1965,7 @@ int32 scriptlib::duel_force_attack(lua_State *L) {
 	//////kdiy//////////
 	if (attack_target)
 	//////kdiy//////////
-	pduel->game_field->core.forced_attack_target = attack_target;
-	//////kdiy//////////
-	else
-	attacker->direct_attackable = 1;
-	//////kdiy//////////
+	   pduel->game_field->core.forced_attack_target = attack_target;
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_calculate_damage(lua_State *L) {
