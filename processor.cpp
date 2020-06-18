@@ -533,7 +533,7 @@ int32 field::process() {
 			        || (attacker->fieldid_r != core.pre_field[0])
 					/////////kdiy////////
 			        //|| (attacker->current.location != LOCATION_MZONE)
-			        || !((attacker->current.location == LOCATION_MZONE && !attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))					
+			        || !((attacker->current.location == LOCATION_MZONE && !attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 					/////////kdiy////////
 			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)
@@ -2257,7 +2257,7 @@ int32 field::process_idle_command(uint16 step) {
 		for(auto& pcard : player[infos.turn_player].list_mzone) {
 			//////kdiy//////////////
 			//if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
-			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))			
+			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 			//////kdiy//////////////
 		        || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))))
 				core.repositionable_cards.push_back(pcard);
@@ -2912,19 +2912,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->step = 12;
 			return FALSE;
 		}
-		// replay
-		///////kdiy////////////
-		//if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK))
-		if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK) && !(core.forced_attacker && !core.forced_attack_target))
-		///////kdiy////////////
+		// replay		
+		if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK))
 			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 30);
 		else {
-			///////kdiy////////////
-			if (core.forced_attacker && !core.forced_attack_target) {
-				core.units.begin()->step = 19;
-				return FALSE;
-			}
-			///////kdiy////////////
 			returns.at<int32>(0) = TRUE;
 			core.attack_cancelable = FALSE;
 		}
@@ -3212,7 +3203,7 @@ int32 field::process_battle_command(uint16 step) {
 		effect* peffect;
 		if(core.attacker->is_status(STATUS_BATTLE_RESULT)	
 		///////////kdiy///////////
-		        //&& core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
+		       // && core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
 		        && ((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) && core.attacker->fieldid_r == core.pre_field[0]) {
 		///////////kdiy///////////					
 			des.insert(core.attacker);
@@ -3328,7 +3319,7 @@ int32 field::process_battle_command(uint16 step) {
 			for(auto cit = des->container.begin(); cit != des->container.end();) {
 				auto rm = cit++;
 				//////kdiy///////////
-				//if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
+				// if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
 				if(!(((*rm)->current.location == LOCATION_MZONE && !(*rm)->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((*rm)->current.location == LOCATION_SZONE && (*rm)->is_affected_by_effect(EFFECT_ORICA_SZONE))) || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
 				//////kdiy///////////
 					des->container.erase(rm);
@@ -3474,9 +3465,9 @@ int32 field::process_forced_battle(uint16 step) {
 		card_vector cv;
 		get_attack_target(tmp_attacker, &cv);
 		///////kdiy///////
-		//if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
-		//if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
-			//return TRUE;
+		if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
+		if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
+			return TRUE;
 		///////kdiy///////			
 		core.attacker = tmp_attacker;
 		core.attack_target = tmp_attack_target;
@@ -3589,8 +3580,8 @@ int32 field::process_damage_step(uint16 step, uint32 new_attack) {
 		core.units.begin()->ptarget = (group*)tmp;
 		core.units.begin()->arg1 = infos.phase;
 		///////////kdiy/////////
-		//if(core.attacker->current.location != LOCATION_MZONE || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
-		if(!((core.attacker->current.location = LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		// if(core.attacker->current.location != LOCATION_MZONE || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
 		///////////kdiy/////////	
 			core.units.begin()->step = 2;
 			return FALSE;
@@ -4529,7 +4520,7 @@ int32 field::add_chain(uint16 step) {
 			}
 			/////////kdiy//////////
 			//if(phandler->current.location == LOCATION_SZONE) {
-			if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {				
+			if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
 			/////////kdiy//////////	
 				phandler->set_status(STATUS_ACT_FROM_HAND, FALSE);
 				change_position(phandler, 0, phandler->current.controler, POS_FACEUP, 0);

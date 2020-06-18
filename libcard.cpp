@@ -1729,22 +1729,6 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 		return 0;
 	}
 	int32 id;
-/////kdiy///////////
-    if (peffect->code == EFFECT_SET_ATTACK || peffect->code == EFFECT_SET_ATTACK_FINAL)
-	{
-		effect_set eset;
-		pcard->filter_effect(EFFECT_OVERINFINITE_ATTACK, &eset);
-		for(auto& eff : eset) {
-			if (eff->value != 1000000)
-			pduel->delete_effect(eff);
-		}
-		pcard->filter_effect(EFFECT_OVERINFINITE_DEFENSE, &eset);
-		for(auto& eff : eset) {
-			if (eff->value != 1000000)
-			pduel->delete_effect(eff);
-		}		
-	}	
-/////kdiy///////////
 	if (peffect->handler)
 		id = -1;
 	else

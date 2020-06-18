@@ -4978,7 +4978,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 			}
 			//////kdiy/////	
 			//if(location == LOCATION_SZONE)
-			if(location == LOCATION_SZONE) && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)
+			if(location == LOCATION_SZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE))
 			//////kdiy/////	
 				flag = flag | ~zone;
 			if((ret == 1) && (ct <= 0 || target->is_status(STATUS_FORBIDDEN) || check_unique_onfield(target, playerid, location))) {
@@ -5211,7 +5211,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				} else {
 					/////kdiu/////////////
 					//uint32 lreason = (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
-					uint32 lreason = (target->current.(location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+					uint32 lreason = ((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 					/////kdiu/////////////
 					pduel->lua->add_param(target->current.controler, PARAM_TYPE_INT);
 					pduel->lua->add_param(move_player, PARAM_TYPE_INT);
