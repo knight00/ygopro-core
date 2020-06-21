@@ -396,7 +396,7 @@ static const struct luaL_Reg grouplib[] = {
 };
 
 static const struct luaL_Reg duellib[] = {
-/////////////////////KDIY///
+    /////////////////////KDIY///
 	{ "SelectField", scriptlib::duel_select_field },
 	{ "GetMasterRule", scriptlib::duel_get_master_rule },
 	{ "ReadCard", scriptlib::duel_read_card },
@@ -405,9 +405,8 @@ static const struct luaL_Reg duellib[] = {
 	{ "SetMetatable", scriptlib::duel_setmetatable },
 	{ "MoveTurnCount", scriptlib::duel_move_turn_count },
 	{ "GetCardsInZone", scriptlib::duel_get_cards_in_zone },
-	//{ "XyzSummonByRose", scriptlib::duel_xyz_summon_by_rose },
-	{ "AnnounceCardFilter", scriptlib::duel_announce_card }, // For compat	
-/////////////////////KDIY///		
+	//{ "XyzSummonByRose", scriptlib::duel_xyz_summon_by_rose },	
+    /////////////////////KDIY///		
 	{ "EnableGlobalFlag", scriptlib::duel_enable_global_flag },
 	{ "GetLP", scriptlib::duel_get_lp },
 	{ "SetLP", scriptlib::duel_set_lp },

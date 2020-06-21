@@ -2685,10 +2685,21 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 		atype = 4;
 		for (uint32 i = 0; i < 7; ++i) {
 			card* atarget = player[1 - p].list_mzone[i];
-			if (atarget != core.attacker) {
+			///////kdiy///////////
+			//if (atarget != core.attacker) {
+			if (atarget && atarget != core.attacker && !atarget->is_affected_by_effect(EFFECT_SANCT_MZONE)) {				
+			///////kdiy///////////	
 					attack_tg.push_back(atarget);
 			}
 		}
+		///////kdiy///////////
+		for (uint32 i = 0; i < 5; ++i) {
+			card* atarget = player[1 - p].list_szone[i];
+			if (atarget && atarget != core.attacker && atarget->is_affected_by_effect(EFFECT_EQUIP_MONSTER)) {	
+					attack_tg.push_back(atarget);
+			}
+		}
+		///////kdiy///////////				
 		if(is_player_affected_by_effect(p, EFFECT_SELF_ATTACK) && (!pcard->is_affected_by_effect(EFFECT_ATTACK_ALL) || !attack_tg.size())) {
 			for (uint32 i = 0; i < 7; ++i) {
 				card* atarget = player[p].list_mzone[i];
@@ -2696,9 +2707,17 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 				// if (atarget != core.attacker) {
 				// 	attack_tg.push_back(atarget);
 				// }
-				attack_tg.push_back(atarget);
+				if (atarget && !atarget -> is_affected_by_effect(EFFECT_SANCT_MZONE))
+				   attack_tg.push_back(atarget);
 				//////kdiy//////////
 			}
+			//////kdiy//////////
+			for (uint32 i = 0; i < 5; ++i) {
+				card* atarget = player[p].list_szone[i];
+				if (atarget && atarget -> is_affected_by_effect(EFFECT_ORICA_SZONE) || atarget -> is_affected_by_effect(EFFECT_EQUIP_MONSTER))
+				   attack_tg.push_back(atarget);
+			}
+			//////kdiy//////////
 		}
 		pv = &attack_tg;
 	}
