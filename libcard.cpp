@@ -1730,8 +1730,8 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 	}
 	//////kdiy///////
     if (peffect->range && (peffect->range & LOCATION_MZONE) && !(peffect->range & LOCATION_SZONE)) {
-		int32 condition = peffect->condition;
-		peffect->condition = (pcard->current.location != LOCATION_SZONE || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE)) && !pcard->equiping_target;
+		int32 con = peffect->condition;
+		peffect->condition = interpreter::get_function_handle(L, (con == NULL || con) && (pcard->current.location != LOCATION_SZONE || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE)) && !pcard->equiping_target);
 	    peffect->range |= LOCATION_SZONE;
 	}
     // else if (peffect->range && (peffect->range & LOCATION_SZONE) && !(peffect->range & LOCATION_MZONE)) {
