@@ -115,7 +115,7 @@ int32 scriptlib::effect_set_range(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
-	uint32 v = lua_tointeger(L, 2);	
+	uint32 v = lua_tointeger(L, 2);
 	peffect->range = v;
 	return 0;
 }
@@ -276,7 +276,7 @@ int32 scriptlib::effect_set_condition(lua_State *L) {
 	check_param(L, PARAM_TYPE_FUNCTION, 2);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
 	if(peffect->condition)
-		luaL_unref(L, LUA_REGISTRYINDEX, peffect->condition);			
+		luaL_unref(L, LUA_REGISTRYINDEX, peffect->condition);
 	peffect->condition = interpreter::get_function_handle(L, 2);
 	return 0;
 }

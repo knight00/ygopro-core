@@ -754,14 +754,11 @@ uint32 card::get_type(card* scard, uint64 sumtype, uint8 playerid) {
 // Atk and def are sepcial cases since text atk/def ? are involved.
 // Asuumption: we can only change the atk/def of cards in LOCATION_MZONE.
 int32 card::get_base_attack() {
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
-	if((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE))	
-	////////kdiy////////
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.base_attack != -1)
@@ -772,12 +769,12 @@ int32 card::get_base_attack() {
 	int32 bdef = data.defense;
 	if(bdef < 0)
 		bdef = 0;
-    ///////////kdiy///////////	
+///////////kdiy///////////	
 	if(batk > 999999)
 		batk = 999999;
 	if(bdef > 999999)
 		bdef = 999999;
-    ///////////kdiy///////////	
+///////////kdiy///////////	
 	temp.base_attack = batk;
 	effect_set eset;
 	int32 swap = 0;
@@ -850,14 +847,11 @@ int32 card::get_base_attack() {
 int32 card::get_attack() {
 	if(assume.find(ASSUME_ATTACK) != assume.end())
 		return assume[ASSUME_ATTACK];
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
-	if((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE))	
-	////////kdiy////////	
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))	
 	////////kdiy////////
 		return data.attack;
 	if (temp.attack != -1)
@@ -1049,14 +1043,11 @@ int32 card::get_attack() {
 int32 card::get_base_defense() {
 	if(data.type & TYPE_LINK)
 		return 0;
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
-	if((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE))	
-	////////kdiy////////		
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.base_defense != -1)
@@ -1145,14 +1136,11 @@ int32 card::get_defense() {
 		return 0;
 	if (assume.find(ASSUME_DEFENSE) != assume.end())
 		return assume[ASSUME_DEFENSE];
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
-	if((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE))	
-	////////kdiy////////
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
 	////////kdiy////////	
 		return data.defense;
 	if (temp.defense != -1)
@@ -1349,10 +1337,7 @@ int32 card::get_level() {
 ////kdiy//////////	
 	if(((data.type & TYPE_XYZ) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
 		|| (data.type & TYPE_LINK) || (status & STATUS_NO_LEVEL)
-		////////kdiy////////
-		//|| (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)))
-	    || ((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE)))	
-	    ////////kdiy////////		
+		|| (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)))
 		return 0;
 	if (assume.find(ASSUME_LEVEL) != assume.end())
 		return assume[ASSUME_LEVEL];
@@ -1412,9 +1397,6 @@ int32 card::get_level() {
 int32 card::get_rank() {
 ///////kdiy///////////////
 	if(((!(data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL)) && !(is_affected_by_effect(EFFECT_LEVEL_RANK) || is_affected_by_effect(EFFECT_LEVEL_RANK_S))) 
-	////////kdiy////////	
-	|| is_affected_by_effect(EFFECT_SANCT_MZONE)	
-	////////kdiy////////		
 	|| (data.type & TYPE_LINK))
 		return 0;
 	if (assume.find(ASSUME_RANK) != assume.end())
@@ -1525,9 +1507,6 @@ uint32 card::get_link() {
 int32 card::get_synchro_level(card* pcard) {	
 ///////////kdiy///////////////	
 	if(((data.type & TYPE_XYZ) || ((status & STATUS_NO_LEVEL) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S))))
-	////kdiy//////////	
-	|| is_affected_by_effect(EFFECT_SANCT_MZONE)
-	////kdiy//////////			
 	|| (data.type & TYPE_LINK))
 		return 0;
 	////kdiy//////////	
@@ -1547,15 +1526,12 @@ int32 card::get_synchro_level(card* pcard) {
 int32 card::get_ritual_level(card* pcard) {		
 ///////////kdiy///////////////		
 	if(((data.type & TYPE_XYZ) || ((status & STATUS_NO_LEVEL) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S))))
-	////kdiy//////////	
-	|| is_affected_by_effect(EFFECT_SANCT_MZONE)
-	////kdiy//////////	
 	|| (data.type & TYPE_LINK))
 		return 0;
-    ////////kdiy///////////		
+////////kdiy///////////		
 	//uint32 lev;
 	int32 lev;
-    ////////kdiy///////////	
+////////kdiy///////////	
 	effect_set eset;
 	filter_effect(EFFECT_RITUAL_LEVEL, &eset);
 	if(eset.size())
@@ -1595,10 +1571,7 @@ int32 card::check_xyz_level(card* pcard, int32 lv) {
 uint32 card::get_attribute(card* scard, uint64 sumtype, uint8 playerid) {
 	if (assume.find(ASSUME_ATTRIBUTE) != assume.end())
 		return assume[ASSUME_ATTRIBUTE];
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
-	if((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE))	
-	////////kdiy////////
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER))
 		return 0;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -1648,10 +1621,7 @@ uint32 card::get_attribute(card* scard, uint64 sumtype, uint8 playerid) {
 uint32 card::get_race(card* scard, uint64 sumtype, uint8 playerid) {
 	if (assume.find(ASSUME_RACE) != assume.end())
 		return assume[ASSUME_RACE];
-	////////kdiy////////		
-	//if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER) && !sumtype)
-	if(((!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) || is_affected_by_effect(EFFECT_SANCT_MZONE)) && !sumtype)	
-	////////kdiy////////	
+	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER) && !sumtype)
 		return 0;
 	if (temp.race != 0xffffffff)
 		return temp.race;

@@ -533,7 +533,7 @@ int32 field::process() {
 			        || (attacker->fieldid_r != core.pre_field[0])
 					/////////kdiy////////
 			        //|| (attacker->current.location != LOCATION_MZONE)
-			        || !((attacker->current.location == LOCATION_MZONE && !attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (attacker->current.location == LOCATION_SZONE && (attacker->is_affected_by_effect(EFFECT_ORICA_SZONE) || attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER))))
+			        || !((attacker->current.location == LOCATION_MZONE && !attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (attacker->current.location == LOCATION_SZONE && attacker->is_affected_by_effect(EFFECT_ORICA_SZONE)))
 					/////////kdiy////////
 			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)
@@ -3204,7 +3204,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.attacker->is_status(STATUS_BATTLE_RESULT)	
 		///////////kdiy///////////
 		       // && core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
-		        && ((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && (core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) && core.attacker->fieldid_r == core.pre_field[0]) {
+		        && ((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) && core.attacker->fieldid_r == core.pre_field[0]) {
 		///////////kdiy///////////					
 			des.insert(core.attacker);
 			core.attacker->temp.reason = core.attacker->current.reason;
@@ -3490,7 +3490,7 @@ int32 field::process_forced_battle(uint16 step) {
 			for(auto& pcard : player[p].list_szone) {
 				if(!pcard)
 					continue;
-				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER))
+				if(!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 					continue;					
 				pcard->attack_announce_count = 0;
 				pcard->announce_count = 0;
@@ -3581,7 +3581,7 @@ int32 field::process_damage_step(uint16 step, uint32 new_attack) {
 		core.units.begin()->arg1 = infos.phase;
 		///////////kdiy/////////
 		// if(core.attacker->current.location != LOCATION_MZONE || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
-		if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && (core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
+		if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (core.attack_target && core.attack_target->current.location != LOCATION_MZONE)) {
 		///////////kdiy/////////	
 			core.units.begin()->step = 2;
 			return FALSE;
@@ -5812,14 +5812,11 @@ int32 field::adjust_step(uint16 step) {
 		} else {
 			/////////kdiy//////	
 			//if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
-			if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && (core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || core.attacker->fieldid_r != core.pre_field[0]
+			if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE))) || core.attacker->fieldid_r != core.pre_field[0]
 			/////////kdiy//////	
 				|| ((core.attacker->current.position & POS_DEFENSE) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
 				|| core.attacker->current.controler != core.attacker->attack_controler
-				/////////kdiy//////	
-				//|| (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE
-				|| (core.attack_target && !(((core.attack_target->current.location == LOCATION_MZONE && !core.attack_target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attack_target->current.location == LOCATION_SZONE && (core.attack_target->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attack_target->is_affected_by_effect(EFFECT_EQUIP_MONSTER))))				
-				/////////kdiy//////	
+				|| (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE
 					|| core.attack_target->current.controler != core.attack_target->attack_controler
 					|| core.attack_target->fieldid_r != core.pre_field[1])))
 				core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
