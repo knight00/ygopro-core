@@ -777,6 +777,8 @@ int32 card::get_base_attack() {
 		batk = 999999;
 	if(bdef > 999999)
 		bdef = 999999;
+	int32 datk = batk;
+	int32 ddef = bdef;		
     ///////////kdiy///////////	
 	temp.base_attack = batk;
 	effect_set eset;
@@ -798,7 +800,7 @@ int32 card::get_base_attack() {
 				if(batk < 0)
 					batk = 0;
 ///////////kdiy///////////			
-				if(batk > 999999)
+				if(batk > 999999 || (datk >= 999999 && batk >400000))
 					batk = 999999;	
 ///////////kdiy///////////									
 				temp.base_attack = batk;
@@ -809,7 +811,7 @@ int32 card::get_base_attack() {
 				if(bdef < 0)
 					bdef = 0;
 ///////////kdiy///////////			
-				if(bdef > 999999)
+				if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 					bdef = 999999;	
 ///////////kdiy///////////					
 				eset.erase(eset.begin() + i);
@@ -825,7 +827,7 @@ int32 card::get_base_attack() {
 			if(batk < 0)
 				batk = 0;
 ///////////kdiy///////////			
-			if(batk > 999999)
+			if(batk > 999999 || (datk >= 999999 && batk >400000))
 				batk = 999999;	
 ///////////kdiy///////////				
 			break;
@@ -834,7 +836,7 @@ int32 card::get_base_attack() {
 			if(bdef < 0)
 				bdef = 0;
 ///////////kdiy///////////			
-			if(bdef > 999999)
+			if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 				bdef = 999999;	
 ///////////kdiy///////////					
 			break;
@@ -875,6 +877,8 @@ int32 card::get_attack() {
 //////////kdiy/////////////
 	if(bdef > 999999)
 		bdef = 999999;
+	int32 datk = batk;
+	int32 ddef = bdef;		
 //////////kdiy/////////////		
 	temp.base_attack = batk;
 	temp.attack = batk;
@@ -905,7 +909,7 @@ int32 card::get_attack() {
 				if(batk < 0)
 					batk = 0;
 //////////kdiy/////////////
-	            if(batk > 999999)
+	            if(batk > 999999 || (datk >= 999999 && batk >400000))
 		            batk = 999999;
 //////////kdiy/////////////				
 				temp.base_attack = batk;
@@ -916,7 +920,7 @@ int32 card::get_attack() {
 				if(bdef < 0)
 					bdef = 0;
 //////////kdiy/////////////
-	            if(bdef > 999999)
+	            if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		            bdef = 999999;
 //////////kdiy/////////////					
 				eset.erase(eset.begin() + i);
@@ -938,12 +942,20 @@ int32 card::get_attack() {
 			atk = eset[i]->get_value(this);
 			if(!(eset[i]->type & EFFECT_TYPE_SINGLE))
 				up_atk = 0;
+//////////kdiy/////////////
+	        if(atk > 999999 || (datk >= 999999 && atk >400000))
+		        atk = 999999;
+//////////kdiy/////////////					
 			break;
 		case EFFECT_SET_ATTACK_FINAL:
 			if((eset[i]->type & EFFECT_TYPE_SINGLE) && !eset[i]->is_flag(EFFECT_FLAG_SINGLE_RANGE)) {
 				atk = eset[i]->get_value(this);
 				up_atk = 0;
 				upc_atk = 0;
+//////////kdiy/////////////
+	        if(atk > 999999 || (datk >= 999999 && atk >400000))
+		        atk = 999999;
+//////////kdiy/////////////					
 			} else {
 				if(!eset[i]->is_flag(EFFECT_FLAG_DELAY))
 					effects_atk.push_back(eset[i]);
@@ -956,7 +968,7 @@ int32 card::get_attack() {
 			if(batk < 0)
 				batk = 0;
 //////////kdiy/////////////
-	        if(batk > 999999)
+	        if(batk > 999999 || (datk >= 999999 && batk >400000))
 		        batk = 999999;
 //////////kdiy/////////////				
 			atk = -1;
@@ -971,7 +983,7 @@ int32 card::get_attack() {
 			if(bdef < 0)
 				bdef = 0;
 //////////kdiy/////////////
-	        if(bdef > 999999)
+	        if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		        bdef = 999999;
 //////////kdiy/////////////				
 			break;
@@ -1074,6 +1086,8 @@ int32 card::get_base_defense() {
 //////////kdiy/////////////
 	if(bdef > 999999)
 		bdef = 999999;
+	int32 datk = batk;
+	int32 ddef = bdef;		
 //////////kdiy/////////////		
 	temp.base_defense = bdef;
 	effect_set eset;
@@ -1091,9 +1105,9 @@ int32 card::get_base_defense() {
 				if(batk < 0)
 					batk = 0;
 //////////kdiy/////////////
-	            if(batk > 999999)
-	             	batk = 999999;
-//////////kdiy/////////////					
+	            if(batk > 999999 || (datk >= 999999 && batk >400000))
+		            batk = 999999;
+//////////kdiy/////////////				
 				eset.erase(eset.begin() + i);
 				continue;
 			case EFFECT_SET_BASE_DEFENSE:
@@ -1101,7 +1115,7 @@ int32 card::get_base_defense() {
 				if(bdef < 0)
 					bdef = 0;
 //////////kdiy/////////////
-	            if(bdef > 999999)
+	            if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		            bdef = 999999;
 //////////kdiy/////////////				
 				temp.base_defense = bdef;
@@ -1118,7 +1132,7 @@ int32 card::get_base_defense() {
 			if(batk < 0)
 				batk = 0;
 //////////kdiy/////////////
-	        if(batk > 999999)
+	        if(batk > 999999 || (datk >= 999999 && batk >400000))
 		        batk = 999999;
 //////////kdiy/////////////				
 			break;
@@ -1127,7 +1141,7 @@ int32 card::get_base_defense() {
 			if(bdef < 0)
 				bdef = 0;
 //////////kdiy/////////////
-	        if(bdef > 999999)
+	        if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		        bdef = 999999;
 //////////kdiy/////////////				
 			break;
@@ -1170,6 +1184,8 @@ int32 card::get_defense() {
 //////////kdiy/////////////
 	if(bdef > 999999)
 		bdef = 999999;
+	int32 datk = batk;
+	int32 ddef = bdef;		
 //////////kdiy/////////////		
 	temp.base_defense = bdef;
 	temp.defense = bdef;
@@ -1198,7 +1214,7 @@ int32 card::get_defense() {
 				if(batk < 0)
 					batk = 0;
 //////////kdiy/////////////
-	            if(bdef > 999999)
+	            if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		            bdef = 999999;
 //////////kdiy/////////////					
 				eset.erase(eset.begin() + i);
@@ -1208,7 +1224,7 @@ int32 card::get_defense() {
 				if(bdef < 0)
 					bdef = 0;
 //////////kdiy/////////////
-	            if(bdef > 999999)
+	            if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		            bdef = 999999;
 //////////kdiy/////////////					
 				temp.base_defense = bdef;
@@ -1231,12 +1247,20 @@ int32 card::get_defense() {
 			def = eset[i]->get_value(this);
 			if(!(eset[i]->type & EFFECT_TYPE_SINGLE))
 				up_def = 0;
+//////////kdiy/////////////
+	            if(def > 999999 || (ddef >= 999999 && def >400000))
+		            def = 999999;
+//////////kdiy/////////////					
 			break;
 		case EFFECT_SET_DEFENSE_FINAL:
 			if((eset[i]->type & EFFECT_TYPE_SINGLE) && !eset[i]->is_flag(EFFECT_FLAG_SINGLE_RANGE)) {
 				def = eset[i]->get_value(this);
 				up_def = 0;
 				upc_def = 0;
+//////////kdiy/////////////
+	            if(def > 999999 || (ddef >= 999999 && def >400000))
+		            def = 999999;
+//////////kdiy/////////////					
 			} else {
 				if(!eset[i]->is_flag(EFFECT_FLAG_DELAY))
 					effects_def.push_back(eset[i]);
@@ -1249,7 +1273,7 @@ int32 card::get_defense() {
 			if(bdef < 0)
 				bdef = 0;
 //////////kdiy/////////////
-	        if(bdef > 999999)
+	        if(bdef > 999999 || (ddef >= 999999 && bdef >400000))
 		        bdef = 999999;
 //////////kdiy/////////////				
 			def = -1;
@@ -1264,7 +1288,7 @@ int32 card::get_defense() {
 			if(batk < 0)
 				batk = 0;
 //////////kdiy/////////////
-	        if(batk > 999999)
+	        if(batk > 999999 || (datk >= 999999 && batk >400000))
 		        batk = 999999;
 //////////kdiy/////////////				
 			break;
