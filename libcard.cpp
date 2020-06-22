@@ -1728,6 +1728,18 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 		pduel->game_field->core.reseted_effects.insert(peffect);
 		return 0;
 	}
+	//////kdiy///////
+    if (peffect->range && (peffect->range & LOCATION_MZONE) && !(peffect->range & LOCATION_SZONE)) {
+		int32 condition = peffect->condition;
+		peffect->condition = (pcard->current.location != LOCATION_SZONE || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE)) && !pcard->equiping_target;
+	    peffect->range |= LOCATION_SZONE;
+	}
+    // else if (peffect->range && (peffect->range & LOCATION_SZONE) && !(peffect->range & LOCATION_MZONE)) {
+	//     peffect->condition = peffect->condition && (pcard->current.location != LOCATION_MZONE || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.location == LOCATION_MZONE));
+	//     peffect->range |= LOCATION_MZONE;
+	// }	
+    // if (peffect->s_range && (peffect->s_range & LOCATION_MZONE) && !(peffect->s_range & LOCATION_SZONE)) {		
+	//////kdiy///////	
 	int32 id;
 	if (peffect->handler)
 		id = -1;
