@@ -3090,14 +3090,20 @@ void card::filter_immune_effect() {
 	auto rg = single_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
-		if (peffect->is_available())
-			immune_effect.push_back(peffect);
+		///////kdiy/////////	
+		//if (peffect->is_available())				
+		if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		///////kdiy/////////
+		immune_effect.push_back(peffect);
 	}
 	for (auto& pcard : equiping_cards) {
 		rg = pcard->equip_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
-			if (peffect->is_available())
+		    ///////kdiy/////////	
+			//if (peffect->is_available())				
+			if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		    ///////kdiy/////////
 				immune_effect.push_back(peffect);
 		}
 	}
@@ -3105,7 +3111,10 @@ void card::filter_immune_effect() {
 		rg = pcard->target_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
-			if(peffect->is_target(this) && peffect->is_available())
+		    ///////kdiy/////////
+		    //if (peffect->is_target(this) && peffect->is_available())
+		    if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		    ///////kdiy/////////
 				immune_effect.push_back(peffect);
 		}
 	}
@@ -3115,14 +3124,20 @@ void card::filter_immune_effect() {
 			peffect = rg.first->second;
 			if (peffect->type & EFFECT_TYPE_FIELD)
 				continue;
-			if (peffect->is_available())
+		    ///////kdiy/////////	
+			//if (peffect->is_available())				
+			if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		    ///////kdiy/////////	
 				immune_effect.push_back(peffect);
 		}
 	}
 	rg = pduel->game_field->effects.aura_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
-		if (peffect->is_target(this) && peffect->is_available())
+		///////kdiy/////////
+		//if (peffect->is_target(this) && peffect->is_available())
+		if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		///////kdiy/////////		
 			immune_effect.push_back(peffect);
 	}
 	std::sort(immune_effect.begin(), immune_effect.end(), effect_sort_id);

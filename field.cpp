@@ -1661,7 +1661,8 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 		//if(location & LOCATION_MZONE) CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP));
 		//if(location & LOCATION_SZONE)
 			//CHECKL(player[self].list_szone, !pcard->is_status(STATUS_ACTIVATE_DISABLED));
-		if(location == LOCATION_RMZONE) CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP));
+		if(location == LOCATION_RMZONE) 
+		    CHECKL(player[self].list_mzone, !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP));
 		if(location == LOCATION_RSZONE)
 			CHECKL(player[self].list_szone, !pcard->is_status(STATUS_ACTIVATE_DISABLED));			
 		if(location & LOCATION_MZONE)
@@ -2653,6 +2654,10 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 	card_vector auto_attack, only_attack, must_attack, attack_tg;
 	for(auto& atarget : player[1 - p].list_mzone) {
 		if(atarget) {
+			///////kdiy///////
+			if(atarget->is_affected_by_effect(EFFECT_SANCT_MZONE))
+			    continue;
+			///////kdiy///////			
 			if(atarget->is_affected_by_effect(EFFECT_ONLY_BE_ATTACKED))
 				auto_attack.push_back(atarget);
 			if(pcard->is_affected_by_effect(EFFECT_ONLY_ATTACK_MONSTER, atarget))
@@ -2661,6 +2666,20 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 				must_attack.push_back(atarget);
 		}
 	}
+	///////kdiy///////
+	for(auto& atarget : player[1 - p].list_szone) {
+		if(atarget) {
+			if(!atarget->is_affected_by_effect(EFFECT_ORICA_SZONE) &&  !atarget->is_affected_by_effect(EFFECT_EQUIP_MONSTER))
+			    continue;		
+			if(atarget->is_affected_by_effect(EFFECT_ONLY_BE_ATTACKED))
+				auto_attack.push_back(atarget);
+			if(pcard->is_affected_by_effect(EFFECT_ONLY_ATTACK_MONSTER, atarget))
+				only_attack.push_back(atarget);
+			if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK_MONSTER, atarget))
+				must_attack.push_back(atarget);
+		}
+	}
+	///////kdiy///////
 	card_vector* pv = nullptr;
 	int32 atype = 0;
 	if(auto_attack.size()) {
@@ -2687,7 +2706,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 			card* atarget = player[1 - p].list_mzone[i];
 			///////kdiy///////////
 			//if (atarget != core.attacker) {
-			if (atarget && atarget != core.attacker && !atarget->is_affected_by_effect(EFFECT_SANCT_MZONE)) {				
+			if (atarget && atarget != core.attacker && !atarget -> is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 			///////kdiy///////////	
 					attack_tg.push_back(atarget);
 			}
@@ -2695,7 +2714,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 		///////kdiy///////////
 		for (uint32 i = 0; i < 5; ++i) {
 			card* atarget = player[1 - p].list_szone[i];
-			if (atarget && atarget != core.attacker && atarget->is_affected_by_effect(EFFECT_EQUIP_MONSTER)) {	
+			if (atarget && atarget != core.attacker && (atarget -> is_affected_by_effect(EFFECT_ORICA_SZONE) || atarget->is_affected_by_effect(EFFECT_EQUIP_MONSTER))) {	
 					attack_tg.push_back(atarget);
 			}
 		}
@@ -2714,7 +2733,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 			//////kdiy//////////
 			for (uint32 i = 0; i < 5; ++i) {
 				card* atarget = player[p].list_szone[i];
-				if (atarget && atarget -> is_affected_by_effect(EFFECT_ORICA_SZONE) || atarget -> is_affected_by_effect(EFFECT_EQUIP_MONSTER))
+				if (atarget && (atarget -> is_affected_by_effect(EFFECT_ORICA_SZONE) || atarget -> is_affected_by_effect(EFFECT_EQUIP_MONSTER)))
 				   attack_tg.push_back(atarget);
 			}
 			//////kdiy//////////

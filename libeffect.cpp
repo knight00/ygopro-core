@@ -124,7 +124,7 @@ int32 scriptlib::effect_set_target_range(lua_State *L) {
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
 	uint32 s = lua_tointeger(L, 2);
-	uint32 o = lua_tointeger(L, 3);
+	uint32 o = lua_tointeger(L, 3);	
 	peffect->s_range = s;
 	peffect->o_range = o;
 	peffect->flag[0] &= ~EFFECT_FLAG_ABSOLUTE_TARGET;
