@@ -3226,7 +3226,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->set_status(STATUS_DESTROY_CONFIRMED, TRUE);
 		}
 		if(core.attack_target && core.attack_target->is_status(STATUS_BATTLE_RESULT)
-		        && core.attack_target->current.location == LOCATION_MZONE && core.attack_target->fieldid_r == core.pre_field[1]) {
+		///////////kdiy///////////
+		        //&& core.attack_target->current.location == LOCATION_MZONE && core.attack_target->fieldid_r == core.pre_field[1]) {
+		        && ((core.attack_target->current.location == LOCATION_MZONE && !core.attack_target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attack_target->current.location == LOCATION_SZONE && (core.attack_target->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attack_target->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) && core.attack_target->fieldid_r == core.pre_field[1]) {
+		///////////kdiy///////////		
 			des.insert(core.attack_target);
 			core.attack_target->temp.reason = core.attack_target->current.reason;
 			core.attack_target->temp.reason_card = core.attack_target->current.reason_card;
