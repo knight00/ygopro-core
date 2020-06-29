@@ -255,10 +255,10 @@ int32 scriptlib::duel_set_lp(lua_State *L) {
 	if(p != 0 && p != 1)
 		return 0;
 	duel* pduel = interpreter::get_duel_info(L);
-//////////kdiy/////////
+    //////////kdiy/////////
     if (pduel->game_field->player[p].lp<999999 && lp>=999999) lp=999999;
     if (pduel->game_field->player[p].lp>=999999 && lp>90000) lp=999999;
-//////////kdiy/////////	
+    //////////kdiy/////////	
 	pduel->game_field->player[p].lp = lp;
 	auto message = pduel->new_message(MSG_LPUPDATE);
 	message->write<uint8>(p);
@@ -1546,9 +1546,10 @@ int32 scriptlib::duel_damage(lua_State *L) {
 	if(lua_gettop(L) >= 4)
 		is_step = lua_toboolean(L, 4);
 	duel* pduel = interpreter::get_duel_info(L);
-///////////kdiy//////////		
-   if (pduel->game_field->player[playerid].lp>=999999) amount=0;
-///////////kdiy//////////			
+    ///////////kdiy//////////		
+    if (pduel->game_field->player[playerid].lp>=999999)    
+	    amount=0;
+    ///////////kdiy//////////			
 	pduel->game_field->damage(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, 0, playerid, amount, is_step);
 	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
@@ -1570,9 +1571,14 @@ int32 scriptlib::duel_recover(lua_State *L) {
 	if(lua_gettop(L) >= 4)
 		is_step = lua_toboolean(L, 4);
 	duel* pduel = interpreter::get_duel_info(L);
-///////////kdiy//////////		
-   if (pduel->game_field->player[playerid].lp<999999 && amount>=999999) amount=999999-pduel->game_field->player[playerid].lp;
-///////////kdiy//////////		
+    ///////////kdiy//////////		
+    if (pduel->game_field->player[playerid].lp>=999999) 
+	    amount=0;
+	else if (pduel->game_field->player[playerid].lp<999999 && amount>=999999) 
+	    amount=999999-pduel->game_field->player[playerid].lp;
+	else if (pduel->game_field->player[playerid].lp<999999 && pduel->game_field->player[playerid].lp<999999+amount>=999999) 
+	    amount=999998-pduel->game_field->player[playerid].lp;
+    ///////////kdiy//////////		
 	pduel->game_field->recover(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, playerid, amount, is_step);
 	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
@@ -2251,6 +2257,9 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 	group* mgroup = 0;
 	uint32 used_location[2] = {0, 0};
 	player_info::card_vector list_mzone[2];
+	///////kdiy//////
+	player_info::card_vector list_szone[2];
+	///////kdiy//////
 	if(lua_gettop(L) >= 3 && !lua_isnil(L, 3)) {
 		if(check_param(L, PARAM_TYPE_CARD, 3, TRUE)) {
 			mcard = *(card**) lua_touserdata(L, 3);
@@ -2268,9 +2277,29 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 					list_mzone[p].push_back(0);
 				digit <<= 1;
 			}
-			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;
+			///////kdiy//////
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA)) {
+			for(auto& pcard : pduel->game_field->player[p].list_szone) {
+				if(pcard && pcard != mcard && !(mgroup && mgroup->container.find(pcard) != mgroup->container.end())) {
+					used_location[p] |= digit;
+					list_szone[p].push_back(pcard);
+				} else
+					list_szone[p].push_back(0);
+				digit <<= 1;
+			}
+			}
+			///////kdiy//////						
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
+			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;
+			else
+			///////kdiy//////	
+			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;						
 			std::swap(used_location[p], pduel->game_field->player[p].used_location);
 			pduel->game_field->player[p].list_mzone.swap(list_mzone[p]);
+			///////kdiy//////						
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))	
+			pduel->game_field->player[p].list_szone.swap(list_szone[p]);
+			///////kdiy//////		
 		}
 		swapped = true;
 	}
@@ -2302,6 +2331,12 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 		pduel->game_field->player[1].used_location = used_location[1];
 		pduel->game_field->player[0].list_mzone.swap(list_mzone[0]);
 		pduel->game_field->player[1].list_mzone.swap(list_mzone[1]);
+		///////kdiy//////						
+		if(pduel->game_field->is_player_affected_by_effect(0, EFFECT_ORICA))
+		pduel->game_field->player[0].list_szone.swap(list_szone[0]);
+		if(pduel->game_field->is_player_affected_by_effect(1, EFFECT_ORICA))		
+		pduel->game_field->player[1].list_szone.swap(list_szone[1]);
+		///////kdiy//////				
 	}
 	if(use_temp_card) {
 		scard->current.location = 0;
@@ -2322,8 +2357,12 @@ int32 scriptlib::duel_get_usable_mzone_count(lua_State *L) {
 	uint32 zone = 0xff;
 	uint32 flag1, flag2;
 	int32 ct1 = pduel->game_field->get_tofield_count(NULL, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD, zone, &flag1);
-	int32 ct2 = pduel->game_field->get_spsummonable_count_fromex(NULL, playerid, uplayer, zone, &flag2);
+	int32 ct2 = pduel->game_field->get_spsummonable_count_fromex(NULL, playerid, uplayer, zone, &flag2);	
 	int32 ct3 = field::field_used_count[~(flag1 | flag2) & 0x1f];
+	///////kdiy//////						
+	if(pduel->game_field->is_player_affected_by_effect(playerid, EFFECT_ORICA))
+	ct3 += field::field_used_count[~((flag1 | flag2) >> 8) & 0x1f];
+	///////kdiy//////		
 	int32 count = ct1 + ct2 - ct3;
 	int32 limit = pduel->game_field->get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
 	if(count > limit)
