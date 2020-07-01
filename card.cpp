@@ -3092,7 +3092,7 @@ void card::filter_immune_effect() {
 		peffect = rg.first->second;
 		///////kdiy/////////	
 		//if (peffect->is_available())				
-		if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		if (peffect->is_available() && !is_affected_by_effect(EFFECT_ULTIMATE_IMMUNE))
 		///////kdiy/////////
 		immune_effect.push_back(peffect);
 	}
@@ -3102,7 +3102,7 @@ void card::filter_immune_effect() {
 			peffect = rg.first->second;
 		    ///////kdiy/////////	
 			//if (peffect->is_available())				
-			if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+			if (peffect->is_available() && !is_affected_by_effect(EFFECT_ULTIMATE_IMMUNE))
 		    ///////kdiy/////////
 				immune_effect.push_back(peffect);
 		}
@@ -3113,7 +3113,7 @@ void card::filter_immune_effect() {
 			peffect = rg.first->second;
 		    ///////kdiy/////////
 		    //if (peffect->is_target(this) && peffect->is_available())
-		    if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		    if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_ULTIMATE_IMMUNE))
 		    ///////kdiy/////////
 				immune_effect.push_back(peffect);
 		}
@@ -3126,7 +3126,7 @@ void card::filter_immune_effect() {
 				continue;
 		    ///////kdiy/////////	
 			//if (peffect->is_available())				
-			if (peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+			if (peffect->is_available() && !is_affected_by_effect(EFFECT_ULTIMATE_IMMUNE))
 		    ///////kdiy/////////	
 				immune_effect.push_back(peffect);
 		}
@@ -3136,7 +3136,7 @@ void card::filter_immune_effect() {
 		peffect = rg.first->second;
 		///////kdiy/////////
 		//if (peffect->is_target(this) && peffect->is_available())
-		if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_IMMUNE_EFFECT))
+		if (peffect->is_target(this) && peffect->is_available() && !is_affected_by_effect(EFFECT_ULTIMATE_IMMUNE))
 		///////kdiy/////////		
 			immune_effect.push_back(peffect);
 	}
