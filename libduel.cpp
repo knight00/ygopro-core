@@ -2200,6 +2200,9 @@ int32 scriptlib::duel_get_mzone_count(lua_State *L) {
 	group* mgroup = 0;
 	uint32 used_location[2] = { 0, 0 };
 	player_info::card_vector list_mzone[2];
+	///////kdiy//////
+	player_info::card_vector list_szone[2];
+	///////kdiy//////
 	if(lua_gettop(L) >= 2 && !lua_isnil(L, 2)) {
 		if(check_param(L, PARAM_TYPE_CARD, 2, TRUE)) {
 			mcard = *(card**)lua_touserdata(L, 2);
@@ -2217,9 +2220,27 @@ int32 scriptlib::duel_get_mzone_count(lua_State *L) {
 					list_mzone[p].push_back(0);
 				digit <<= 1;
 			}
+			///////kdiy//////
+			uint32 digit2 = 256;
+			for(auto& pcard : pduel->game_field->player[p].list_szone) {
+				if(pcard && pcard != mcard && !(mgroup && mgroup->container.find(pcard) != mgroup->container.end())) {
+					used_location[p] |= digit2;
+					list_szone[p].push_back(pcard);
+				} else
+					list_szone[p].push_back(0);
+				digit2 <<= 256;
+			}
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
+			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;
+			else						
+			///////kdiy//////				
 			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;
 			std::swap(used_location[p], pduel->game_field->player[p].used_location);
 			pduel->game_field->player[p].list_mzone.swap(list_mzone[p]);
+			///////kdiy//////			
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
+			pduel->game_field->player[p].list_szone.swap(list_szone[p]);
+			///////kdiy//////			
 		}
 		swapped = true;
 	}
@@ -2240,6 +2261,12 @@ int32 scriptlib::duel_get_mzone_count(lua_State *L) {
 		pduel->game_field->player[1].used_location = used_location[1];
 		pduel->game_field->player[0].list_mzone.swap(list_mzone[0]);
 		pduel->game_field->player[1].list_mzone.swap(list_mzone[1]);
+		///////kdiy//////				
+		if(pduel->game_field->is_player_affected_by_effect(0, EFFECT_ORICA))
+		pduel->game_field->player[0].list_szone.swap(list_szone[0]);
+		if(pduel->game_field->is_player_affected_by_effect(1, EFFECT_ORICA))
+		pduel->game_field->player[1].list_szone.swap(list_szone[1]);
+		///////kdiy//////						
 	}
 	return 2;
 }
@@ -2278,28 +2305,26 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 				digit <<= 1;
 			}
 			///////kdiy//////
-			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA)) {
+			uint32 digit2 = 256;
 			for(auto& pcard : pduel->game_field->player[p].list_szone) {
 				if(pcard && pcard != mcard && !(mgroup && mgroup->container.find(pcard) != mgroup->container.end())) {
-					used_location[p] |= digit;
+					used_location[p] |= digit2;
 					list_szone[p].push_back(pcard);
 				} else
 					list_szone[p].push_back(0);
-				digit <<= 1;
+				digit2 <<= 256;
 			}
-			}
-			///////kdiy//////						
 			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
 			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;
 			else
-			///////kdiy//////	
+			///////kdiy//////			
 			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;						
 			std::swap(used_location[p], pduel->game_field->player[p].used_location);
 			pduel->game_field->player[p].list_mzone.swap(list_mzone[p]);
-			///////kdiy//////						
-			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))	
+			///////kdiy//////				
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
 			pduel->game_field->player[p].list_szone.swap(list_szone[p]);
-			///////kdiy//////		
+			///////kdiy//////				
 		}
 		swapped = true;
 	}
@@ -2334,7 +2359,7 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 		///////kdiy//////						
 		if(pduel->game_field->is_player_affected_by_effect(0, EFFECT_ORICA))
 		pduel->game_field->player[0].list_szone.swap(list_szone[0]);
-		if(pduel->game_field->is_player_affected_by_effect(1, EFFECT_ORICA))		
+		if(pduel->game_field->is_player_affected_by_effect(1, EFFECT_ORICA))
 		pduel->game_field->player[1].list_szone.swap(list_szone[1]);
 		///////kdiy//////				
 	}
@@ -2365,6 +2390,10 @@ int32 scriptlib::duel_get_usable_mzone_count(lua_State *L) {
 	///////kdiy//////		
 	int32 count = ct1 + ct2 - ct3;
 	int32 limit = pduel->game_field->get_mzone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
+	///////kdiy//////						
+	if(pduel->game_field->is_player_affected_by_effect(playerid, EFFECT_ORICA))	
+	limit += pduel->game_field->get_szone_limit(playerid, uplayer, LOCATION_REASON_TOFIELD);
+	///////kdiy//////	
 	if(count > limit)
 		count = limit;
 	lua_pushinteger(L, count);
