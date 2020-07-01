@@ -1006,7 +1006,7 @@ uint32 field::get_linked_zone(int32 playerid, bool free) {
 		value = eset[i]->get_value();
 		if (value) {
 			////////kdiy////////
-			if(is_player_affected_by_effect(playerid, EFFECT_ORICA_SZONE))
+			if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
 			zones |= (value >> (16 * playerid)) & 0x1f7f;
 			else
 			////////kdiy////////			
