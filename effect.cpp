@@ -816,9 +816,9 @@ int32 effect::in_range(card* pcard) {
 	if(type & EFFECT_TYPE_XMATERIAL)
 		return handler->overlay_target ? TRUE : FALSE;
 	/////kdiy/////
-	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (range & LOCATION_MZONE))
+	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (range & LOCATION_MZONE) && !(range & LOCATION_SZONE))
 	   return pcard->current.is_location(range | LOCATION_SZONE);
-	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (range & LOCATION_SZONE))
+	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (range & LOCATION_SZONE) && !(range & LOCATION_MZONE))
 	   return pcard->current.is_location(range | LOCATION_MZONE);   
 	else
 	/////kdiy/////	

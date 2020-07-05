@@ -450,27 +450,19 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	//////kdiy///////////	  
 	// if((new_sequence1 != s1 && !is_location_useable(p1, l1, new_sequence1))
 	// 	|| (new_sequence2 != s2 && !is_location_useable(p2, l2, new_sequence2)))
-	if((new_sequence1 != s1 && !is_location_useable(p1, loc1, new_sequence1))
-		|| (new_sequence2 != s2 && !is_location_useable(p2, loc2, new_sequence2)))
+	if((!(new_sequence1 == s1 && l1 == loc2) && !is_location_useable(p1, loc2, new_sequence1))
+		|| (!(new_sequence2 == s2 && l2 == loc1) && !is_location_useable(p2, loc1, new_sequence2)))
 	//////kdiy///////////		
 		return;
 	//////kdiy///////////	
 	//if(p1 == p2 && l1 == l2 && (new_sequence1 == s2 || new_sequence2 == s1))
-	if(p1 == p2 && loc1 == loc2 && (new_sequence1 == s2 || new_sequence2 == s1))	
+	if(p1 == p2 && ((new_sequence1 == s2 && l1 == loc1) || (new_sequence2 == s1 && l2 == loc2)))	
 	//////kdiy///////////		
 		return;		
 	//////kdiy///////////	
 	//if(l1 == l2) {
     if(l1 == l2 || is_player_affected_by_effect(p1,EFFECT_ORICA) || is_player_affected_by_effect(p2,EFFECT_ORICA) || is_player_affected_by_effect(p1,EFFECT_SANCT) || is_player_affected_by_effect(p2,EFFECT_SANCT)) {
-	//////kdiy///////////
-	    if(!is_player_affected_by_effect(p1,EFFECT_ORICA))
-		   loc2 = l1;
-	    if(!is_player_affected_by_effect(p2,EFFECT_ORICA))
-		   loc1 = l2;	
-	    if(!is_player_affected_by_effect(p1,EFFECT_SANCT))
-		   loc2 = l1;
-	    if(!is_player_affected_by_effect(p2,EFFECT_SANCT))
-		   loc1 = l2;			   	   
+	//////kdiy///////////		   	   
 		pcard1->previous.controler = p1;
 		pcard1->previous.location = l1;
 		pcard1->previous.sequence = s1;
@@ -520,32 +512,28 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		if(l1 == LOCATION_MZONE) {
 			player[p1].list_mzone[s1] = 0;
 			player[p1].used_location &= ~(1 << s1);
-		}
-		else {
+		} else {
 			player[p1].list_szone[s1] = 0;
 			player[p1].used_location &= ~(256 << s1);
 		}
 		if(l2 == LOCATION_MZONE) {
 			player[p2].list_mzone[s2] = 0;
 			player[p2].used_location &= ~(1 << s2);
-		}
-		else {
+		} else {
 			player[p2].list_szone[s2] = 0;
 			player[p2].used_location &= ~(256 << s2);
 		}	
 		if(loc2 == LOCATION_MZONE) {
 			player[p1].list_mzone[new_sequence1] = pcard2;
 			player[p1].used_location |= 1 << new_sequence1;
-		}	
-		else {	
+		} else {	
 			player[p1].list_szone[new_sequence1] = pcard2;
 			player[p1].used_location |= 256 << new_sequence1;
 		}
 		if(loc1 == LOCATION_MZONE) {			
 			player[p2].list_mzone[new_sequence2] = pcard1;
 			player[p2].used_location |= 1 << new_sequence2;
-		}
-		else {			
+		} else {			
 			player[p2].list_szone[new_sequence2] = pcard1;
 			player[p2].used_location |= 256 << new_sequence2;
 		}		
@@ -565,10 +553,9 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		message->write(info1);
 		message->write<uint32>(pcard2->data.code);
 		message->write(info2);
-	//////kdiy//////////		
 	//} else if(s1 == new_sequence1) {
-	} else if(s1 == new_sequence1 && l1 == loc1) {		
-	//////kdiy//////////		
+	} else if(s1 == new_sequence1 && loc1 == l1) {		
+	//////kdiy//////////				
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard1->data.code);
 		message->write(info1);
@@ -791,7 +778,7 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	if(location == LOCATION_MZONE) {
 		///////////kdiy////////	
-	    if(!(is_player_affected_by_effect(playerid, EFFECT_ORICA)) || get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD) != 0x7f)
+	    if(get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD) != 0x7f)
 	    ///////////kdiy////////	
 		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);		
 		flag = (flag | ~zone) & 0x1f;
@@ -800,14 +787,16 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	int32 count = 5 - field_used_count[flag];	
 	///////////kdiy////////
 	if(location == LOCATION_MZONE && is_player_affected_by_effect(playerid, EFFECT_ORICA)) {
+		if(zone == 0xff || zone == 0x1f || zone == 0x7f) zone |= 0x1f00;
 	    uint32 flag2 = player[playerid].disabled_location | player[playerid].used_location;
-		flag2 = ((flag2 >> 8) | ~0xff) & 0x1f;	
+		flag2 = ((flag2 >> 8) | ~zone) & 0x1f;
 		count += 5 - field_used_count[flag2];
-		flag = ((flag & 0x1f) | ((flag2 & 0x1f) << 8)) & 0x1f1f;
+		flag = ((flag & 0xff) | ((flag2 & 0xff) << 8));
 	}
 	if(location == LOCATION_SZONE && is_player_affected_by_effect(playerid, EFFECT_SANCT)) {
+		if(zone == 0xff || zone == 0x1f || zone == 0x7f) zone = (zone << 8) || 0x1f;
 	    uint32 flag2 = player[playerid].disabled_location | player[playerid].used_location;
-		flag2 = (flag2 | ~0xff) & 0x1f;	
+		flag2 = (flag2 | ~zone) & 0x1f;	
 		count += 5 - field_used_count[flag2];
 		flag = ((flag2 & 0x1f) | ((flag & 0x1f) << 8)) & 0x1f1f;
 	}	
@@ -832,7 +821,7 @@ int32 field::get_useable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 u
 int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, uint8 uplayer, uint32 zone, uint32* list) {
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	///////////kdiy////////	
-	if(!(is_player_affected_by_effect(playerid, EFFECT_ORICA)) || get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD) != 0x7f)
+	if(get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD) != 0x7f)
 	///////////kdiy////////			
 	flag |= ~get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD);  
 	if(player[playerid].list_mzone[5] && is_location_useable(playerid, LOCATION_MZONE, 6)
@@ -851,9 +840,8 @@ int32 field::get_spsummonable_count_fromex_rule4(card* pcard, uint8 playerid, ui
 	}	
 	uint32 rule_zone = get_rule_zone_fromex(playerid, pcard);
 	///////////kdiy////////	
-	if(is_player_affected_by_effect(playerid, EFFECT_ORICA))
-	flag = flag | ~((zone & 0xff) | 0x1f00) | ~rule_zone;
-	else
+	if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && (zone == 0xff || zone == 0x7f))
+	   zone |= 0x1f00;
 	///////////kdiy////////		
 	flag = flag | ~zone | ~rule_zone;	
 	if(list)

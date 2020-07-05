@@ -2221,17 +2221,17 @@ int32 scriptlib::duel_get_mzone_count(lua_State *L) {
 				digit <<= 1;
 			}
 			///////kdiy//////
-			uint32 digit2 = 256;
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA)) {			
+			uint32 digit2 = 1;
 			for(auto& pcard : pduel->game_field->player[p].list_szone) {
 				if(pcard && pcard != mcard && !(mgroup && mgroup->container.find(pcard) != mgroup->container.end())) {
-					used_location[p] |= digit2;
+					used_location[p] |= digit2<<8;
 					list_szone[p].push_back(pcard);
 				} else
 					list_szone[p].push_back(0);
-				digit2 <<= 256;
+				digit2 <<= 1;
 			}
-			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
-			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;
+		    }
 			else						
 			///////kdiy//////				
 			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;
@@ -2305,17 +2305,18 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State *L) {
 				digit <<= 1;
 			}
 			///////kdiy//////
-			uint32 digit2 = 256;
+			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA)) {			
+			uint32 digit2 = 1;
 			for(auto& pcard : pduel->game_field->player[p].list_szone) {
 				if(pcard && pcard != mcard && !(mgroup && mgroup->container.find(pcard) != mgroup->container.end())) {
-					used_location[p] |= digit2;
+					used_location[p] |= digit2<<8;
 					list_szone[p].push_back(pcard);
 				} else
 					list_szone[p].push_back(0);
-				digit2 <<= 256;
+				digit2 <<= 1;
 			}
-			if(pduel->game_field->is_player_affected_by_effect(p, EFFECT_ORICA))
-			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;
+			used_location[p] |= pduel->game_field->player[p].used_location & 0xe000;						
+			}
 			else
 			///////kdiy//////			
 			used_location[p] |= pduel->game_field->player[p].used_location & 0xff00;						

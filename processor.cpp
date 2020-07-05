@@ -2845,7 +2845,10 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_rollback = FALSE;
 		core.opp_mzone.clear();
 		for(auto& pcard : player[1 - infos.turn_player].list_mzone) {
-			if(pcard)
+			///////kdiy///////
+			//if(pcard)
+			if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))	
+			///////kdiy///////					
 				core.opp_mzone.insert(pcard->fieldid_r);
 		}
 		//core.units.begin()->arg1 ---> is rollbacked
@@ -4550,11 +4553,6 @@ int32 field::add_chain(uint16 step) {
 					if(phandler->data.type & TYPE_PENDULUM) {
 						loc = LOCATION_PZONE;
 					} else {
-						///////////kdiy/////////
-						if(is_player_affected_by_effect(0, EFFECT_SANCT))
-						loc = LOCATION_ONFIELD;
-						else
-						///////////kdiy/////////
 						loc = LOCATION_SZONE;
 					}
 				}
