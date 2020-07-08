@@ -798,7 +798,7 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 	    uint32 flag2 = player[playerid].disabled_location | player[playerid].used_location;
 		flag2 = (flag2 | ~zone) & 0x1f;	
 		count += 5 - field_used_count[flag2];
-		flag = ((flag2 & 0x1f) | ((flag & 0x1f) << 8)) & 0x1f1f;
+		flag = ((flag2 & 0x1f) | ((flag & 0x1f) << 8));
 	}	
 	///////////kdiy////////		
 	if(location == LOCATION_MZONE)
