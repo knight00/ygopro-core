@@ -1617,7 +1617,29 @@ int32 field::trap_monster_adjust(uint16 step) {
 		for(uint8 p = 0; p < 2; ++p) {
 			for(auto& pcard : core.trap_monster_adjust_set[tp]) {
 				pcard->reset(RESET_TURN_SET, RESET_EVENT);
+				///////kdiy///////
+				if(is_player_affected_by_effect(tp,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+					effect* deffect = pduel->new_effect();
+					deffect->owner = pduel->game_field->player[tp].list_szone[5];
+					deffect->code = EFFECT_SANCT_MZONE;
+					deffect->type = EFFECT_TYPE_SINGLE;
+					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+					deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
+					pcard->add_effect(deffect);
+					}	
+				///////kdiy///////				
 				move_to_field(pcard, tp, tp, LOCATION_SZONE, pcard->current.position, FALSE, 2);
+				///////kdiy///////
+				if(is_player_affected_by_effect(tp,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.location == LOCATION_MZONE) {
+					effect* deffect = pduel->new_effect();
+					deffect->owner = pduel->game_field->player[tp].list_szone[5];
+					deffect->code = EFFECT_SANCT_MZONE;
+					deffect->type = EFFECT_TYPE_SINGLE;
+					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+					deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
+					pcard->add_effect(deffect);
+					}	
+				///////kdiy///////				
 			}
 			tp = 1 - tp;
 		}
@@ -1644,7 +1666,10 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 		if(!((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (target->current.position & POS_FACEDOWN))
 		///////////kdiy//////////			
 			to_grave = true;
-		if(equip_card->current.location != LOCATION_SZONE) {
+		///////////kdiy//////////				
+		//if(equip_card->current.location != LOCATION_SZONE) {
+		if(!(((equip_card->current.location == LOCATION_SZONE && !equip_card->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (equip_card->current.location == LOCATION_MZONE && equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE))))) {
+		///////////kdiy//////////				
 			refresh_location_info_instant();
 			if(get_useable_count(equip_card, equip_player, LOCATION_SZONE, equip_player, LOCATION_REASON_TOFIELD) <= 0)
 				to_grave = true;
@@ -1662,13 +1687,38 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 			equip_card->enable_field_effect(false);
 			return FALSE;
 		}
-		if(equip_card->current.location == LOCATION_SZONE) {
+		///////////kdiy//////////			
+		//if(equip_card->current.location == LOCATION_SZONE) {
+		if(((equip_card->current.location == LOCATION_SZONE && !equip_card->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (equip_card->current.location == LOCATION_MZONE && equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE)))) {
+		///////////kdiy//////////			
 			if(up && equip_card->is_position(POS_FACEDOWN))
 				change_position(equip_card, 0, equip_player, POS_FACEUP, 0);
 			return FALSE;
 		}
 		equip_card->enable_field_effect(false);
+	    ///////kdiy///////
+	    if(is_player_affected_by_effect(equip_player,EFFECT_SANCT) && !equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+		    effect* deffect = pduel->new_effect();
+			deffect->owner = pduel->game_field->player[equip_player].list_szone[5];
+			deffect->code = EFFECT_SANCT_MZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			equip_card->add_effect(deffect);
+		}	
+		///////kdiy///////		
 		move_to_field(equip_card, equip_player, equip_player, LOCATION_SZONE, (up || equip_card->is_position(POS_FACEUP)) ? POS_FACEUP : POS_FACEDOWN, FALSE, 0, TRUE);
+	    ///////kdiy///////
+	    if(is_player_affected_by_effect(equip_player,EFFECT_SANCT) && !equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE) && equip_card->current.location == LOCATION_MZONE) {
+		    effect* deffect = pduel->new_effect();
+			deffect->owner = pduel->game_field->player[equip_player].list_szone[5];
+			deffect->code = EFFECT_SANCT_MZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000-RESET_TURN_SET-RESET_TOFIELD;
+			equip_card->add_effect(deffect);
+		}	
+		///////kdiy///////			
 		return FALSE;
 	}
 	case 1: {
@@ -2846,6 +2896,17 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target, e
 		}	
 		///////kdiy///////			
 		move_to_field(target, setplayer, toplayer, LOCATION_SZONE, POS_FACEDOWN);
+	    ///////kdiy///////
+	    if(is_player_affected_by_effect(toplayer,EFFECT_SANCT) && !target->is_affected_by_effect(EFFECT_SANCT_MZONE) && target->current.location == LOCATION_MZONE) {
+		    effect* deffect = pduel->new_effect();
+			deffect->owner = pduel->game_field->player[toplayer].list_szone[5];
+			deffect->code = EFFECT_SANCT_MZONE;
+			deffect->type = EFFECT_TYPE_SINGLE;
+			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+			deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+			target->add_effect(deffect);
+		}	
+		///////kdiy///////			
 		return FALSE;
 	}
 	case 2: {
@@ -5511,7 +5572,29 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				pcard->unequip();
 			if(trapmonster) {
 				refresh_location_info_instant();
+				///////kdiy///////
+				if(is_player_affected_by_effect(pcard->current.controler,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+					effect* deffect = pduel->new_effect();
+					deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+					deffect->code = EFFECT_SANCT_MZONE;
+					deffect->type = EFFECT_TYPE_SINGLE;
+					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+					deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+					pcard->add_effect(deffect);
+					}	
+					///////kdiy///////				
 				move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN, FALSE, 2);
+				///////kdiy///////
+				if(is_player_affected_by_effect(pcard->current.controler,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.location == LOCATION_MZONE) {
+					effect* deffect = pduel->new_effect();
+					deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+					deffect->code = EFFECT_SANCT_MZONE;
+					deffect->type = EFFECT_TYPE_SINGLE;
+					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+					deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET-RESET_TOFIELD;
+					pcard->add_effect(deffect);
+					}	
+				///////kdiy///////					
 				raise_single_event(pcard, 0, EVENT_SSET, reason_effect, 0, reason_player, 0, 0);
 				ssets.insert(pcard);
 			}
