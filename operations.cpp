@@ -5162,7 +5162,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				    //////kdiy/////	
 					//flag = ((flag & 0xff) << 24) | 0xffffff;
 			        {
-					   if(is_player_affected_by_effect(1-playerid, EFFECT_SANCT) && Rlocation != LOCATION_RSZONE)
+					   if(is_player_affected_by_effect(playerid, EFFECT_SANCT) && Rlocation != LOCATION_RSZONE)
 					      flag = ((flag & 0xff1f) << 16) | 0xe0ffff;	
 					   else						
 					      flag = ((flag & 0xff) << 24) | 0xffffff;	
@@ -5172,7 +5172,7 @@ int32 field::move_to_field(uint16 step, card* target, uint32 enable, uint32 ret,
 				    //////kdiy/////	
 					//flag = ((flag & 0xff) << 16) | 0xff00ffff;		
 			        {
-					   if(is_player_affected_by_effect(1-playerid, EFFECT_ORICA) && Rlocation != LOCATION_RMZONE)
+					   if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && Rlocation != LOCATION_RMZONE)
 					      flag = (flag & 0x1fff0000) | 0xe000ffff;
 					   else						
 					      flag = ((flag & 0xff) << 16) | 0xff00ffff;	
