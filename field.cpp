@@ -438,12 +438,12 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		return;
 	//////kdiy///////////	
 	uint32 loc1 = 0;
-	if(pcard1->temp.location) 
+	if(pcard1->temp.location == LOCATION_MZONE || pcard1->temp.location == LOCATION_SZONE) 
 	   loc1 = pcard1->temp.location;
 	else
 	   loc1 = l2;
 	uint32 loc2 = 0;
-	if(pcard2->temp.location) 
+	if(pcard2->temp.location == LOCATION_MZONE || pcard2->temp.location == LOCATION_SZONE) 
 	   loc2 = pcard2->temp.location;
 	else
 	   loc2 = l1;
