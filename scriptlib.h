@@ -14,7 +14,7 @@
 class scriptlib {
 public:
 /////////////////////KDIY///
-	static int32 card_is_ritual_type(lua_State *L);
+	//static int32 card_is_ritual_type(lua_State *L);
 	static int32 card_set_entity_code(lua_State *L);
 	static int32 card_set_card_data(lua_State *L);
 	static int32 card_get_origin_link_marker(lua_State *L);

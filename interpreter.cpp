@@ -14,7 +14,7 @@
 #include <cmath>
 static const struct luaL_Reg cardlib[] = {
 ///////kdiy///////
-	{ "IsRitualType", scriptlib::card_is_ritual_type },
+	//{ "IsRitualType", scriptlib::card_is_ritual_type },
 	{ "SetEntityCode", scriptlib::card_set_entity_code },
 	{ "SetCardData", scriptlib::card_set_card_data },
 	{ "GetOriginalLinkMarker", scriptlib::card_get_origin_link_marker },
