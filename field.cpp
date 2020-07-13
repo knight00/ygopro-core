@@ -77,6 +77,9 @@ field::field(duel* pduel) {
 	core.pre_field[0] = 0;
 	core.pre_field[1] = 0;
 	core.opp_mzone.clear();
+	//////kdiy/////
+	// core.opp_szone.clear();	
+	//////kdiy/////	
 	core.summoning_card = 0;
 	core.summon_depth = 0;
 	core.summon_cancelable = FALSE;
@@ -546,7 +549,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 	}
 	//////kdiy//////////
 	//if(s1 == new_sequence1 && s2 == new_sequence2) {
-	if(s1 == new_sequence1 && s2 == new_sequence2 && loc1 == l1 && loc2 == l2) {		
+	if(s1 == new_sequence1 && s2 == new_sequence2 && loc2 == l1 && loc1 == l2) {		
 	//////kdiy//////////	
 		auto message = pduel->new_message(MSG_SWAP);
 		message->write<uint32>(pcard1->data.code);
@@ -554,7 +557,7 @@ void field::swap_card(card* pcard1, card* pcard2, uint8 new_sequence1, uint8 new
 		message->write<uint32>(pcard2->data.code);
 		message->write(info2);
 	//} else if(s1 == new_sequence1) {
-	} else if(s1 == new_sequence1 && loc1 == l1) {		
+	} else if(s1 == new_sequence1 && loc2 == l1) {		
 	//////kdiy//////////				
 		auto message = pduel->new_message(MSG_MOVE);
 		message->write<uint32>(pcard1->data.code);
@@ -1727,6 +1730,15 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 					count++;
 				}
 			}
+			////kdiy////////
+			for(auto& pcard : player[self].list_szone) { 
+				if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {				
+					if(pgroup)
+						pgroup->container.insert(pcard);
+					count++;
+				}
+			}				
+			////kdiy////////		
 		}
 		if(location & LOCATION_SZONE) {
 			for(auto& pcard : player[self].list_szone) {
@@ -1739,6 +1751,15 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 					count++;
 				}
 			}
+			////kdiy////////
+			for(auto& pcard : player[self].list_mzone) { 
+				if(pcard && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)) {			
+					if(pgroup)
+						pgroup->container.insert(pcard);
+					count++;
+				}
+			}				
+			////kdiy////////				
 		}
 		if(location & LOCATION_FZONE) {
 			card* pcard = player[self].list_szone[5];
