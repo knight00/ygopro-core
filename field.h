@@ -115,7 +115,6 @@ struct field_effect {
 	effect_collection rechargeable;
 	effect_collection spsummon_count_eff;
 
-	std::list<card*> disable_check_list;
 	std::unordered_set<card*> disable_check_set;
 
 	grant_effect_container grant_effect;
@@ -407,6 +406,7 @@ public:
 	void add_effect(effect* peffect, uint8 owner_player = 2);
 	void remove_effect(effect* peffect);
 	void remove_oath_effect(effect* reason_effect);
+	void release_oath_relation(effect* reason_effect);
 	void reset_phase(uint32 phase);
 	void reset_chain();
 	void add_effect_code(uint32 code, uint32 flag, uint32 playerid);
@@ -427,7 +427,7 @@ public:
 	int32 get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_oneof, group* mg = NULL, uint32 ex = 0, uint32 releasable = 0xff00ff, uint32 pos = 0x1);
 	int32 get_summon_count_limit(uint8 playerid);
 	int32 get_draw_count(uint8 playerid);
-	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material);
+	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material, bool check_level);
 	void get_fusion_material(uint8 playerid, card_set* material);
 	void ritual_release(card_set* material);
 	void get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset, group* pgroup);
@@ -565,7 +565,7 @@ public:
 	void release(card* target, effect* reason_effect, uint32 reason, uint32 reason_player);
 	void send_to(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position, uint32 ignore = false);
 	void send_to(card* target, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position, uint32 ignore = false);
-	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint8 enable = FALSE, uint32 ret = 0, uint8 is_equip = FALSE, uint32 zone = 0xff, uint8 rule = FALSE, uint32 reason = 0, uint8 confirm = TRUE);
+	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint8 enable = FALSE, uint8 ret = 0, uint8 zone = 0xff, uint8 rule = FALSE, uint8 reason = 0, uint8 confirm = TRUE);
 	void change_position(card_set* targets, effect* reason_effect, uint32 reason_player, uint32 au, uint32 ad, uint32 du, uint32 dd, uint32 flag, uint32 enable = FALSE);
 	void change_position(card* target, effect* reason_effect, uint32 reason_player, uint32 npos, uint32 flag, uint32 enable = FALSE);
 	void operation_replace(int32 type, int32 step, group* targets);
@@ -573,7 +573,7 @@ public:
 
 	int32 remove_counter(uint16 step, uint32 reason, card* pcard, uint8 rplayer, uint8 s, uint8 o, uint16 countertype, uint16 count);
 	int32 remove_overlay_card(uint16 step, uint32 reason, group* pgroup, uint8 rplayer, uint8 s, uint8 o, uint16 min, uint16 max);
-	int32 get_control(uint16 step, effect* reason_effect, uint8 reason_player, group* targets, uint8 playerid, uint16 reset_phase, uint8 reset_count, uint32 zone);
+	int32 get_control(uint16 step, effect* reason_effect, uint8 chose_player, group* targets, uint8 playerid, uint16 reset_phase, uint8 reset_count, uint32 zone);
 	int32 swap_control(uint16 step, effect* reason_effect, uint8 reason_player, group* targets1, group* targets2, uint16 reset_phase, uint8 reset_count);
 	int32 control_adjust(uint16 step);
 	int32 self_destroy(uint16 step, card* ucard, int32 p);
@@ -596,7 +596,7 @@ public:
 	int32 send_replace(uint16 step, group* targets, card* target);
 	int32 send_to(uint16 step, group* targets, effect* reason_effect, uint32 reason, uint8 reason_player);
 	int32 discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reason);
-	int32 move_to_field(uint16 step, card* target, uint32 enable, uint32 ret, uint32 is_equip, uint32 zone, uint8 pzone = FALSE, uint8 rule = FALSE, uint32 reason = 0, uint8 confirm = TRUE);
+	int32 move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, uint8 pzone, uint8 zone, uint8 rule = FALSE, uint8 reason = 0, uint8 confirm = TRUE);
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, card* target, int32 is_destroy);
 	int32 activate_effect(uint16 step, effect* peffect);

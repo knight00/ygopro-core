@@ -152,6 +152,7 @@ public:
 	static int32 card_get_equip_target(lua_State *L);
 	static int32 card_get_pre_equip_target(lua_State *L);
 	static int32 card_check_equip_target(lua_State *L);
+	static int32 card_check_union_target(lua_State *L);
 	static int32 card_get_union_count(lua_State *L);
 	static int32 card_get_overlay_group(lua_State *L);
 	static int32 card_get_overlay_count(lua_State *L);
@@ -630,6 +631,7 @@ public:
 	static int32 duel_get_player_count(lua_State *L);
 	static int32 duel_swap_deck_and_grave(lua_State *L);
 	static int32 duel_majestic_copy(lua_State *L);
+	static int32 duel_get_starting_hand(lua_State *L);
 
 	//preload
 	static int32 debug_message(lua_State *L);
@@ -645,5 +647,46 @@ public:
 	static int32 debug_show_hint(lua_State *L);
 	static int32 debug_print_stacktrace(lua_State *L);	
 };
+
+template<typename T, typename type>
+using EnableIf = typename std::enable_if_t<std::is_same<T, type>::value, T>;
+
+template<typename T, bool check = false>
+EnableIf<T,card*> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_CARD, idx);
+	return *static_cast<card**>(lua_touserdata(L, idx));
+}
+
+template<typename T, bool check = false>
+EnableIf<T, group*> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_GROUP, idx);
+	return *static_cast<group**>(lua_touserdata(L, idx));
+}
+
+template<typename T, bool check = false>
+EnableIf<T, effect*> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_EFFECT, idx);
+	return *static_cast<effect**>(lua_touserdata(L, idx));
+}
+
+template<typename T, bool check = false>
+EnableIf<T, bool> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_BOOLEAN, idx);
+	return lua_toboolean(L, idx);
+}
+
+template<typename T, bool check = false>
+typename std::enable_if_t<std::is_integral<T>::value && !std::is_same<T, bool>::value, T>
+lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_INT, idx);
+	if(lua_isinteger(L, idx))
+		return static_cast<T>(lua_tointeger(L, idx));
+	return static_cast<T>(std::round(lua_tonumber(L, idx)));
+}
 
 #endif /* SCRIPTLIB_H_ */
