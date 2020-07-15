@@ -1915,9 +1915,18 @@ int32 scriptlib::duel_change_attack_target(lua_State *L) {
 		pduel->game_field->core.opp_mzone.clear();
 		uint8 turnp = pduel->game_field->infos.turn_player;
 		for(auto& pcard : pduel->game_field->player[1 - turnp].list_mzone) {
-			if(pcard)
+			/////////kdiy/////
+			// if(pcard)
+			if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+			/////////kdiy/////			
 				pduel->game_field->core.opp_mzone.insert(pcard->fieldid_r);
 		}
+		/////////kdiy/////
+		for(auto& pcard : pduel->game_field->player[1 - turnp].list_szone) {
+			if(pcard && (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))
+				pduel->game_field->core.opp_mzone.insert(pcard->fieldid_r);
+		}
+		/////////kdiy/////		
 		auto message = pduel->new_message(MSG_ATTACK);
 		message->write(attacker->get_info_location());
 		if(target) {

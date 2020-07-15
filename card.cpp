@@ -4311,7 +4311,10 @@ int32 card::is_capable_cost_to_extra(uint8 playerid) {
 	return TRUE;
 }
 int32 card::is_capable_attack() {
-	if(!is_position(POS_FACEUP_ATTACK) && !(is_position(POS_FACEUP_DEFENSE) && is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
+	///////kdiy//////
+	//if(!is_position(POS_FACEUP_ATTACK) && !(is_position(POS_FACEUP_DEFENSE) && is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
+	if((!is_position(POS_FACEUP_ATTACK) && !(is_position(POS_FACEUP_DEFENSE) && is_affected_by_effect(EFFECT_DEFENSE_ATTACK)) && !is_affected_by_effect(EFFECT_EQUIP_MONSTER)) || (is_affected_by_effect(EFFECT_EQUIP_MONSTER) && is_position(POS_FACEDOWN)))
+	///////kdiy//////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;

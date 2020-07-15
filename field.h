@@ -257,7 +257,7 @@ struct processor {
 	int64 temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[2];
-	std::set<uint16> opp_mzone;
+	std::set<uint16> opp_mzone;	
 	chain_limit_list chain_limit;
 	chain_limit_list chain_limit_p;
 	uint8 chain_solving;

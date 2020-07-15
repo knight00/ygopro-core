@@ -2843,14 +2843,20 @@ int32 field::process_battle_command(uint16 step) {
 			message->write(loc_info{});
 		}
 		core.attack_rollback = FALSE;
-		core.opp_mzone.clear();
+		core.opp_mzone.clear();	
 		for(auto& pcard : player[1 - infos.turn_player].list_mzone) {
 			///////kdiy///////
-			//if(pcard)
-			if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))	
+			// if(pcard)
+			if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 			///////kdiy///////					
 				core.opp_mzone.insert(pcard->fieldid_r);
 		}
+		///////kdiy///////		
+		for(auto& pcard : player[1 - infos.turn_player].list_szone) {
+			if(pcard && (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))	
+				core.opp_mzone.insert(pcard->fieldid_r);
+		}
+		///////kdiy///////	
 		//core.units.begin()->arg1 ---> is rollbacked
 		if(!core.units.begin()->arg1) {
 			raise_single_event(core.attacker, 0, EVENT_ATTACK_ANNOUNCE, 0, 0, 0, infos.turn_player, 0);
@@ -3674,11 +3680,17 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 		battstat = core.attack_target->is_affected_by_effect(EFFECT_CHANGE_BATTLE_STAT);
 		if(battstat)
 			d = battstat->get_value(core.attack_target);
-		else if (core.attack_target->is_position(POS_ATTACK))
+		//////////kdiy/////////	
+		//else if (core.attack_target->is_position(POS_ATTACK))
+		else if (core.attack_target->is_position(POS_ATTACK) || core.attack_target->is_affected_by_effect(EFFECT_EQUIP_MONSTER))		
+		//////////kdiy/////////
 			d = da;
 		else
 			d = dd;
-		if(core.attack_target->is_position(POS_ATTACK)) {
+		//////////kdiy/////////				
+		//if(core.attack_target->is_position(POS_ATTACK)) {
+		if(core.attack_target->is_position(POS_ATTACK) || core.attack_target->is_affected_by_effect(EFFECT_EQUIP_MONSTER)) {
+		//////////kdiy/////////			
 			if(a > d) {
 				damp = pd;
 				//////////kdiy/////////
@@ -5833,14 +5845,21 @@ int32 field::adjust_step(uint16 step) {
 				/////////kdiy//////				
 					fidset.insert(pcard->fieldid_r);
 			}
+			/////////kdiy//////
+			for(auto& pcard : player[1 - infos.turn_player].list_szone) {
+				if(pcard && (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))			
+					fidset.insert(pcard->fieldid_r);
+			}
+			/////////kdiy//////
 			if(fidset != core.opp_mzone || !confirm_attack_target())
 				core.attack_rollback = TRUE;
 		} else {
 			/////////kdiy//////	
 			//if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+				//|| ((core.attacker->current.position & POS_DEFENSE) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))			
 			if(!((core.attacker->current.location == LOCATION_MZONE && !core.attacker->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (core.attacker->current.location == LOCATION_SZONE && (core.attacker->is_affected_by_effect(EFFECT_ORICA_SZONE) || core.attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || core.attacker->fieldid_r != core.pre_field[0]
+			    || ((core.attacker->current.position & POS_DEFENSE) && !core.attacker->is_affected_by_effect(EFFECT_EQUIP_MONSTER) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
 			/////////kdiy//////	
-				|| ((core.attacker->current.position & POS_DEFENSE) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENSE_ATTACK)))
 				|| core.attacker->current.controler != core.attacker->attack_controler
 				/////////kdiy//////	
 				//|| (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE
