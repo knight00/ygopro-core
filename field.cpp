@@ -246,7 +246,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 }
 void field::remove_card(card* pcard) {
 	if (pcard->current.controler == PLAYER_NONE || pcard->current.location == 0)
-		return;
+		return;	
 	uint8 playerid = pcard->current.controler;
 	switch (pcard->current.location) {
 	case LOCATION_MZONE:
@@ -311,7 +311,10 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 		pcard->sendto_param.position = POS_FACEDOWN_DEFENSE;
 	}
 	if (pcard->current.location) {
-		if (pcard->current.location == location) {
+		/////kdiy///////
+		// if (pcard->current.location == location) {
+		if (pcard->current.location == location && !(pcard->is_affected_by_effect(EFFECT_PRE_MONSTER) && (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) || pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))) {			
+		/////kdiy///////			
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {
 					auto message = pduel->new_message(MSG_MOVE);
@@ -780,7 +783,7 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		///////////kdiy////////	
 	    if(get_forced_zones(pcard, playerid, LOCATION_MZONE, uplayer, LOCATION_REASON_TOFIELD) != 0x7f)
 	    ///////////kdiy////////	
-		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);		
+		flag |= ~get_forced_zones(pcard, playerid, location, uplayer, reason);
 		flag = (flag | ~zone) & 0x1f;
 	} else
 		flag = ((flag >> 8) | ~zone) & 0x1f;
@@ -794,7 +797,9 @@ int32 field::get_tofield_count(card* pcard, uint8 playerid, uint8 location, uint
 		flag = ((flag & 0xff) | ((flag2 & 0xff) << 8));
 	}
 	if(location == LOCATION_SZONE && is_player_affected_by_effect(playerid, EFFECT_SANCT)) {
-		if(zone == 0xff || zone == 0x1f || zone == 0x7f) zone = (zone << 8) || 0x1f;
+		if(zone == 0xff || zone == 0x1f || zone == 0x7f) 
+		   zone = (zone << 8) | 0x1f;
+		else zone = (zone << 8);
 	    uint32 flag2 = player[playerid].disabled_location | player[playerid].used_location;
 		flag2 = (flag2 | ~zone) & 0x1f;	
 		count += 5 - field_used_count[flag2];

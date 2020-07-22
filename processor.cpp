@@ -4511,21 +4511,13 @@ int32 field::add_chain(uint16 step) {
 					ecode = EFFECT_QP_ACT_IN_NTPHAND;
 			//////////kdiy//////////		
 			//} else if(phandler->current.location == LOCATION_SZONE) {
-			} else if(phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
+			} else if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
 			//////////kdiy//////////		
 				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
 				if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && phandler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_QP_ACT_IN_SET_TURN;
-			}
-			//////////kdiy//////////		
-			else if(phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
-				if((phandler->data.type & TYPE_TRAP) && phandler->get_status(STATUS_SET_TURN))
-					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
-				if((phandler->data.type & TYPE_SPELL) && (phandler->data.type & TYPE_QUICKPLAY || phandler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && phandler->get_status(STATUS_SET_TURN))
-					ecode = EFFECT_QP_ACT_IN_SET_TURN;
-			}	
-			//////////kdiy//////////						
+			}					
 			if(ecode) {
 				eset.clear();
 				phandler->filter_effect(ecode, &eset);
@@ -4580,7 +4572,7 @@ int32 field::add_chain(uint16 step) {
 					loc = peffect->value;				
 				if(loc > 0) {
 					phandler->enable_field_effect(false);
-					///////kdiy///////
+					///////kdiy///////						
 					if(is_player_affected_by_effect(phandler->current.controler,EFFECT_SANCT) && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 						effect* deffect = pduel->new_effect();
 						deffect->owner = pduel->game_field->player[phandler->current.controler].list_szone[5];
@@ -4589,24 +4581,19 @@ int32 field::add_chain(uint16 step) {
 						deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
 						deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
 						phandler->add_effect(deffect);
-						}	
+					}	
 					///////kdiy///////
 					if(loc == LOCATION_MZONE) {	
-						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
+						///////kdiy///////
+						// move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
+						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP);
+						///////kdiy///////						
 					} else {
+						///////kdiy///////
+						loc = LOCATION_RSZONE+LOCATION_SZONE;
+						///////kdiy///////						
 						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone);
-					}
-					///////kdiy///////
-					if(is_player_affected_by_effect(phandler->current.controler,EFFECT_SANCT) && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE) && phandler->current.location == LOCATION_MZONE) {
-						effect* deffect = pduel->new_effect();
-						deffect->owner = pduel->game_field->player[phandler->current.controler].list_szone[5];
-						deffect->code = EFFECT_SANCT_MZONE;
-						deffect->type = EFFECT_TYPE_SINGLE;
-						deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
-						deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
-						phandler->add_effect(deffect);
-						}	
-					///////kdiy///////					
+					}					
 				}
 			}
 		}
@@ -5697,9 +5684,19 @@ int32 field::adjust_step(uint16 step) {
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				card* pcard = player[tp].list_szone[i];
-				if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target))
+				//////kdiy//////
+				//if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target))
+				if(pcard && pcard->equiping_target && (!pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+				//////kdiy//////
 					destroy_set.insert(pcard);
 			}
+			//////kdiy//////
+			for(uint8 i = 0; i < 5; ++i) {
+				card* pcard = player[tp].list_mzone[i];
+				if(pcard && pcard->equiping_target && (!pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) || (!pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))))
+					destroy_set.insert(pcard);
+			}	
+			//////kdiy//////					
 			tp = 1 - tp;
 		}
 		if(destroy_set.size()) {
@@ -5853,7 +5850,7 @@ int32 field::adjust_step(uint16 step) {
 			}
 			/////////kdiy//////
 			for(auto& pcard : player[1 - infos.turn_player].list_szone) {
-				if(pcard && (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))			
+				if(pcard && (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) || pcard->is_affected_by_effect(EFFECT_EQUIP_MONSTER)))
 					fidset.insert(pcard->fieldid_r);
 			}
 			/////////kdiy//////
