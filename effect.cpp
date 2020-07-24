@@ -205,10 +205,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					return FALSE;
 			}
 			// additional check for each location
-			////////kdiy/////////
-			//if(handler->current.location == LOCATION_SZONE) {
-			if(((handler->current.location == LOCATION_SZONE && !handler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (handler->current.location == LOCATION_MZONE && handler->is_affected_by_effect(EFFECT_SANCT_MZONE))) || (handler->get_type() & TYPE_TRAPMONSTER)) {
-			////////kdiy/////////				
+			if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
 					return FALSE;
 				if(handler->equiping_target)
@@ -241,10 +238,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					else
 						return FALSE;
 				}
-			////////kdiy/////////					
-			//} else if(handler->current.location == LOCATION_SZONE) {
-			} else if((handler->current.location == LOCATION_SZONE && !handler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (handler->current.location == LOCATION_MZONE && handler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
-			////////kdiy/////////					
+			} else if(handler->current.location == LOCATION_SZONE) {
 				if((handler->data.type & TYPE_TRAP) && handler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
 				if((handler->data.type & TYPE_SPELL) && (handler->data.type & TYPE_QUICKPLAY || handler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && handler->get_status(STATUS_SET_TURN))
