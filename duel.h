@@ -23,6 +23,26 @@ class field;
 class interpreter;
 struct loc_info;
 
+struct card_data {
+	uint32_t code{};
+	uint32_t alias{};
+	std::set<uint16_t> setcodes;
+	uint32_t type{};
+///////kdiy///////	
+	//uint32_t level{};
+	int32_t level{};
+///////kdiy///////		
+	uint32_t attribute{};
+	uint32_t race{};
+	int32_t attack{};
+	int32_t defense{};
+	uint32_t lscale{};
+	uint32_t rscale{};
+	uint32_t link_marker{};
+	card_data(OCG_CardData* data);
+	card_data() {};
+};
+
 class duel {
 public:
 	class duel_message {

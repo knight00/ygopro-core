@@ -12,6 +12,39 @@
 #include "effect.h"
 #include "group.h"
 
+/////////////////////KDIY///
+int32 scriptlib::effect_set_owner(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	check_param(L, PARAM_TYPE_CARD, 2);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	card* pcard = *(card**) lua_touserdata(L, 2);
+	peffect->owner = pcard;
+	return 0;
+}
+int32 scriptlib::effect_get_range(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	if (peffect) {
+		lua_pushinteger(L, peffect->range);
+		return 1;
+	}
+	return 0;
+}
+int32 scriptlib::effect_get_target_range(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	if (peffect) {
+		lua_pushinteger(L, peffect->s_range);
+		lua_pushinteger(L, peffect->o_range);
+		return 2;
+	}
+	return 0;
+}
+/////////////////////KDIY///
+
 int32 scriptlib::effect_new(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
@@ -243,7 +276,7 @@ int32 scriptlib::effect_set_condition(lua_State *L) {
 	check_param(L, PARAM_TYPE_FUNCTION, 2);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
 	if(peffect->condition)
-		luaL_unref(L, LUA_REGISTRYINDEX, peffect->condition);
+		luaL_unref(L, LUA_REGISTRYINDEX, peffect->condition);			
 	peffect->condition = interpreter::get_function_handle(L, 2);
 	return 0;
 }

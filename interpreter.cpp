@@ -282,6 +282,16 @@ static const struct luaL_Reg ailib[] = {
 };
 #endif //BUILD_WITH_AI
 static const struct luaL_Reg cardlib[] = {
+///////kdiy///////
+	//{ "IsRitualType", scriptlib::card_is_ritual_type },
+	{ "SetEntityCode", scriptlib::card_set_entity_code },
+	{ "SetCardData", scriptlib::card_set_card_data },
+	{ "GetOriginalLinkMarker", scriptlib::card_get_origin_link_marker },
+	//{ "IsXyzSummonableByRose", scriptlib::card_is_xyz_summonable_by_rose },
+	//{ "GetRemovedOverlayCount", scriptlib::card_get_removed_overlay_count },
+	{ "IsAbleToDecreaseAttackAsCost", scriptlib::card_is_able_to_decrease_attack_as_cost },
+	{ "IsAbleToDecreaseDefenseAsCost", scriptlib::card_is_able_to_decrease_defense_as_cost },	
+///////kdiy///////	
 	{ "GetCode", scriptlib::card_get_code },
 	{ "GetOriginalCode", scriptlib::card_get_origin_code },
 	{ "GetOriginalCodeRule", scriptlib::card_get_origin_code_rule },
@@ -544,6 +554,11 @@ static const struct luaL_Reg cardlib[] = {
 };
 
 static const struct luaL_Reg effectlib[] = {
+/////////////kdiy/////////////////
+	{ "SetOwner", scriptlib::effect_set_owner },
+	{ "GetRange", scriptlib::effect_get_range },
+	{ "GetTargetRange", scriptlib::effect_get_target_range },
+/////////////kdiy/////////////////
 	{ "CreateEffect", scriptlib::effect_new },
 	{ "GlobalEffect", scriptlib::effect_newex },
 	{ "Clone", scriptlib::effect_clone },
@@ -639,6 +654,17 @@ static const struct luaL_Reg grouplib[] = {
 };
 
 static const struct luaL_Reg duellib[] = {
+    /////////////////////KDIY///
+	{ "SelectField", scriptlib::duel_select_field },
+	{ "GetMasterRule", scriptlib::duel_get_master_rule },
+	{ "ReadCard", scriptlib::duel_read_card },
+	{ "Exile", scriptlib::duel_exile },
+	//{ "DisableActionCheck", scriptlib::duel_disable_action_check },
+	{ "SetMetatable", scriptlib::duel_setmetatable },
+	{ "MoveTurnCount", scriptlib::duel_move_turn_count },
+	{ "GetCardsInZone", scriptlib::duel_get_cards_in_zone },
+	//{ "XyzSummonByRose", scriptlib::duel_xyz_summon_by_rose },	
+    /////////////////////KDIY///		
 	{ "EnableGlobalFlag", scriptlib::duel_enable_global_flag },
 	{ "GetLP", scriptlib::duel_get_lp },
 	{ "SetLP", scriptlib::duel_set_lp },
@@ -913,10 +939,43 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_setglobal(lua_state, "Duel");
 	luaL_newlib(lua_state, debuglib);
 	lua_setglobal(lua_state, "Debug");
+<<<<<<< Updated upstream
 #ifdef BUILD_WITH_AI
 	luaL_newlib(lua_state, ailib);
 	lua_setglobal(lua_state, "AI");
 #endif //BUILD_WITH_AI
+=======
+	
+//////////////kdiy///////////	
+	//card data constants
+	lua_pushinteger(lua_state, CARDDATA_CODE);
+	lua_setglobal(lua_state, "CARDDATA_CODE");
+	lua_pushinteger(lua_state, CARDDATA_ALIAS);
+	lua_setglobal(lua_state, "CARDDATA_ALIAS");
+	lua_pushinteger(lua_state, CARDDATA_SETCODE);
+	lua_setglobal(lua_state, "CARDDATA_SETCODE");
+	lua_pushinteger(lua_state, CARDDATA_TYPE);
+	lua_setglobal(lua_state, "CARDDATA_TYPE");
+	lua_pushinteger(lua_state, CARDDATA_LEVEL);
+	lua_setglobal(lua_state, "CARDDATA_LEVEL");
+	lua_pushinteger(lua_state, CARDDATA_ATTRIBUTE);
+	lua_setglobal(lua_state, "CARDDATA_ATTRIBUTE");
+	lua_pushinteger(lua_state, CARDDATA_ATTRIBUTE);
+	lua_setglobal(lua_state, "CARDDATA_ATTRIBUTE");
+	lua_pushinteger(lua_state, CARDDATA_RACE);
+	lua_setglobal(lua_state, "CARDDATA_RACE");
+	lua_pushinteger(lua_state, CARDDATA_ATTACK);
+	lua_setglobal(lua_state, "CARDDATA_ATTACK");
+	lua_pushinteger(lua_state, CARDDATA_DEFENSE);
+	lua_setglobal(lua_state, "CARDDATA_DEFENSE");
+	lua_pushinteger(lua_state, CARDDATA_LSCALE);
+	lua_setglobal(lua_state, "CARDDATA_LSCALE");
+	lua_pushinteger(lua_state, CARDDATA_RSCALE);
+	lua_setglobal(lua_state, "CARDDATA_RSCALE");
+	lua_pushinteger(lua_state, CARDDATA_LINK_MARKER);
+	lua_setglobal(lua_state, "CARDDATA_LINK_MARKER");
+//////////////kdiy///////////	
+>>>>>>> Stashed changes
 }
 interpreter::~interpreter() {
 	lua_close(lua_state);

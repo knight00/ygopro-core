@@ -13,6 +13,29 @@
 
 class scriptlib {
 public:
+/////////////////////KDIY///
+	//static int32 card_is_ritual_type(lua_State *L);
+	static int32 card_set_entity_code(lua_State *L);
+	static int32 card_set_card_data(lua_State *L);
+	static int32 card_get_origin_link_marker(lua_State *L);
+	//static int32 card_is_xyz_summonable_by_rose(lua_State *L);
+	// static int32 card_get_removed_overlay_count(lua_State *L);
+	static int32 card_is_able_to_decrease_attack_as_cost(lua_State *L);
+	static int32 card_is_able_to_decrease_defense_as_cost(lua_State *L);	
+	static int32 effect_set_owner(lua_State *L);
+	static int32 effect_get_range(lua_State *L);
+	static int32 effect_get_target_range(lua_State *L);
+	static int32 duel_select_field(lua_State *L);
+	static int32 duel_get_master_rule(lua_State *L);
+	static int32 duel_read_card(lua_State *L);
+	static int32 duel_exile(lua_State *L);
+	//static int32 duel_disable_action_check(lua_State *L);
+	static int32 duel_setmetatable(lua_State *L);
+	static int32 duel_move_turn_count(lua_State *L);
+	static int32 duel_get_cards_in_zone(lua_State *L);
+	//static int32 duel_xyz_summon_by_rose(lua_State *L);		
+/////////////////////KDIY///	
+
 	static int32 check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse = FALSE);
 	static int32 check_param_count(lua_State* L, int32 count);
 	static int32 check_action_permission(lua_State* L);
@@ -609,7 +632,29 @@ public:
 	static int32 debug_reload_field_end(lua_State *L);
 	static int32 debug_set_ai_name(lua_State *L);
 	static int32 debug_show_hint(lua_State *L);
+<<<<<<< Updated upstream
 	static int32 debug_print_stacktrace(lua_State *L);
+=======
+	static int32 debug_print_stacktrace(lua_State *L);	
+};
+
+template<typename T, typename type>
+using EnableIf = typename std::enable_if_t<std::is_same<T, type>::value, T>;
+
+template<typename T, bool check = false>
+EnableIf<T,card*> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_CARD, idx);
+	return *static_cast<card**>(lua_touserdata(L, idx));
+}
+
+template<typename T, bool check = false>
+EnableIf<T, group*> lua_get(lua_State *L, int idx) {
+	if(check)
+		scriptlib::check_param(L, PARAM_TYPE_GROUP, idx);
+	return *static_cast<group**>(lua_touserdata(L, idx));
+}
+>>>>>>> Stashed changes
 
 #ifdef BUILD_WITH_AI
 	//ai

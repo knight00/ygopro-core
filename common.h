@@ -26,6 +26,21 @@ typedef int16_t int16;
 typedef int8_t int8;
 typedef int32_t BOOL;
 
+/////////////kdiy///////////////
+#define CARDDATA_CODE			1
+#define CARDDATA_ALIAS			2
+#define CARDDATA_SETCODE		3
+#define CARDDATA_TYPE			4
+#define CARDDATA_LEVEL			5
+#define CARDDATA_ATTRIBUTE		6
+#define CARDDATA_RACE			7
+#define CARDDATA_ATTACK			8
+#define CARDDATA_DEFENSE		9
+#define CARDDATA_LSCALE			10
+#define CARDDATA_RSCALE			11
+#define CARDDATA_LINK_MARKER	12
+/////////////kdiy///////////////
+
 #define MATCH_ALL(x,y) (((x)&(y))==(y))
 #define MATCH_ANY(x,y) ((x)&(y))
 #define ADD_BIT(x,y) ((x)|=(y))
@@ -44,6 +59,10 @@ struct card_sort {
 };
 
 //Locations
+//////kdiy//////
+#define LOCATION_RMZONE   0x400
+#define LOCATION_RSZONE   0x800
+//////kdiy//////
 #define LOCATION_DECK    0x01
 #define LOCATION_HAND    0x02
 #define LOCATION_MZONE   0x04

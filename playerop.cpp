@@ -2161,8 +2161,16 @@ static int32 is_declarable(card_data const& cd, const std::vector<uint64>& opcod
 	}
 	if(stack.size() != 1 || stack.top() == 0)
 		return FALSE;
+<<<<<<< Updated upstream
 	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
 		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+=======
+	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
+	///////kdiy//////
+		//|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));	
+		|| (cd->alias || cd->code);
+	///////kdiy//////			
+>>>>>>> Stashed changes
 }
 #undef BINARY_OP
 #undef UNARY_OP
@@ -2209,12 +2217,17 @@ int32 field::announce_card(int16 step, uint8 playerid) {
 		return FALSE;
 	} else {
 		int32 code = returns.at<int32>(0);
+<<<<<<< Updated upstream
 		card_data data;
 		pduel->read_card(pduel->read_card_payload, code, &data);
 		if(!data.code || !is_declarable(data, core.select_options)) {
+=======
+		auto data = pduel->read_card(code);
+		if(!(data->code || data->alias) || !is_declarable(data, core.select_options)) {	
+>>>>>>> Stashed changes
 			/*auto message = */pduel->new_message(MSG_RETRY);
 			return FALSE;
-		}
+		}		
 		auto message = pduel->new_message(MSG_HINT);
 		message->write<uint8>(HINT_CODE);
 		message->write<uint8>(playerid);
