@@ -29,10 +29,7 @@ struct card_data {
 	uint32_t alias{};
 	std::set<uint16_t> setcodes;
 	uint32_t type{};
-///////kdiy///////	
-	//uint32_t level{};
-	int32_t level{};
-///////kdiy///////		
+	uint32_t level{};
 	uint32_t attribute{};
 	uint32_t race{};
 	int32_t attack{};

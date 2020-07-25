@@ -23,7 +23,7 @@ class duel;
 class effect;
 class group;
 struct chain;
-	
+
 struct loc_info {
 	uint8 controler;
 	uint8 location;
@@ -36,12 +36,8 @@ struct card_state {
 	uint32 code2;
 	std::set<uint16> setcodes;
 	uint32 type;
-/////////kdiy/////////	
-	//uint32 level;
-    int32 level;
-	int32 rank;
-	//uint32 rank;
-/////////kdiy/////////		
+	uint32 level;
+	uint32 rank;
 	uint32 link;
 	uint32 link_marker;
 	uint32 lscale;
@@ -85,15 +81,6 @@ public:
 		void addcard(card* pcard);
 		uint32 findcard(card* pcard);
 	};
-
-///////////kdiy//////////////
-	uint32 get_ritual_type();
-	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool effect = false);
-	//uint32 get_summon_info();
-	int32 is_attack_decreasable_as_cost(uint8 playerid, int32 val);
-	int32 is_defense_decreasable_as_cost(uint8 playerid, int32 val);		
-///////////kdiy//////////////
-
 	struct sendto_param_t {
 		void set(uint8 p, uint8 pos, uint8 loc, uint8 seq = 0) {
 			playerid = p;
@@ -198,21 +185,12 @@ public:
 	int32 get_attack();
 	int32 get_base_defense();
 	int32 get_defense();
-	///////kdiy//////////
-	//uint32 get_level();
-	int32 get_level();
-    int32 get_rank();
-	//uint32 get_rank();
-	///////kdiy//////////		
+	uint32 get_level();
+	uint32 get_rank();
 	uint32 get_link();
-	///////kdiy//////////		
-	//uint32 get_synchro_level(card* pcard);
-	//uint32 get_ritual_level(card* pcard);
-	//uint32 check_xyz_level(card* pcard, uint32 lv);
-	int32 get_synchro_level(card* pcard);
-	int32 get_ritual_level(card* pcard);
-	int32 check_xyz_level(card* pcard, int32 lv);	
-	///////kdiy//////////		
+	uint32 get_synchro_level(card* pcard);
+	uint32 get_ritual_level(card* pcard);
+	uint32 check_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	uint32 get_race(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	uint32 get_lscale();
