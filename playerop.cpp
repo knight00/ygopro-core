@@ -935,7 +935,10 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 	if(stack.size() != 1 || stack.top() == 0)
 		return FALSE;
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
-		|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+	///////kdiy//////
+		//|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+		|| (cd->alias || cd->code);
+	///////kdiy//////			
 }
 #undef BINARY_OP
 #undef UNARY_OP
@@ -952,7 +955,7 @@ int32 field::announce_card(int16 step, uint8 playerid) {
 	} else {
 		int32 code = returns.at<int32>(0);
 		auto data = pduel->read_card(code);
-		if(!data->code || !is_declarable(data, core.select_options)) {
+		if(!(data->code || data->alias) || !is_declarable(data, core.select_options)) {	
 			/*auto message = */pduel->new_message(MSG_RETRY);
 			return FALSE;
 		}

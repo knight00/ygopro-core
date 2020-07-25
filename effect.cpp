@@ -205,7 +205,10 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					return FALSE;
 			}
 			// additional check for each location
-			if(handler->current.location == LOCATION_SZONE) {
+			////////kdiy/////////
+			//if(handler->current.location == LOCATION_SZONE) {
+			if(((handler->current.location == LOCATION_SZONE && !handler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (handler->current.location == LOCATION_MZONE && handler->is_affected_by_effect(EFFECT_SANCT_MZONE))) || (handler->get_type() & TYPE_TRAPMONSTER)) {
+			////////kdiy/////////				
 				if(handler->is_position(POS_FACEUP))
 					return FALSE;
 				if(handler->equiping_target)
@@ -238,7 +241,10 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					else
 						return FALSE;
 				}
-			} else if(handler->current.location == LOCATION_SZONE) {
+			////////kdiy/////////					
+			//} else if(handler->current.location == LOCATION_SZONE) {
+			} else if((handler->current.location == LOCATION_SZONE && !handler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (handler->current.location == LOCATION_MZONE && handler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
+			////////kdiy/////////					
 				if((handler->data.type & TYPE_TRAP) && handler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
 				if((handler->data.type & TYPE_SPELL) && (handler->data.type & TYPE_QUICKPLAY || handler->is_affected_by_effect(EFFECT_BECOME_QUICK)) && handler->get_status(STATUS_SET_TURN))
@@ -463,21 +469,47 @@ int32 effect::is_target(card* pcard) {
 		if(is_flag(EFFECT_FLAG_SPSUM_PARAM))
 			return FALSE;
 		if(is_flag(EFFECT_FLAG_ABSOLUTE_TARGET)) {
+			////////kdiy//////			
+			//  if(pcard->current.controler == 0) {
+			//  	if(!pcard->current.is_location(s_range))
+			//  		return FALSE;
+			//  } else {
+			//  	if(!pcard->current.is_location(o_range))
+			//  		return FALSE;
+			//  }
 			if(pcard->current.controler == 0) {
-				if(!pcard->current.is_location(s_range))
-					return FALSE;
+				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (s_range & LOCATION_MZONE) && (pcard->current.is_location(s_range | LOCATION_SZONE))) 
+				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (s_range & LOCATION_SZONE) && (pcard->current.is_location(s_range | LOCATION_MZONE)))
+				|| (!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(s_range))))
+				   return FALSE;				   			   				
 			} else {
-				if(!pcard->current.is_location(o_range))
-					return FALSE;
+				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (o_range & LOCATION_MZONE) && (pcard->current.is_location(o_range | LOCATION_SZONE))) 
+				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (o_range & LOCATION_SZONE) && (pcard->current.is_location(o_range | LOCATION_MZONE)))
+				|| (!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(o_range))))
+				   return FALSE;
 			}
+			////////kdiy//////				
 		} else {
-			if(pcard->current.controler == get_handler_player()) {
-				if(!pcard->current.is_location(s_range))
-					return FALSE;
+			////////kdiy//////				
+			//  if(pcard->current.controler == get_handler_player()) {
+			//  	if(!pcard->current.is_location(s_range))
+			// 		return FALSE;
+			//  } else {
+			//  	if(!pcard->current.is_location(o_range))
+			//  		return FALSE;
+			//  }
+			if(pcard->current.controler == get_handler_player()) {			
+				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (s_range & LOCATION_MZONE) && (pcard->current.is_location(s_range | LOCATION_SZONE))) 
+				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (s_range & LOCATION_SZONE) && (pcard->current.is_location(s_range | LOCATION_MZONE)))
+				|| (!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(s_range))))
+				   return FALSE;
 			} else {
-				if(!pcard->current.is_location(o_range))
-					return FALSE;
+				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (o_range & LOCATION_MZONE) && (pcard->current.is_location(o_range | LOCATION_SZONE))) 
+				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (o_range & LOCATION_SZONE) && (pcard->current.is_location(o_range | LOCATION_MZONE)))
+				|| (!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(o_range))))
+				   return FALSE;
 			}
+			////////kdiy//////					
 		}
 	}
 	return is_fit_target_function(pcard);
@@ -792,6 +824,13 @@ uint8 effect::get_handler_player() {
 int32 effect::in_range(card* pcard) {
 	if(type & EFFECT_TYPE_XMATERIAL)
 		return handler->overlay_target ? TRUE : FALSE;
+	/////kdiy/////
+	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (range & LOCATION_MZONE) && !(range & LOCATION_SZONE))
+	   return pcard->current.is_location(range | LOCATION_SZONE);
+	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (range & LOCATION_SZONE) && !(range & LOCATION_MZONE))
+	   return pcard->current.is_location(range | LOCATION_MZONE);   
+	else
+	/////kdiy/////	
 	return pcard->current.is_location(range);
 }
 int32 effect::in_range(const chain& ch) {

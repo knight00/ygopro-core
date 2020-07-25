@@ -13,6 +13,24 @@
 
 class scriptlib {
 public:
+/////////////////////KDIY///
+	static int32 card_set_entity_code(lua_State *L);
+	static int32 card_set_card_data(lua_State *L);
+	static int32 card_get_origin_link_marker(lua_State *L);
+	static int32 card_is_able_to_decrease_attack_as_cost(lua_State *L);
+	static int32 card_is_able_to_decrease_defense_as_cost(lua_State *L);	
+	static int32 effect_set_owner(lua_State *L);
+	static int32 effect_get_range(lua_State *L);
+	static int32 effect_get_target_range(lua_State *L);
+	static int32 duel_select_field(lua_State *L);
+	static int32 duel_get_master_rule(lua_State *L);
+	static int32 duel_read_card(lua_State *L);
+	static int32 duel_exile(lua_State *L);
+	static int32 duel_setmetatable(lua_State *L);
+	static int32 duel_move_turn_count(lua_State *L);
+	static int32 duel_get_cards_in_zone(lua_State *L);	
+/////////////////////KDIY///	
+
 	static int32 check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse = FALSE);
 	static int32 check_param_count(lua_State* L, int32 count);
 	static int32 check_action_permission(lua_State* L);
