@@ -313,7 +313,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	if (pcard->current.location) {
 		/////kdiy///////
 		// if (pcard->current.location == location) {
-		if (pcard->current.location == location && !(pcard->is_affected_by_effect(EFFECT_PRE_MONSTER) && (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) || pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))) {			
+		if (pcard->current.location == location && !(pcard->is_affected_by_effect(EFFECT_PRE_MONSTER))) {			
 		/////kdiy///////			
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {

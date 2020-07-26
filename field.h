@@ -565,7 +565,10 @@ public:
 	void release(card* target, effect* reason_effect, uint32 reason, uint32 reason_player);
 	void send_to(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position, uint32 ignore = false);
 	void send_to(card* target, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position, uint32 ignore = false);
-	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint8 enable = FALSE, uint8 ret = 0, uint8 zone = 0xff, uint8 rule = FALSE, uint8 reason = 0, uint8 confirm = TRUE);
+	/////kdiy//////////
+	//void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint8 enable = FALSE, uint8 ret = 0, uint8 zone = 0xff, uint8 rule = FALSE, uint8 reason = 0, uint8 confirm = TRUE);
+	/////kdiy//////////		
+	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint8 enable = FALSE, uint8 ret = 0, uint8 zone = 0xff, uint8 rule = FALSE, uint8 reason = 0, uint8 confirm = TRUE, uint8 Rloc=0);
 	void change_position(card_set* targets, effect* reason_effect, uint32 reason_player, uint32 au, uint32 ad, uint32 du, uint32 dd, uint32 flag, uint32 enable = FALSE);
 	void change_position(card* target, effect* reason_effect, uint32 reason_player, uint32 npos, uint32 flag, uint32 enable = FALSE);
 	void operation_replace(int32 type, int32 step, group* targets);

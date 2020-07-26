@@ -2213,12 +2213,15 @@ int32 field::process_idle_command(uint16 step) {
 			if(pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(pcard);
 		for(auto& pcard : player[infos.turn_player].list_mzone) {
-			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
+			////kdiy////
+			//if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
+			////kdiy////			
+			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 				core.summonable_cards.push_back(pcard);
 		}
 		/////kdiy//////////
 		for(auto& pcard : player[infos.turn_player].list_szone) {
-			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
+			if(pcard && pcard->is_can_be_summoned(infos.turn_player, FALSE, 0, 0) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 				core.summonable_cards.push_back(pcard);
 		}		
 		/////kdiy//////////
@@ -4592,7 +4595,8 @@ int32 field::add_chain(uint16 step) {
 					} else {
 						///////kdiy///////
 						if (loc == LOCATION_SZONE)
-						   loc = LOCATION_RSZONE+LOCATION_SZONE;
+						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone,FALSE,0,TRUE,2);
+						else
 						///////kdiy///////						
 						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone);
 					}
