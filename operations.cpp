@@ -5248,9 +5248,11 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 			target->overlay_target->xyz_remove(target);
 		// call move_card()
 		//kdiy///////
-		//move_card(playerid, target, location, target->temp.sequence, pzone);
+		if(target->temp.location == LOCATION_MZONE || target->temp.location == LOCATION_SZONE)
 		move_card(playerid, target, target->temp.location, target->temp.sequence, pzone);
-		//kdiy///////				
+		else
+		//kdiy///////		
+		move_card(playerid, target, location, target->temp.sequence, pzone);
 		target->current.position = returns.at<int32>(0);
 		target->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
 		message->write(target->get_info_location());
