@@ -22,9 +22,9 @@ int32 scriptlib::card_set_entity_code(lua_State *L) {
 	int32 enable = lua_toboolean(L, 3);
 	if (enable)
 		remove_alias = true;
-	bool effect = false;	
-	int32 replace = lua_toboolean(L, 4);		
-	if (effect)
+	bool replace = false;	
+	int32 reffect = lua_toboolean(L, 4);		
+	if (reffect)
 		replace = true;	
 	lua_pushinteger(L, pcard->set_entity_code(trace, remove_alias, replace));
 	return 1;

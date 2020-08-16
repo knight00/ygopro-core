@@ -33,67 +33,40 @@ uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace
 	message->write(get_info_location());
 	message->write<uint32>(0);	
 
-	if (replace)
-	{
+	if (replace && !(data.type & TYPE_NORMAL)) {
 		if(is_status(STATUS_EFFECT_REPLACED))
 		    set_status(STATUS_EFFECT_REPLACED, FALSE);
 		for(auto i = indexer.begin(); i != indexer.end();) {
 			auto rm = i++;
 			effect* peffect = rm->first;
 			auto it = rm->second;
-			if (peffect->is_flag(EFFECT_FLAG_INITIAL | EFFECT_FLAG_COPY_INHERIT))
-			  remove_effect(peffect, it);
-			}
-			pduel->lua->load_card_script(code);
-			pduel->lua->add_param(this, PARAM_TYPE_CARD);
-			pduel->lua->call_code_function(code, (char*) "initial_effect", 1, 0);
-			set_status(STATUS_INITIALIZING | STATUS_COPYING_EFFECT, FALSE);
-			//pduel->game_field->infos.copy_id++;
-			set_status(STATUS_EFFECT_REPLACED, TRUE);
-			// for(auto& peffect : pduel->uncopy)
-			//     pduel->delete_effect(peffect);
-			// pduel->uncopy.clear();
-			if((data.type & TYPE_MONSTER) && !(data.type & TYPE_EFFECT)) {
-				effect* peffect = pduel->new_effect();
-				if(pduel->game_field->core.reason_effect)
-				peffect->owner = pduel->game_field->core.
-				reason_effect->get_handler();
-				else
-				peffect->owner = this;
-				peffect->handler = this;
-				peffect->type = EFFECT_TYPE_SINGLE;
-				peffect->code = EFFECT_ADD_TYPE;
-				peffect->value = TYPE_EFFECT;
-				peffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE;
-				// peffect->reset_flag = reset;
-				// peffect->reset_count = count;
-				this->add_effect(peffect);
-				}
+			if (peffect->is_flag(EFFECT_FLAG_INITIAL))
+			    remove_effect(peffect, it);
+		}
+		//set_status(STATUS_INITIALIZING | STATUS_COPYING_EFFECT, TRUE);
+		pduel->lua->load_card_script(code);
+		pduel->lua->add_param(this, PARAM_TYPE_CARD);
+		pduel->lua->call_code_function(code, "initial_effect", 1, 0);
+		//set_status(STATUS_INITIALIZING | STATUS_COPYING_EFFECT, FALSE);
+		//pduel->game_field->infos.copy_id++;
+		set_status(STATUS_EFFECT_REPLACED, TRUE);
+		//pduel->uncopy.clear();
+		if((data.type & TYPE_MONSTER) && !(data.type & TYPE_EFFECT)) {
+			effect* peffect = pduel->new_effect();
+			if(pduel->game_field->core.reason_effect)
+			   peffect->owner = pduel->game_field->core.reason_effect->get_handler();
+			else
+			   peffect->owner = this;
+			peffect->handler = this;
+			peffect->type = EFFECT_TYPE_SINGLE;
+			peffect->code = EFFECT_ADD_TYPE;
+			peffect->value = TYPE_EFFECT;
+			peffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE;
+			this->add_effect(peffect);
+		}
 	}
 	return code;
 }
-// uint32 card::get_summon_info() {
-// 	effect_set effects;
-// 	effect_set effects2;
-// 	uint32 res = summon_info;
-// 	//filter_effect(EFFECT_ADD_SUMMON_TYPE_KOISHI, &effects, FALSE);
-// 	//filter_effect(EFFECT_REMOVE_SUMMON_TYPE_KOISHI, &effects);
-// 	//filter_effect(EFFECT_CHANGE_SUMMON_TYPE_KOISHI, &effects2, FALSE);
-// 	//filter_effect(EFFECT_CHANGE_SUMMON_LOCATION_KOISHI, &effects2);
-// 	for (int32 i = 0; i < effects.size(); ++i) {
-// 		//if (effects[i]->code == EFFECT_ADD_SUMMON_TYPE_KOISHI)
-// 			//res |= (effects[i]->get_value(this) & 0xff00ffff);
-// 		//else
-// 			res &= ~(effects[i]->get_value(this) & 0xff00ffff);
-// 	}
-// 	for (int32 i = 0; i < effects2.size(); ++i) {
-// 		//if (effects2[i]->code == EFFECT_CHANGE_SUMMON_TYPE_KOISHI)
-// 			//res = (res & 0xff0000) | (effects2[i]->get_value(this) & 0xff00ffff);
-// 		//else
-// 			res = ((effects2[i]->get_value(this) & 0xff) << 16) | (res & 0xff00ffff);
-// 	}
-// 	return res;
-// }
 int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return FALSE;
@@ -942,20 +915,26 @@ int32 card::get_attack() {
 			atk = eset[i]->get_value(this);
 			if(!(eset[i]->type & EFFECT_TYPE_SINGLE))
 				up_atk = 0;
-//////////kdiy/////////////
-	        if(atk > 999999 || (datk >= 999999 && atk >400000))
-		        atk = 999999;
-//////////kdiy/////////////					
+			//////////kdiy/////////////
+	        if(atk > 999999 || (datk >= 999999 && atk >400000)) {
+				if (!is_affected_by_effect(EFFECT_OVERINFINITE_ATTACK))
+		            atk = 999999;
+				else atk = 1000000;
+		    }
+			//////////kdiy/////////////					
 			break;
 		case EFFECT_SET_ATTACK_FINAL:
 			if((eset[i]->type & EFFECT_TYPE_SINGLE) && !eset[i]->is_flag(EFFECT_FLAG_SINGLE_RANGE)) {
 				atk = eset[i]->get_value(this);
 				up_atk = 0;
 				upc_atk = 0;
-//////////kdiy/////////////
-	        if(atk > 999999 || (datk >= 999999 && atk >400000))
-		        atk = 999999;
-//////////kdiy/////////////					
+				//////////kdiy/////////////
+	            if(atk > 999999 || (datk >= 999999 && atk >400000)) {
+				   if (!is_affected_by_effect(EFFECT_OVERINFINITE_ATTACK))
+				      atk = 999999;
+				   else atk = 1000000;
+			    }
+				//////////kdiy/////////////					
 			} else {
 				if(!eset[i]->is_flag(EFFECT_FLAG_DELAY))
 					effects_atk.push_back(eset[i]);
@@ -1021,12 +1000,11 @@ int32 card::get_attack() {
 		if(temp.attack < 0)
 			temp.attack = 0;
 //////////kdiy/////////////
-	    if(temp.attack > 999999)
-		{
-			if (!is_affected_by_effect(EFFECT_REVERSE_UPDATE))
-			temp.attack = 999999;
+	    if(temp.attack > 999999) {
+			if (!is_affected_by_effect(EFFECT_OVERINFINITE_ATTACK))
+			   temp.attack = 999999;
 			else
-		    temp.attack = 1000000;
+		       temp.attack = 1000000;
 		}
 //////////kdiy/////////////			
 	}
@@ -1046,13 +1024,12 @@ int32 card::get_attack() {
 	if(atk < 0)
 		atk = 0;
 //////////kdiy/////////////
-	if(atk > 999999)
-		{
-			if (!is_affected_by_effect(EFFECT_OVERINFINITE_ATTACK))
+	if(atk > 999999) {
+	    if (!is_affected_by_effect(EFFECT_OVERINFINITE_ATTACK))
 			atk = 999999;
-			else
+		else
 			atk = 1000000;
-		}
+	}
 //////////kdiy/////////////			
 	temp.base_attack = -1;
 	temp.attack = -1;
@@ -1248,8 +1225,11 @@ int32 card::get_defense() {
 			if(!(eset[i]->type & EFFECT_TYPE_SINGLE))
 				up_def = 0;
 //////////kdiy/////////////
-	            if(def > 999999 || (ddef >= 999999 && def >400000))
-		            def = 999999;
+	            if(def > 999999 || (ddef >= 999999 && def >400000)) {
+					if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
+		               def = 999999;
+					else def = 1000000;
+				}
 //////////kdiy/////////////					
 			break;
 		case EFFECT_SET_DEFENSE_FINAL:
@@ -1258,8 +1238,11 @@ int32 card::get_defense() {
 				up_def = 0;
 				upc_def = 0;
 //////////kdiy/////////////
-	            if(def > 999999 || (ddef >= 999999 && def >400000))
-		            def = 999999;
+	            if(def > 999999 || (ddef >= 999999 && def >400000)) {
+					if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
+		               def = 999999;
+					else def = 1000000;
+				}
 //////////kdiy/////////////					
 			} else {
 				if(!eset[i]->is_flag(EFFECT_FLAG_DELAY))
@@ -1326,12 +1309,11 @@ int32 card::get_defense() {
 		if(temp.defense < 0)
 			temp.defense = 0;
 //////////kdiy/////////////
-	    if(temp.defense > 999999)
-		{
+	    if(temp.defense > 999999) {
 			if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
-			temp.defense = 999999;
+			   temp.defense = 999999;
 			else
-		    temp.defense = 1000000;
+		       temp.defense = 1000000;
 		}
 //////////kdiy/////////////		
 	}
@@ -1351,13 +1333,12 @@ int32 card::get_defense() {
 	if(def < 0)
 		def = 0;
 //////////kdiy/////////////
-	if(def > 999999)
-		{
-			if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
+	if(def > 999999) {
+		if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
 			def = 999999;
-			else
+		else
 			def = 1000000;
-		}
+	}
 //////////kdiy/////////////		
 	temp.base_defense = -1;
 	temp.defense = -1;

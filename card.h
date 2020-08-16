@@ -88,7 +88,7 @@ public:
 
 ///////////kdiy//////////////
 	uint32 get_ritual_type();
-	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool effect = false);
+	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool replace = false);
 	//uint32 get_summon_info();
 	int32 is_attack_decreasable_as_cost(uint8 playerid, int32 val);
 	int32 is_defense_decreasable_as_cost(uint8 playerid, int32 val);		
