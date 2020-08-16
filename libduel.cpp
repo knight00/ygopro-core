@@ -193,7 +193,7 @@ int32 scriptlib::duel_get_cards_in_zone(lua_State *L) {
 	pduel->game_field->get_cards_in_zone(&cset, zone >> 16, 1 - rplayer, LOCATION_MZONE);
 	pduel->game_field->get_cards_in_zone(&cset, zone >> 24, 1 - rplayer, LOCATION_SZONE);
 	group* pgroup = pduel->new_group(cset);
-	interpreter::pushobject(L, pgroup);
+	interpreter::group2value(L, pgroup);
 	return 1;
 }
 /////////////////////KDIY///
@@ -1782,7 +1782,7 @@ int32 scriptlib::duel_force_attack(lua_State* L) {
 	auto attacker = lua_get<card*, true>(L, 1);
 	duel* pduel = attacker->pduel;
 	//auto attack_target = lua_get<card*, true>(L, 2);
-	auto attack_target = check_param(L, PARAM_TYPE_CARD, 2, true)? lua_get<card*, true>(L, 2): 0;
+	auto attack_target = check_param(L, PARAM_TYPE_CARD, 2, true)? lua_get<card*, true>(L, 2);: 0;
 	//////kdiy//////////	
 	pduel->game_field->core.set_forced_attack = true;
 	pduel->game_field->core.forced_attacker = attacker;
