@@ -5,21 +5,23 @@
  *      Author: Argon
  */
 
-#include "interpreter.h"
 #include "group.h"
 #include "card.h"
 #include "duel.h"
 
 group::group(duel* pd) {
-	lua_type = PARAM_TYPE_GROUP;
+	ref_handle = 0;
 	pduel = pd;
+	is_readonly = FALSE;
 }
 group::group(duel* pd, card* pcard) {
 	container.insert(pcard);
-	lua_type = PARAM_TYPE_GROUP;
+	ref_handle = 0;
 	pduel = pd;
+	is_readonly = FALSE;
 }
 group::group(duel* pd, const card_set& cset): container(cset) {
-	lua_type = PARAM_TYPE_GROUP;
+	ref_handle = 0;
 	pduel = pd;
+	is_readonly = FALSE;
 }
