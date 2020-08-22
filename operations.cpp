@@ -1912,6 +1912,14 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		effect* pextra = core.select_effects[returns.at<int32>(0)];
 		core.units.begin()->ptr1 = pextra;
 		int32 releasable = 0xff00ff;
+		///////kdiy///////
+		if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+			releasable+= 0x1f00;  
+		}
+		if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+			releasable+= 0x1f000000; 
+		}
+		///////kdiy///////		
 		if(pextra) {
 			std::vector<int32> retval;
 			pextra->get_value(target, 0, &retval);
@@ -2147,10 +2155,26 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		if(proc->operation) {
 			effect* pextra = (effect*)core.units.begin()->ptr1;
 			int32 releasable = 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA))
+				releasable+= 0x1f00;
+			if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA))
+				releasable+= 0x1f000000;
+			///////kdiy///////			
 			if(pextra) {
 				std::vector<int32> retval;
 				pextra->get_value(target, 0, &retval);
 				releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+= 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+= 0x1f000000; 
+				}
+				///////kdiy///////				
 			}
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(min_tribute, PARAM_TYPE_INT);
@@ -2586,6 +2610,12 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 		effect* pextra = core.select_effects[returns.at<int32>(0)];
 		core.units.begin()->ptr1 = pextra;
 		int32 releasable = 0xff00ff;
+		///////kdiy///////
+		if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))
+			releasable+= 0x1f00;
+		if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA))
+			releasable+= 0x1f000000;
+		///////kdiy///////			
 		if(pextra) {
 			std::vector<int32> retval;
 			pextra->get_value(target, 0, &retval);
@@ -2602,11 +2632,11 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 			if(is_player_affected_by_effect(setplayer,EFFECT_ORICA)) {
 				if(retval.size() < 0 || retval.size() < 3)
 					releasable+= 0x1f00;  
-				}
-				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
-					if(retval.size() < 0 || retval.size() < 3)
-					   releasable+= 0x1f000000; 
-			    }
+			}
+			if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f000000; 
+			}
 			///////kdiy///////				
 			if((int32)min_tribute < new_min_tribute)
 				min_tribute = new_min_tribute;
@@ -2714,10 +2744,26 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 		if(proc->target) {
 			effect* pextra = (effect*)core.units.begin()->ptr1;
 			int32 releasable = 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))
+				releasable+= 0x1f00;  
+			if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA))
+				releasable+= 0x1f000000;
+			///////kdiy///////				
 			if(pextra) {
 				std::vector<int32> retval;
 				pextra->get_value(target, 0, &retval);
 				releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+				///////kdiy///////
+				if(is_player_affected_by_effect(setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+= 0x1f00;  
+				}
+				if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA)) {
+					if(retval.size() < 0 || retval.size() < 3)
+					   releasable+= 0x1f000000; 
+				}
+				///////kdiy///////				
 			}
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(min_tribute, PARAM_TYPE_INT);
@@ -2740,6 +2786,12 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 		if(proc->operation) {
 			effect* pextra = (effect*)core.units.begin()->ptr1;
 			int32 releasable = 0xff00ff;
+			///////kdiy///////
+			if(is_player_affected_by_effect(setplayer,EFFECT_ORICA))
+				releasable+= 0x1f00;  
+			if(is_player_affected_by_effect(1-setplayer,EFFECT_ORICA))
+				releasable+= 0x1f000000;
+			///////kdiy///////				
 			if(pextra) {
 				std::vector<int32> retval;
 				pextra->get_value(target, 0, &retval);

@@ -1900,7 +1900,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	}
 	///////kdiy//////
 	for(auto& pcard : player[playerid].list_szone) {
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;			
 		if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1939,7 +1939,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 		}
 		///////kdiy///////
 		for(auto& pcard : player[1 - playerid].list_szone) {
-		    if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		    if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 			  continue;				
 			if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && (pcard->is_position(POS_FACEUP) || !use_con)
 			   && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {						   
@@ -1980,7 +1980,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 		}
 		//////kdiy//////
 		for(auto& pcard : player[1 - playerid].list_szone) {
-			if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+			if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 			  continue;					
 			if(pcard && pcard != exc && !(exg && exg->has_card(pcard)) && (pcard->is_position(POS_FACEUP) || !use_con)
 			   && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {   
@@ -2080,7 +2080,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	uint32 ex_oneof_max = 0;
 	for(auto& pcard : player[1 - p].list_mzone) {
 		////////kdiy//////
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))
+		if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 		  continue;
 		////////kdiy//////		
 		if(!pcard || !((releasable >> (pcard->current.sequence + 16)) & 1) || !pcard->is_releasable_by_summon(p, target))
@@ -2114,7 +2114,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	////////kdiy//////
 	for(auto& pcard : player[p].list_szone) {
 		////////kdiy//////
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;
 		////////kdiy//////		
 		if(pcard && ((releasable >> pcard->current.sequence) & 1) && pcard->is_releasable_by_summon(p, target)) {
@@ -2133,7 +2133,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	}
 	for(auto& pcard : player[1 - p].list_szone) {
 		////////kdiy//////
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;
 		////////kdiy//////		
 		if(!pcard || !((releasable >> (pcard->current.sequence + 16)) & 1) || !pcard->is_releasable_by_summon(p, target))
@@ -2232,14 +2232,14 @@ void field::get_ritual_material(uint8 playerid, effect* peffect, card_set* mater
 	}
 	/////kdiy//////
 	for(auto& pcard : player[playerid].list_szone) {
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;
 		if(pcard && pcard->get_level() && pcard->is_affect_by_effect(peffect)
 		        && pcard->is_releasable_by_nonsummon(playerid) && pcard->is_releasable_by_effect(playerid, peffect))
 			material->insert(pcard);
 	}
 	for(auto& pcard : player[1 - playerid].list_szone) {
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;		
 		if(pcard && pcard->get_level() && pcard->is_affect_by_effect(peffect)
 		        && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
@@ -2265,7 +2265,7 @@ void field::get_fusion_material(uint8 playerid, card_set* material) {
 	}
 	for(auto& pcard : player[playerid].list_szone) {
 		/////kdiy//////
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;	
 		/////kdiy//////			
 		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_FUSION_MATERIAL))
@@ -2273,7 +2273,7 @@ void field::get_fusion_material(uint8 playerid, card_set* material) {
 	}
 	/////kdiy//////
 	for(auto& pcard : player[playerid].list_szone) {
-		if(!(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;	
 		if(pcard)
 			material->insert(pcard);
