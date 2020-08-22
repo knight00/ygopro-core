@@ -364,6 +364,16 @@ uint32 card::get_code() {
 	}
 	return code;
 }
+/////////kdiy////////
+uint32 card::get_ocode() {
+	if (assume.find(ASSUME_CODE) != assume.end())
+		return assume[ASSUME_CODE];
+	if (temp.code != 0xffffffff)
+		return temp.code;
+	uint32 code = data.code;
+	return code;
+}
+/////////kdiy////////
 // return: the current second card name
 // for double-name cards, it returns the name in description
 uint32 card::get_another_code() {
@@ -428,9 +438,11 @@ uint32 card::get_summon_code(card* scard, uint64 sumtype, uint8 playerid) {
 int32 card::is_set_card(uint32 set_code) {
 	uint32 code = get_code();
 	std::set<uint16> setcodes = data.setcodes;
-	if (code != data.code) {
-		setcodes = pduel->read_card(code)->setcodes;
-	}
+	/////kdiy///////
+	// if (code != data.code) {
+	// 	setcodes = pduel->read_card(code)->setcodes;
+	// }
+	/////kdiy///////	
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for(auto& setcode : setcodes) {
@@ -560,9 +572,11 @@ uint32 card::get_set_card() {
 	uint32 count = 0;
 	uint32 code = get_code();
 	std::set<uint16> setcodes = data.setcodes;
-	if(code != data.code) {
-		setcodes = pduel->read_card(code)->setcodes;
-	}
+	//////kdiy///////
+	// if(code != data.code) {
+	// 	setcodes = pduel->read_card(code)->setcodes;
+	// }
+	//////kdiy///////	
 	for(auto& setcode : setcodes) {
 		count++;
 		lua_pushinteger(pduel->lua->current_state, setcode);
@@ -593,9 +607,11 @@ uint32 card::get_pre_set_card() {
 	uint32 count = 0;
 	uint32 code = previous.code;
 	std::set<uint16> setcodes = data.setcodes;
-	if(code != data.code) {
-		setcodes = pduel->read_card(code)->setcodes;
-	}
+	////////kdiy//////
+	// if(code != data.code) {
+	// 	setcodes = pduel->read_card(code)->setcodes;
+	// }
+	////////kdiy//////	
 	for(auto& setcode : setcodes) {
 		count++;
 		lua_pushinteger(pduel->lua->current_state, setcode);
@@ -3177,7 +3193,21 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 			eset[i]->get_value(this, 0, &retval);
 			int32 new_min = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f00;			  
+			///////kdiy///////			
 			int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f00;  
+			}
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f000000; 
+			}
+			///////kdiy///////			
 			if(new_min < min)
 				new_min = min;
 			new_zone &= zone;
@@ -3210,7 +3240,23 @@ int32 card::check_summon_procedure(effect* peffect, uint8 playerid, uint8 ignore
 			eset[i]->get_value(this, 0, &retval);
 			int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f00;
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f0000;				  
+			///////kdiy///////			
 			int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f00;  
+			}
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f000000; 
+			}
+			///////kdiy///////			
 			if(new_min_tribute < (int32)min_tribute)
 				new_min_tribute = min_tribute;
 			if (peffect->is_flag(EFFECT_FLAG_SPSUM_PARAM) && peffect->o_range)
@@ -3262,7 +3308,21 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 			eset[i]->get_value(this, 0, &retval);
 			int32 new_min = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f00;			  
+			///////kdiy///////				
 			int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f00;  
+			}
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f000000; 
+			}
+			///////kdiy///////				
 			if(new_min < min)
 				new_min = min;
 			new_zone &= zone;
@@ -3292,7 +3352,23 @@ int32 card::check_set_procedure(effect* peffect, uint8 playerid, uint8 ignore_co
 			eset[i]->get_value(this, 0, &retval);
 			int32 new_min_tribute = retval.size() > 0 ? retval[0] : 0;
 			int32 new_zone = retval.size() > 1 ? retval[1] : 0x1f001f;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f00;
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA) && retval.size()<2)
+				new_zone+= 0x1f0000;				  
+			///////kdiy///////				
 			int32 releasable = retval.size() > 2 ? (retval[2] < 0 ? 0xff00ff + retval[2] : retval[2]) : 0xff00ff;
+			///////kdiy///////
+			if(pduel->game_field->is_player_affected_by_effect(playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f00;  
+			}
+			if(pduel->game_field->is_player_affected_by_effect(1-playerid,EFFECT_ORICA)) {
+				if(retval.size() < 0 || retval.size() < 3)
+					releasable+= 0x1f000000; 
+			}
+			///////kdiy///////				
 			if (peffect->is_flag(EFFECT_FLAG_SPSUM_PARAM) && peffect->o_range)
 				new_zone = (new_zone >> 16) | (new_zone & 0xffff << 16);
 			if(new_min_tribute < (int32)min_tribute)

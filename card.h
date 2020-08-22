@@ -183,6 +183,9 @@ public:
 	loc_info get_info_location();
 	uint32 second_code(uint32 code);
 	uint32 get_code();
+	//////kdiy/////
+	uint32 get_ocode();	
+	//////kdiy/////	
 	uint32 get_another_code();
 	uint32 get_summon_code(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	int32 is_set_card(uint32 set_code);

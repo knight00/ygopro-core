@@ -962,13 +962,19 @@ int32 scriptlib::card_is_code(lua_State *L) {
 	auto pcard = lua_get<card*>(L, 1);
 	uint32 code1 = pcard->get_code();
 	uint32 code2 = pcard->get_another_code();
+	////kdiy/////
+	uint32 code3 = pcard->get_ocode();	
+	////kdiy/////	
 	uint32 count = lua_gettop(L) - 1;
 	uint32 result = FALSE;
 	for(uint32 i = 0; i < count; ++i) {
 		if(lua_isnil(L, i + 2))
 			continue;
 		uint32 tcode = lua_tointeger(L, i + 2);
-		if(code1 == tcode || (code2 && code2 == tcode)) {
+		////kdiy/////	
+		//if(code1 == tcode || (code2 && code2 == tcode)) {
+		if(code1 == tcode || code3 == tcode || (code2 && code2 == tcode)) {
+		////kdiy/////		
 			result = TRUE;
 			break;
 		}
