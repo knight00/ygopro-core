@@ -2521,7 +2521,10 @@ int32 scriptlib::card_is_level_below(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	auto pcard = lua_get<card*>(L, 1);
-	uint32 lvl = lua_tointeger(L, 2);
+	//////kdiy/////////		
+	//uint32 lvl = lua_tointeger(L, 2);
+	int32 lvl = lua_tointeger(L, 2);
+	//////kdiy/////////		
 	if(((pcard->data.type & TYPE_XYZ) && !(pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S))) 
 		|| (pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)	
 	//////kdiy/////////	
@@ -2537,7 +2540,10 @@ int32 scriptlib::card_is_level_above(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	auto pcard = lua_get<card*>(L, 1);
-	uint32 lvl = lua_tointeger(L, 2);
+	//////kdiy/////////		
+	//uint32 lvl = lua_tointeger(L, 2);
+	int32 lvl = lua_tointeger(L, 2);
+	//////kdiy/////////		
 	if(((pcard->data.type & TYPE_XYZ) && !(pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
 		|| (pcard->data.type & TYPE_LINK) || (pcard->status & STATUS_NO_LEVEL)
 	//////kdiy/////////	
