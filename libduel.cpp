@@ -479,8 +479,10 @@ int32 scriptlib::duel_summon(lua_State *L) {
 		return 0;
 	auto pcard = lua_get<card*>(L, 2);
 	duel* pduel = pcard->pduel;
-	if(pduel->game_field->core.effect_damage_step)
-		return 0;
+	////kdiy/////////
+	// if(pduel->game_field->core.effect_damage_step)
+	// 	return 0;
+	////kdiy/////////	
 	uint32 ignore_count = lua_get<bool>(L, 3);
 	effect* peffect = 0;
 	if(!lua_isnil(L, 4)) {
@@ -495,11 +497,13 @@ int32 scriptlib::duel_summon(lua_State *L) {
 		zone = lua_tointeger(L, 6);
 	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->summon(playerid, pcard, peffect, ignore_count, min_tribute, zone);
-	if(pduel->game_field->core.current_chain.size()) {
-		pduel->game_field->core.reserved = pduel->game_field->core.subunits.back();
-		pduel->game_field->core.subunits.pop_back();
-		pduel->game_field->core.summoning_card = pcard;
-	}
+	////kdiy/////////
+	// if(pduel->game_field->core.current_chain.size()) {
+	// 	pduel->game_field->core.reserved = pduel->game_field->core.subunits.back();
+	// 	pduel->game_field->core.subunits.pop_back();
+	// 	pduel->game_field->core.summoning_card = pcard;
+	// }
+	////kdiy/////////
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_special_summon_rule(lua_State *L) {
@@ -601,8 +605,10 @@ int32 scriptlib::duel_setm(lua_State *L) {
 		return 0;
 	auto pcard = lua_get<card*>(L, 2);
 	duel* pduel = pcard->pduel;
-	if(pduel->game_field->core.effect_damage_step)
-		return 0;
+	////kdiy/////////	
+	// if(pduel->game_field->core.effect_damage_step)
+	// 	return 0;
+	////kdiy/////////		
 	uint32 ignore_count = lua_get<bool>(L, 3);
 	effect* peffect = 0;
 	if(!lua_isnil(L, 4)) {
@@ -617,11 +623,13 @@ int32 scriptlib::duel_setm(lua_State *L) {
 		zone = lua_tointeger(L, 6);
 	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->mset(playerid, pcard, peffect, ignore_count, min_tribute, zone);
-	if(pduel->game_field->core.current_chain.size()) {
-		pduel->game_field->core.reserved = pduel->game_field->core.subunits.back();
-		pduel->game_field->core.subunits.pop_back();
-		pduel->game_field->core.summoning_card = pcard;
-	}
+	////kdiy/////////
+	// if(pduel->game_field->core.current_chain.size()) {
+	// 	pduel->game_field->core.reserved = pduel->game_field->core.subunits.back();
+	// 	pduel->game_field->core.subunits.pop_back();
+	// 	pduel->game_field->core.summoning_card = pcard;
+	// }
+	////kdiy/////////	
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_sets(lua_State *L) {
