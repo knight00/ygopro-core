@@ -643,7 +643,7 @@ int32 scriptlib::group_band(lua_State* L) {
 	duel* pduel = pgroup1->pduel;
 	field::card_set cset;
 	if(pcard) {
-		if(pgroup1->container.count(pcard)) {
+		if(pgroup1->container.find(pcard) != pgroup1->container.end()) {
 			cset.insert(pcard);
 		}
 	} else {
@@ -651,7 +651,7 @@ int32 scriptlib::group_band(lua_State* L) {
 			std::swap(pgroup1, pgroup2);
 		}
 		for(const auto& pcard : pgroup1->container) {
-			if(pgroup2->container.count(pcard))
+			if(pgroup2->container.find(pcard) != pgroup2->container.end())
 				cset.insert(pcard);
 		}
 	}
@@ -802,13 +802,14 @@ int32 scriptlib::group_includes(lua_State* L) {
 	check_param_count(L, 2);
 	auto pgroup1 = lua_get<group*, true>(L, 1);
 	auto pgroup2 = lua_get<group*, true>(L, 2);
-	auto& cset = pgroup1->container;
 	if(pgroup1->container.size() < pgroup2->container.size()) {
 		lua_pushboolean(L, FALSE);
 	} else {
 		int res = TRUE;
+		auto& cset = pgroup1->container;
+		auto end = cset.end();
 		for(auto& pcard : pgroup2->container) {
-			if(!cset.count(pcard)) {
+			if(cset.find(pcard) == end) {
 				res = FALSE;
 				break;
 			}

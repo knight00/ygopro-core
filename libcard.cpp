@@ -1578,7 +1578,7 @@ int32 scriptlib::card_is_relate_to_chain(lua_State* L) {
 	auto chain_count = lua_get<uint8>(L, 2);
 	duel* pduel = pcard->pduel;
 	if(chain_count > pduel->game_field->core.current_chain.size() || chain_count < 1)
-		chain_count = pduel->game_field->core.current_chain.size();
+		chain_count = (uint8)pduel->game_field->core.current_chain.size();
 	lua_pushboolean(L, pcard->is_has_relation(pduel->game_field->core.current_chain[chain_count - 1]));
 	return 1;
 }
@@ -1733,7 +1733,7 @@ inline int32 spsummonable_rule(lua_State* L, uint32 cardtype, uint32 sumtype, ui
 		must = pcard->pduel->new_group(_pcard);
 	else
 		must = lua_get<group*>(L, 2 + offset);
-	if(auto _pcard = lua_get<card*>(L, 2 + offset))
+	if(auto _pcard = lua_get<card*>(L, 3 + offset))
 		materials = pcard->pduel->new_group(_pcard);
 	else
 		materials = lua_get<group*>(L, 3 + offset);
@@ -2468,13 +2468,13 @@ int32 scriptlib::card_add_monster_attribute(lua_State* L) {
 	}
 	return 0;
 }
-int32 scriptlib::card_add_monster_attribute_complete(lua_State* L) {
+int32 scriptlib::card_add_monster_attribute_complete(lua_State* /*L*/) {
 	return 0;
 }
 int32 scriptlib::card_cancel_to_grave(lua_State* L) {
 	check_param_count(L, 1);
 	auto pcard = lua_get<card*, true>(L, 1);
-	bool cancel = lua_get<bool, false>(L, 2);
+	bool cancel = lua_get<bool, true>(L, 2);
 	if(cancel)
 		pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
 	else {
@@ -2672,7 +2672,7 @@ int32 scriptlib::card_recreate(lua_State* L) {
 		pcard->data.rscale = lua_get<uint32>(L, 12, pcard->data.rscale);
 		pcard->data.link_marker = lua_get<uint32>(L, 13, pcard->data.link_marker);
 		if (lua_get<bool, false>(L, 14))
-			pcard->replace_effect(code, 0, 0);
+			pcard->replace_effect(code, 0, 0, true);
 	}
 	return 0;
 }

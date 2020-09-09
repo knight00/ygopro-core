@@ -1159,7 +1159,7 @@ int32 scriptlib::duel_check_event(lua_State* L) {
 	check_param_count(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	auto ev = lua_get<uint32>(L, 1);
-	if(!lua_get<bool>(L, 2)) {
+	if(!/*bool get_info = */lua_get<bool, false>(L, 2)) {
 		lua_pushboolean(L, pduel->game_field->check_event(ev));
 		return 1;
 	} else {
@@ -2382,7 +2382,7 @@ int32 scriptlib::duel_skip_phase(lua_State* L) {
 	auto phase = lua_get<uint16>(L, 2);
 	auto reset = lua_get<uint32>(L, 3);
 	auto count = lua_get<uint16>(L, 4);
-	auto value = lua_get<uint32>(L, 5);
+	auto value = lua_get<uint32, 0>(L, 5);
 	if(count <= 0)
 		count = 1;
 	duel* pduel = interpreter::get_duel_info(L);
@@ -2662,11 +2662,11 @@ int32 scriptlib::duel_select_matching_cards(lua_State* L) {
 		check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
-	bool cancelable = true;
+	bool cancelable = false;
 	uint8 lastarg = 8;
 	if(lua_isboolean(L, lastarg)) {
 		check_param_count(L, 9);
-		cancelable = lua_get<bool, true>(L, lastarg);
+		cancelable = lua_get<bool, false>(L, lastarg);
 		lastarg++;
 	}
 	if(!(pexception = lua_get<card*>(L, lastarg)))
@@ -2694,6 +2694,52 @@ int32 scriptlib::duel_select_matching_cards(lua_State* L) {
 			interpreter::pushobject(L, pgroup);
 		}
 		return 1;
+	});
+}
+int32 scriptlib::duel_select_cards_code(lua_State * L) {
+	check_action_permission(L);
+	check_param_count(L, 6);
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->core.select_cards.clear();
+	auto playerid = lua_get<uint8>(L, 1);
+	if(playerid != 0 && playerid != 1)
+		return 0;
+	auto min = lua_get<uint16>(L, 2);
+	auto max = lua_get<uint16>(L, 3);
+	bool cancelable = lua_get<bool>(L, 4);
+	//bool ret_index = lua_get<bool>(L, 5);
+	for(int32 i = 6, tot = lua_gettop(L); i <= tot; ++i) {
+		auto cardobj = new std::pair<uint32_t, uint32_t>(lua_get<uint32>(L, i), i - 5);
+		pduel->game_field->core.select_cards.push_back((card*)cardobj);
+	}
+	pduel->game_field->add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid + (cancelable << 16), min + (max << 16), TRUE);
+	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State* L, int32/* status*/, lua_KContext ctx) {
+		duel* pduel = (duel*)ctx;
+		if(pduel->game_field->return_cards.canceled) {
+			for(auto& obj : pduel->game_field->core.select_cards)
+				delete obj;
+			lua_pushnil(L);
+			return 1;
+		}  else {
+			bool ret_index = lua_get<bool>(L, 5);
+			for(auto& code : pduel->game_field->return_cards.list) {
+				auto obj = (std::pair<uint32_t, uint32_t>*)code;
+				if(ret_index) {
+					lua_newtable(L);
+					lua_pushinteger(L, 1);
+				}
+				lua_pushinteger(L, obj->first);
+				if(ret_index) {
+					lua_settable(L, -3);
+					lua_pushinteger(L, 2);
+					lua_pushinteger(L, obj->second);
+					lua_settable(L, -3);
+				}
+			}
+			for(auto& obj : pduel->game_field->core.select_cards)
+				delete ((std::pair<uint32_t, uint32_t>*)obj);
+			return (int)pduel->game_field->return_cards.list.size();
+		}
 	});
 }
 /**
@@ -3660,7 +3706,7 @@ int32 scriptlib::duel_announce_level(lua_State* L) {
 	check_param_count(L, 1);
 	auto playerid = lua_get<uint8>(L, 1);
 	auto min = lua_get<uint32, 1>(L, 2);
-	auto max = lua_get<uint32, 12>(L, 2);
+	auto max = lua_get<uint32, 12>(L, 3);
 	auto paramcount = lua_gettop(L);
 	if(min > max)
 		std::swap(min, max);
