@@ -6,11 +6,18 @@
  */
 #include "scriptlib.h"
 #include "duel.h"
-#include "lua_obj.h"
 
-int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse, void* retobj) {
-	const char* type = nullptr;
-	lua_obj* obj = nullptr;
+static int32 check_data_type(lua_State* L, int32 index, const char* tname) {
+	int32 result = FALSE;
+	if(lua_getmetatable(L, index)) {
+		lua_getglobal(L, tname);
+		if(lua_rawequal(L, -1, -2))
+			result = TRUE;
+		lua_pop(L, 2);
+	}
+	return result;
+}
+int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse) {
 	switch (param_type) {
 	case PARAM_TYPE_CARD:
 	case PARAM_TYPE_GROUP:
@@ -20,27 +27,59 @@ int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 
 				*(lua_obj**)retobj = obj;
 			return TRUE;
 		}
-		type = param_type == PARAM_TYPE_CARD ? "Card" : param_type == PARAM_TYPE_GROUP ? "Group" : "Effect";
+		if(result)
+			return TRUE;
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"Card\".", index);
 		break;
-	case PARAM_TYPE_FUNCTION:
+	}
+	case PARAM_TYPE_GROUP: {
+		if(lua_isuserdata(L, index) && check_data_type(L, index, "Group"))
+			return TRUE;
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"Group\".", index);
+		break;
+	}
+	case PARAM_TYPE_EFFECT: {
+		if(lua_isuserdata(L, index) && check_data_type(L, index, "Effect"))
+			return TRUE;
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"Effect\".", index);
+		break;
+	}
+	case PARAM_TYPE_FUNCTION: {
 		if(lua_isfunction(L, index))
 			return TRUE;
-		type = "Function";
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"Function\".", index);
 		break;
-	case PARAM_TYPE_STRING:
+	}
+	case PARAM_TYPE_STRING: {
 		if(lua_isstring(L, index))
 			return TRUE;
-		type = "String";
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"String\".", index);
 		break;
-	case PARAM_TYPE_INT:
+	}
+	case PARAM_TYPE_INT: {
 		if(lua_isinteger(L, index) || lua_isnumber(L, index))
 			return TRUE;
-		type = "Int";
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"Int\".", index);
 		break;
-	case PARAM_TYPE_BOOLEAN:
-		if(lua_gettop(L) >= index)
+	}
+	case PARAM_TYPE_BOOLEAN: {
+		if(lua_isboolean(L, index))
 			return TRUE;
-		type = "boolean";
+		if(retfalse)
+			return FALSE;
+		luaL_error(L, "Parameter %d should be \"boolean\".", index);
 		break;
 	}
 	if(retfalse)
