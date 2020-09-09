@@ -1400,8 +1400,8 @@ int32 card::get_level() {
 		switch (effects[i]->code) {
 		case EFFECT_UPDATE_RANK:
 		case EFFECT_UPDATE_LEVEL:
-			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !effects[i]->is_flag(EFFECT_FLAG_SINGLE_RANGE))
-				up += effects[i]->get_value(this);
+			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !effects[i]->is_flag(EFFECT_FLAG_SINGLE_RANGE)) 
+			    up += effects[i]->get_value(this);		
 			else
 				upc += effects[i]->get_value(this);
 			break;
@@ -4425,7 +4425,7 @@ int32 card::is_control_can_be_changed(int32 ignore_mzone, uint32 zone) {
 	if(!ignore_mzone && pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL, zone) <= 0)
 		return FALSE;
 	if(!pduel->game_field->is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && ((get_type() & TYPE_TRAPMONSTER)
-											 && pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_CONTROL) <= 0))
+		&& pduel->game_field->get_useable_count(this, 1 - current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_CONTROL) <= 0))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_CHANGE_CONTROL))
 		return FALSE;
