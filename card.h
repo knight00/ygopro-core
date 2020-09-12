@@ -9,6 +9,7 @@
 #define CARD_H_
 
 #include "common.h"
+#include "lua_obj.h"
 #include "effectset.h"
 #include "ocgapi.h"
 #include "duel.h"
@@ -65,7 +66,7 @@ struct card_state {
 	void set0xff();
 };
 
-class card {
+class card : public lua_obj {
 public:
 	struct effect_relation_hash {
 		inline std::size_t operator()(const std::pair<effect*, uint16>& v) const {
@@ -88,7 +89,7 @@ public:
 
 ///////////kdiy//////////////
 	uint32 get_ritual_type();
-	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool replace = false);
+	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool effect = false);
 	//uint32 get_summon_info();
 	int32 is_attack_decreasable_as_cost(uint8 playerid, int32 val);
 	int32 is_defense_decreasable_as_cost(uint8 playerid, int32 val);		
@@ -112,8 +113,6 @@ public:
 		uint8 location;
 		uint8 sequence;
 	};
-	int32 ref_handle;
-	duel* pduel;
 	card_data data;
 	card_state previous;
 	card_state temp;
@@ -183,9 +182,6 @@ public:
 	loc_info get_info_location();
 	uint32 second_code(uint32 code);
 	uint32 get_code();
-	//////kdiy/////
-	uint32 get_ocode();	
-	//////kdiy/////	
 	uint32 get_another_code();
 	uint32 get_summon_code(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	int32 is_set_card(uint32 set_code);
@@ -225,7 +221,7 @@ public:
 	uint32 get_linked_zone(bool free = false);
 	void get_linked_cards(card_set* cset, uint32 zones = 0);
 	uint32 get_mutual_linked_zone();
-	void get_mutual_linked_cards(card_set * cset);
+	void get_mutual_linked_cards(card_set* cset);
 	int32 is_link_state();
 	int32 is_mutual_linked(card* pcard, uint32 zones1 = 0, uint32 zones2 = 0);
 	int32 is_extra_link_state();
@@ -237,7 +233,7 @@ public:
 	void get_column_cards(card_set* cset, int32 left, int32 right);
 	int32 is_all_column();
 
-	void equip(card *target, uint32 send_msg = TRUE);
+	void equip(card* target, uint32 send_msg = TRUE);
 	void unequip();
 	int32 get_union_count();
 	int32 get_old_union_count();
