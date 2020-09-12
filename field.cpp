@@ -1717,14 +1717,14 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 		////kdiy////////////
 		//return checkc(pcard, [](auto pcard)->bool {return !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP); });
 	    return checkc(pcard, [](auto pcard)->bool {return !pcard->get_status(STATUS_SUMMONING | STATUS_SUMMON_DISABLED | STATUS_SPSUMMON_STEP) 
-			&& ((pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((pcard->current.location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))); });
+			&& ((pcard->current.location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (pcard->current.location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))); });
 	    ////kdiy////////////
 	};
 	auto szonechk = [&checkc](auto pcard)->bool {
 		////kdiy////////////
 		//return checkc(pcard, [](auto pcard)->bool {return !pcard->is_status(STATUS_ACTIVATE_DISABLED); });
 	    return checkc(pcard, [](auto pcard)->bool {return !pcard->get_status(STATUS_ACTIVATE_DISABLED) 
-			&& ((pcard->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || ((pcard->current.location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))); });
+			&& ((pcard->current.location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))); });
 	    ////kdiy////////////	
 	};
 	auto pzonechk = [&checkc](auto pcard)->bool {
@@ -1743,14 +1743,16 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 		if((location & LOCATION_RSZONE) && check_list(player[self].list_szone, rszonechk))
 			return TRUE;
 		//if((location & LOCATION_MZONE) && check_list(player[self].list_mzone, mzonechk))
-		if((location & LOCATION_MZONE) && check_list(player[self].list_mzone, mzonechk) 
-			&& check_list(player[self].list_szone, mzonechk))
+		if((location & LOCATION_MZONE) 
+		    && (check_list(player[self].list_mzone, mzonechk) 
+			|| check_list(player[self].list_szone, mzonechk)))
 		////////kdiy////////////			
 			return TRUE;
 		////kdiy////////////
 		//if((location & LOCATION_SZONE) && check_list(player[self].list_szone, szonechk))
-		if((location & LOCATION_SZONE) && check_list(player[self].list_szone, szonechk)
-			&& check_list(player[self].list_mzone, szonechk))
+		if((location & LOCATION_SZONE) 
+		    && (check_list(player[self].list_szone, szonechk)
+			|| check_list(player[self].list_mzone, szonechk)))
 		////////kdiy////////////			
 			return TRUE;
 		////kdiy////////////
