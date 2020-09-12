@@ -3507,9 +3507,8 @@ int32 field::process_forced_battle(uint16 step) {
 		card_vector cv;
 		get_attack_target(tmp_attacker, &cv);
 		///////kdiy///////
-		if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
-		if(tmp_attacker->direct_attackable == 0 && !tmp_attack_target )
-			return TRUE;
+		//if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
+			//return TRUE;
 		///////kdiy///////			
 		core.attacker = tmp_attacker;
 		core.attack_target = tmp_attack_target;

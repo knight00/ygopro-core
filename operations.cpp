@@ -11,6 +11,7 @@
 #include "group.h"
 #include "interpreter.h"
 #include <algorithm>
+#include <iterator>
 
 int32 field::negate_chain(uint8 chaincount) {
 	if(core.current_chain.size() == 0)
@@ -1914,6 +1915,14 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		effect* pextra = core.select_effects[returns.at<int32>(0)];
 		core.units.begin()->ptr1 = pextra;
 		int32 releasable = 0xff00ff;
+		///////kdiy///////
+		if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA)) {
+			releasable+= 0x1f00;  
+		}
+		if(is_player_affected_by_effect(1-sumplayer,EFFECT_ORICA)) {
+			releasable+= 0x1f000000; 
+		}
+		///////kdiy///////		
 		if(pextra) {
 			std::vector<int32> retval;
 			pextra->get_value(target, 0, &retval);
@@ -3467,7 +3476,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		uint32 zone = 0xff;
 		uint32 flag1, flag2;
 		int32 ct1 = get_tofield_count(pcard, sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD, zone, &flag1);
-		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, 0x1f, &flag2);		
+		int32 ct2 = get_spsummonable_count_fromex(pcard, sumplayer, sumplayer, zone, &flag2);
 		for(auto it = pgroup->it; it != pgroup->container.end(); ++it) {
 			if((*it)->current.location != LOCATION_EXTRA)
 				ct1--;
@@ -3700,7 +3709,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		if(targets && pduel->game_field->is_flag(DUEL_EMZONE)) {
 			uint32 flag1, flag2;
 			int32 ct1 = get_tofield_count(target, playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag1);
-			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, 0x1f, &flag2);			
+			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, zone, &flag2);			
 			for(auto& pcard : targets->container) {
 				///////////kdiy//////////				
 				//if(pcard->current.location == LOCATION_MZONE)
@@ -5127,7 +5136,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 					//flag = ((flag & 0xff) << 16) | 0xff00ffff;		
 			        {
 					   if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && Rloc != 4)
-					      flag = (flag & 0x1fff0000) | 0xe000ffff;
+					      flag = ((flag & 0x1fff) << 16) | 0xe000ffff;
 					   else						
 					      flag = ((flag & 0xff) << 16) | 0xff00ffff;	
 					}	
@@ -5160,18 +5169,18 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 				if(target->temp.location == LOCATION_MZONE && target->is_affected_by_effect(EFFECT_SANCT_MZONE))
 				   sanct = 1;
 				//if(location & LOCATION_ONFIELD)		
-				if((location & LOCATION_ONFIELD) && !((target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE)) && (Rloc==4 || Rloc==8)))
+				if((location & LOCATION_ONFIELD) && !((target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE)) && (Rloc==4 || Rloc==8 || (target->is_affected_by_effect(EFFECT_ORICA_SZONE) && location == LOCATION_MZONE) || (target->is_affected_by_effect(EFFECT_SANCT_MZONE) && location == LOCATION_SZONE))))
 				///kdiy////////			
 					resetflag |= RESET_TOFIELD;
 				///kdiy////////
 				//if(target->current.location & LOCATION_ONFIELD)
-				if((target->current.location & LOCATION_ONFIELD) && !((target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE)) && (Rloc==4 || Rloc==8)))
+				if((target->current.location & LOCATION_ONFIELD) && !((target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE)) && (Rloc==4 || Rloc==8 || (target->is_affected_by_effect(EFFECT_ORICA_SZONE) && location == LOCATION_MZONE) || (target->is_affected_by_effect(EFFECT_SANCT_MZONE) && location == LOCATION_SZONE))))
 				///kdiy////////				
 					resetflag |= RESET_LEAVE;
 				effect* peffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER);
 				///kdiy////////	
 				//if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD)
-				if((location & LOCATION_ONFIELD) && !(target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE) && (Rloc==4 || Rloc==8))
+				if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD) && !((target->is_affected_by_effect(EFFECT_ORICA_SZONE) || target->is_affected_by_effect(EFFECT_SANCT_MZONE)) && (Rloc==4 || Rloc==8 || (target->is_affected_by_effect(EFFECT_ORICA_SZONE) && location == LOCATION_MZONE) || (target->is_affected_by_effect(EFFECT_SANCT_MZONE) && location == LOCATION_SZONE)))
 				///kdiy////////
 					&& !(peffect && (peffect->value & TYPE_TRAP)) && ret != 2)
 					resetflag |= RESET_MSCHANGE;

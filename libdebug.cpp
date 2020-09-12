@@ -102,7 +102,7 @@ int32 scriptlib::debug_pre_equip(lua_State* L) {
 	        //|| (target->current.location != LOCATION_MZONE)
 	        || !((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE &&target->is_affected_by_effect(EFFECT_ORICA_SZONE)))			
 			/////////kdiy////////
-	        || (target->current.position & POS_FACEDOWN))
+		|| (target->current.position & POS_FACEDOWN))
 		lua_pushboolean(L, 0);
 	else {
 		equip_card->equip(target, FALSE);

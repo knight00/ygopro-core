@@ -45,7 +45,7 @@ int32 scriptlib::effect_get_target_range(lua_State *L) {
 }
 /////////////////////KDIY///
 
-int32 scriptlib::effect_new(lua_State *L) {
+int32 scriptlib::effect_new(lua_State* L) {
 	check_param_count(L, 1);
 	auto pcard = lua_get<card*, true>(L, 1);
 	duel* pduel = pcard->pduel;

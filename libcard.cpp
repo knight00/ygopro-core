@@ -22,9 +22,9 @@ int32 scriptlib::card_set_entity_code(lua_State *L) {
 	int32 enable = lua_toboolean(L, 3);
 	if (enable)
 		remove_alias = true;
-	bool effect = false;	
-	int32 replace = lua_toboolean(L, 4);		
-	if (effect)
+	bool replace = false;	
+	int32 reffect = lua_toboolean(L, 4);		
+	if (reffect)
 		replace = true;	
 	lua_pushinteger(L, pcard->set_entity_code(trace, remove_alias, replace));
 	return 1;
@@ -126,7 +126,7 @@ int32 scriptlib::card_is_able_to_decrease_defense_as_cost(lua_State *L) {
 }
 /////////////////////KDIY///
 
-int32 scriptlib::card_get_code(lua_State *L) {
+int32 scriptlib::card_get_code(lua_State* L) {
 	check_param_count(L, 1);
 	auto pcard = lua_get<card*, true>(L, 1);
 	if (lua_gettop(L) > 1) {
@@ -831,12 +831,18 @@ int32 scriptlib::card_is_code(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	uint32 code1 = pcard->get_code();
 	uint32 code2 = pcard->get_another_code();
+	////kdiy/////
+	uint32 code3 = pcard->get_ocode();	
+	////kdiy/////	
 	uint32 count = lua_gettop(L) - 1;
 	for(uint32 i = 0; i < count; ++i) {
 		if(lua_isnil(L, i + 2))
 			continue;
 		uint32 tcode = lua_get<uint32>(L, i + 2);
-		if(code1 == tcode || (code2 && code2 == tcode)) {
+		////kdiy/////	
+		//if(code1 == tcode || (code2 && code2 == tcode)) {
+		if(code1 == tcode || code3 == tcode || (code2 && code2 == tcode)) {
+		////kdiy/////		
 			lua_pushboolean(L, TRUE);
 			return 1;
 		}
@@ -861,9 +867,16 @@ int32 scriptlib::card_is_summon_code(lua_State* L) {
 	pcard->filter_effect(EFFECT_CHANGE_CODE, &eset);
 	uint32 code1 = pcard->get_code();
 	uint32 code2 = pcard->get_another_code();
+	////kdiy/////
+	uint32 code3 = pcard->get_ocode();	
+	////kdiy/////	
 	codes.insert(code1);
 	if (code2)
 		codes.insert(code2);
+	////kdiy/////	
+	if (code3)
+		codes.insert(code3);
+	////kdiy/////	
 	for (const auto& peff : eset) {
 		if (!peff->operation)
 			continue;
@@ -942,18 +955,18 @@ int32 scriptlib::card_is_type(lua_State* L) {
 	lua_pushboolean(L, pcard->get_type(scard, sumtype, playerid) & ttype);
 	return 1;
 }
-///////kdiy////////
-//inline int32 is_prop(lua_State* L, uint32 val) {
+////////kdiy///////////	
+//inline int32 is_prop(lua_State* L, uint32 val) {	
 inline int32 is_prop(lua_State* L, int32 val) {	
-///////kdiy////////
+////////kdiy///////////	
 	uint32 count = lua_gettop(L) - 1;
 	for(uint32 i = 0; i < count; ++i) {
 		if(lua_isnil(L, i + 2))
 			continue;
-		///////kdiy////////	
-		// if(val == lua_get<uint32>(L, i + 2)) {
-		if(val == lua_get<int32>(L, i + 2)) {	
-		///////kdiy////////	
+		////////kdiy///////////	
+		//if(val == lua_get<uint32>(L, i + 2)) {
+		if(val == lua_get<int32>(L, i + 2)) {
+		////////kdiy///////////	
 			lua_pushboolean(L, TRUE);
 			return 1;
 		}
@@ -976,7 +989,10 @@ int32 scriptlib::card_is_link(lua_State* L) {
 int32 scriptlib::card_is_attack(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER))
+	//////kdiy/////////
+	//if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+	//////kdiy/////////
 		lua_pushboolean(L, 0);
 	else
 		is_prop(L, pcard->get_attack());
@@ -985,8 +1001,11 @@ int32 scriptlib::card_is_attack(lua_State* L) {
 int32 scriptlib::card_is_defense(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	if((pcard->data.type & TYPE_LINK)
-	   || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER)))
+	//////kdiy/////////
+	//if((pcard->data.type & TYPE_LINK) 
+	  //|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER)))
+	if((pcard->data.type & TYPE_LINK) || !(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+	//////kdiy/////////
 		lua_pushboolean(L, 0);
 	else
 		is_prop(L, pcard->get_defense());
@@ -2026,32 +2045,48 @@ int32 scriptlib::card_is_level_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto lvl = lua_get<uint32>(L, 2);
-	uint32 plvl = pcard->get_level();
-	lua_pushboolean(L, plvl > 0 && plvl <= lvl);
+	//////kdiy/////////		
+	//uint32 plvl = pcard->get_level();
+	//lua_pushboolean(L, plvl > 0 && plvl <= lvl);
+	int32 plvl = pcard->get_level();
+	lua_pushboolean(L, plvl <= lvl);
+	//////kdiy/////////		
 	return 1;
 }
 int32 scriptlib::card_is_level_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto lvl = lua_get<uint32>(L, 2);
-	uint32 plvl = pcard->get_level();
-	lua_pushboolean(L, plvl > 0 && plvl >= lvl);
+	//////kdiy/////////	
+	//uint32 plvl = pcard->get_level();
+	//lua_pushboolean(L, plvl > 0 && plvl >= lvl);
+	int32 plvl = pcard->get_level();
+	lua_pushboolean(L, plvl >= lvl);
+	//////kdiy/////////	
 	return 1;
 }
 int32 scriptlib::card_is_rank_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto rnk = lua_get<uint32>(L, 2);
-	uint32 prnk = pcard->get_rank();
-	lua_pushboolean(L, prnk > 0 && prnk <= rnk);
+	//////kdiy/////////	
+	//uint32 prnk = pcard->get_rank();
+	//lua_pushboolean(L, prnk > 0 && prnk <= rnk);
+	int32 prnk = pcard->get_rank();
+	lua_pushboolean(L, prnk <= rnk);
+	//////kdiy/////////	
 	return 1;
 }
 int32 scriptlib::card_is_rank_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto rnk = lua_get<uint32>(L, 2);
-	uint32 prnk = pcard->get_rank();
-	lua_pushboolean(L, prnk > 0 && prnk >= rnk);
+	//////kdiy/////////	
+	//uint32 prnk = pcard->get_rank();
+	//lua_pushboolean(L, prnk > 0 && prnk >= rnk);
+	int32 prnk = pcard->get_rank();
+	lua_pushboolean(L, prnk >= rnk);
+	//////kdiy/////////	
 	return 1;
 }
 int32 scriptlib::card_is_link_below(lua_State* L) {
@@ -2098,7 +2133,10 @@ int32 scriptlib::card_is_defense_below(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto def = lua_get<int32>(L, 2);
 	if((pcard->data.type & TYPE_LINK)
-	   || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	//////kdiy/////////
+	//|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))
+	//////kdiy/////////	
 		lua_pushboolean(L, 0);
 	else {
 		int32 _def = pcard->get_defense();
@@ -2111,7 +2149,10 @@ int32 scriptlib::card_is_defense_above(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto def = lua_get<int32>(L, 2);
 	if((pcard->data.type & TYPE_LINK)
-	   || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER)))
+	//////kdiy/////////
+	//|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_PRE_MONSTER)))
+	|| (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(((pcard->current.location & LOCATION_MZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((pcard->current.location & LOCATION_SZONE) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))))
+	//////kdiy/////////	
 		lua_pushboolean(L, 0);
 	else {
 		lua_pushboolean(L, pcard->get_defense() >= def);

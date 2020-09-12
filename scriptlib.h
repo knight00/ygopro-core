@@ -29,7 +29,7 @@ public:
 	static int32 duel_setmetatable(lua_State *L);
 	static int32 duel_move_turn_count(lua_State *L);
 	static int32 duel_get_cards_in_zone(lua_State *L);	
-/////////////////////KDIY///	
+/////////////////////KDIY///
 
 	static int32 check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse = FALSE, void* retobj = nullptr);
 	static int32 check_param_count(lua_State* L, int32 count);

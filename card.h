@@ -88,9 +88,7 @@ public:
 	};
 
 ///////////kdiy//////////////
-	uint32 get_ritual_type();
-	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool effect = false);
-	//uint32 get_summon_info();
+	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool replace = false);
 	int32 is_attack_decreasable_as_cost(uint8 playerid, int32 val);
 	int32 is_defense_decreasable_as_cost(uint8 playerid, int32 val);		
 ///////////kdiy//////////////
@@ -182,6 +180,9 @@ public:
 	loc_info get_info_location();
 	uint32 second_code(uint32 code);
 	uint32 get_code();
+	//////kdiy/////
+	uint32 get_ocode();	
+	//////kdiy/////	
 	uint32 get_another_code();
 	uint32 get_summon_code(card* scard = 0, uint64 sumtype = 0, uint8 playerid = 2);
 	int32 is_set_card(uint32 set_code);
