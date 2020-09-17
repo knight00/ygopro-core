@@ -88,7 +88,7 @@ public:
 	};
 
 ///////////kdiy//////////////
-	uint32 set_entity_code(uint32 entity_code, bool remove_alias = false, bool replace = false);
+	uint32 set_entity_code(uint32 entity_code);
 	int32 is_attack_decreasable_as_cost(uint8 playerid, int32 val);
 	int32 is_defense_decreasable_as_cost(uint8 playerid, int32 val);		
 ///////////kdiy//////////////
@@ -248,7 +248,10 @@ public:
 	void remove_effect(effect* peffect);
 	void remove_effect(effect* peffect, effect_container::iterator it);
 	int32 copy_effect(uint32 code, uint32 reset, uint32 count);
-	int32 replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating = false);
+	/////kdiy//////////
+	//int32 replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating = false);
+	int32 replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating = false, bool uncopy = false);
+	/////kdiy//////////	
 	void reset(uint32 id, uint32 reset_type);
 	void reset_effect_count();
 	void refresh_disable_status();

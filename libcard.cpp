@@ -14,19 +14,34 @@
 
 /////////////////////KDIY///
 int32 scriptlib::card_set_entity_code(lua_State *L) {
-	check_param_count(L,2);
-	check_param(L, PARAM_TYPE_CARD, 1);
-	card* pcard = *(card**) lua_touserdata(L, 1);
-	uint32 trace = lua_tointeger(L, 2);
-	bool remove_alias = false;
-	int32 enable = lua_toboolean(L, 3);
-	if (enable)
-		remove_alias = true;
-	bool replace = false;	
-	int32 reffect = lua_toboolean(L, 4);		
-	if (reffect)
-		replace = true;	
-	lua_pushinteger(L, pcard->set_entity_code(trace, remove_alias, replace));
+	check_param_count(L, 2);
+	auto pcard = lua_get<card*, true>(L, 1);
+	auto code = lua_get<uint32>(L, 2);
+	if (pcard->recreate(code)) {
+		lua_pushinteger(L, pcard->set_entity_code(code));
+		pcard->data.alias = lua_get<uint32>(L, 3, pcard->data.alias);
+		if(lua_gettop(L) > 3 && !lua_isnil(L, 4)) {
+			if(lua_istable(L, 4)) {
+				lua_pushnil(L);
+				while(lua_next(L, 4) != 0) {
+					pcard->data.setcodes.insert(lua_get<uint16>(L, -1));
+					lua_pop(L, 1);
+				}
+			} else
+				pcard->data.setcodes.insert(lua_get<uint16>(L, 4));
+		}
+		pcard->data.type = lua_get<uint32>(L, 5, pcard->data.type);
+		pcard->data.level = lua_get<uint32>(L, 6, pcard->data.level);
+		pcard->data.attribute = lua_get<uint32>(L, 7, pcard->data.attribute);
+		pcard->data.race = lua_get<uint32>(L, 8, pcard->data.race);
+		pcard->data.attack = lua_get<int32>(L, 9, pcard->data.attack);
+		pcard->data.defense = lua_get<int32>(L, 10, pcard->data.defense);
+		pcard->data.lscale = lua_get<uint32>(L, 11, pcard->data.lscale);
+		pcard->data.rscale = lua_get<uint32>(L, 12, pcard->data.rscale);
+		pcard->data.link_marker = lua_get<uint32>(L, 13, pcard->data.link_marker);
+		if (lua_get<bool, false>(L, 14))
+			pcard->replace_effect(code, 0, 0, true, true);
+	}
 	return 1;
 }
 int32 scriptlib::card_set_card_data(lua_State *L) {
@@ -44,7 +59,14 @@ int32 scriptlib::card_set_card_data(lua_State *L) {
 		break;
 	case CARDDATA_SETCODE:
 		pcard->data.setcodes.clear();
-		pcard->data.setcodes.insert((uint16)lua_tointeger(L, 3));
+		if(lua_istable(L, 3)) {
+			lua_pushnil(L);
+			while(lua_next(L, 3) != 0) {
+				pcard->data.setcodes.insert(lua_get<uint16>(L, -1));
+				lua_pop(L, 1);
+			}
+		} else
+			pcard->data.setcodes.insert(lua_get<uint16>(L, 3));
 		break;
 	case CARDDATA_TYPE:
 		pcard->data.type = lua_tointeger(L, 3);

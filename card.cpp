@@ -13,53 +13,16 @@
 #include <algorithm>
 
 ///////////kdiy//////////////
-uint32 card::set_entity_code(uint32 entity_code, bool remove_alias, bool replace) {
-	card_data dat;
-	pduel->read_card(entity_code, &dat);
-	uint32 code = dat.code;
+uint32 card::set_entity_code(uint32 entity_code) {
+	pduel->read_card(entity_code, &data);
+	uint32 code = data.code;
 	if (!code)
 		return 0;
-	if (remove_alias && dat.alias)
-		dat.alias = 0;
-	data = dat;
 	auto message = pduel->new_message(MSG_MOVE);
 	message->write<uint32>(code);
 	message->write(get_info_location());
 	message->write(get_info_location());
-	message->write<uint32>(0);	
-
-	if (replace && !(data.type & TYPE_NORMAL)) {
-		if(is_status(STATUS_EFFECT_REPLACED))
-		    set_status(STATUS_EFFECT_REPLACED, FALSE);
-		for(auto i = indexer.begin(); i != indexer.end();) {
-			auto rm = i++;
-			effect* peffect = rm->first;
-			auto it = rm->second;
-			if (peffect->is_flag(EFFECT_FLAG_INITIAL))
-			    remove_effect(peffect, it);
-		}
-		//set_status(STATUS_INITIALIZING | STATUS_COPYING_EFFECT, TRUE);
-		pduel->lua->load_card_script(code);
-		pduel->lua->add_param(this, PARAM_TYPE_CARD);
-		pduel->lua->call_code_function(code, "initial_effect", 1, 0);
-		//set_status(STATUS_INITIALIZING | STATUS_COPYING_EFFECT, FALSE);
-		//pduel->game_field->infos.copy_id++;
-		set_status(STATUS_EFFECT_REPLACED, TRUE);
-		//pduel->uncopy.clear();
-		if((data.type & TYPE_MONSTER) && !(data.type & TYPE_EFFECT)) {
-			effect* peffect = pduel->new_effect();
-			if(pduel->game_field->core.reason_effect)
-			   peffect->owner = pduel->game_field->core.reason_effect->get_handler();
-			else
-			   peffect->owner = this;
-			peffect->handler = this;
-			peffect->type = EFFECT_TYPE_SINGLE;
-			peffect->code = EFFECT_ADD_TYPE;
-			peffect->value = TYPE_EFFECT;
-			peffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE;
-			this->add_effect(peffect);
-		}
-	}
+	message->write<uint32>(0);
 	return code;
 }
 int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
@@ -2557,7 +2520,10 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	}
 	return pduel->game_field->infos.copy_id - 1;
 }
-int32 card::replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating) {
+////kdiy/////////
+//int32 card::replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating) {
+int32 card::replace_effect(uint32 code, uint32 reset, uint32 count, bool recreating, bool uncopy) {
+////kdiy/////////	
 	if(pduel->read_card(code)->type & TYPE_NORMAL)
 		return -1;
 	if(is_status(STATUS_EFFECT_REPLACED))
@@ -2584,8 +2550,14 @@ int32 card::replace_effect(uint32 code, uint32 reset, uint32 count, bool recreat
 	pduel->game_field->core.copy_reset = cr;
 	pduel->game_field->core.copy_reset_count = crc;
 	set_status(STATUS_EFFECT_REPLACED, TRUE);
+	///////kdiy////////
+	if(!uncopy) {
+	///////kdiy////////		
 	for(auto& peffect : pduel->uncopy)
 		pduel->delete_effect(peffect);
+	///////kdiy////////		
+	}
+	///////kdiy////////		
 	pduel->uncopy.clear();
 	if((data.type & TYPE_MONSTER) && !(data.type & TYPE_EFFECT)) {
 		effect* peffect = pduel->new_effect();
