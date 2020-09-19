@@ -1614,6 +1614,11 @@ int32 field::trap_monster_adjust(uint16 step) {
 			to_grave_set->insert(pcard);
 			core.trap_monster_adjust_set[check_player].erase(pcard);
 		}
+		if(!core.units.begin()->arg1) {
+			core.units.begin()->arg1 = 1;
+			core.units.begin()->step = 0;
+		}
+		return FALSE;
 	}
 	case 3: {
 		if(!core.units.begin()->arg1) {
@@ -2576,7 +2581,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 					int32 rcount = target->get_set_tribute_count();
 					int32 min = rcount & 0xffff;
 					int32 max = (rcount >> 16) & 0xffff;
-					if(!is_player_can_summon(SUMMON_TYPE_ADVANCE, setplayer, target, setplayer))
+					if(!is_player_can_mset(SUMMON_TYPE_ADVANCE, setplayer, target, setplayer))
 						max = 0;
 					if(min < (int32)min_tribute)
 						min = min_tribute;
@@ -3649,7 +3654,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		if((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) 
 			|| (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		//////////kdiy//////////		
-			|| !(positions & POS_FACEDOWN) && check_unique_onfield(target, playerid, LOCATION_MZONE)
+			|| (!(positions & POS_FACEDOWN) && check_unique_onfield(target, playerid, LOCATION_MZONE))
 			|| !is_player_can_spsummon(core.reason_effect, target->summon_info & 0xff00ffff, positions, target->summon_player, playerid, target)
 			|| (!nocheck && !(target->data.type & TYPE_MONSTER))) {
 			core.units.begin()->step = 4;
@@ -3881,7 +3886,7 @@ int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_pla
 	}
 	return TRUE;
 }
-int32 field::destroy_replace(uint16 step, group* targets, card* target, uint8 battle) {
+int32 field::destroy_replace(uint16 /*step*/, group* targets, card* target, uint8 battle) {
 	if(target->current.location & (LOCATION_GRAVE | LOCATION_REMOVED)) {
 		target->current.reason = target->temp.reason;
 		target->current.reason_effect = target->temp.reason_effect;
@@ -4239,7 +4244,7 @@ int32 field::destroy(uint16 step, group* targets, effect* reason_effect, uint32 
 	}
 	return TRUE;
 }
-int32 field::release_replace(uint16 step, group* targets, card* target) {
+int32 field::release_replace(uint16 /*step*/, group* targets, card* target) {
 	if(!(target->current.location & (LOCATION_ONFIELD | LOCATION_HAND))) {
 		target->current.reason = target->temp.reason;
 		target->current.reason_effect = target->temp.reason_effect;
@@ -4346,7 +4351,7 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 	}
 	return TRUE;
 }
-int32 field::send_replace(uint16 step, group* targets, card* target) {
+int32 field::send_replace(uint16 /*step*/, group* targets, card* target) {
 	uint8 playerid = target->sendto_param.playerid;
 	uint8 dest = target->sendto_param.location;
 	if(targets->container.find(target) == targets->container.end())
@@ -5332,7 +5337,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 				}
 			}
 			effect* teffect;
-			if((teffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER))) {
+			if((teffect = target->is_affected_by_effect(EFFECT_PRE_MONSTER)) != nullptr) {
 				uint32 type = teffect->value;
 				if(type & TYPE_TRAP)
 					type |= TYPE_TRAPMONSTER | target->data.type;
@@ -5891,8 +5896,8 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 	switch(step) {
 	case 0: {
 		if(check_field) {
-			uint32 ct = 0;
-			zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));			
+			int32 ct = 0;
+			zone &= (0x1f & get_forced_zones(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD));
 			ct = get_useable_count(to_check, toplayer, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD, zone);
 			if(ct < min) {
 				card_set* must_choose_one = new card_set;
@@ -5909,9 +5914,9 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		core.operated_set.clear();
 		return_cards.clear();
 		/*if all the available cards are equal to the minimum, then the selection will always use all the forced cards without needing to check*/
-		bool allminimum = core.release_cards_ex_oneof.size() <= 1 && ((core.release_cards_ex.size() + core.release_cards.size() + core.release_cards_ex_oneof.size()) == min);
+		bool allminimum = core.release_cards_ex_oneof.size() <= 1 && ((int32)(core.release_cards_ex.size() + core.release_cards.size() + core.release_cards_ex_oneof.size()) == min);
 		/*if only must use cards are available, then the selection will always be correct*/
-		bool allmust = (core.release_cards_ex.size() >= max) || (core.release_cards.size() + core.release_cards_ex_oneof.size()) == 0;
+		bool allmust = ((int32)core.release_cards_ex.size() >= max) || (core.release_cards.size() + core.release_cards_ex_oneof.size()) == 0;
 		/*only self cards available, no need for special check*/
 		bool onlyself = (core.release_cards_ex.size() + core.release_cards_ex_oneof.size()) == 0;
 		if((!allminimum && !allmust && !onlyself) || core.units.begin()->ptr1) {
@@ -5920,7 +5925,7 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		}
 		core.select_cards.clear();
 		core.select_cards.insert(core.select_cards.begin(), core.release_cards_ex.begin(), core.release_cards_ex.end());
-		if(core.release_cards_ex.size() < max) {
+		if((int32)core.release_cards_ex.size() < max) {
 			core.select_cards.insert(core.select_cards.begin(), core.release_cards.begin(), core.release_cards.end());
 			core.select_cards.insert(core.select_cards.begin(), core.release_cards_ex_oneof.begin(), core.release_cards_ex_oneof.end());
 		}
@@ -5934,8 +5939,9 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		return FALSE;
 	}
 	case 1: {
-		if(core.units.begin()->ptr1)
-			delete core.units.begin()->ptr1;
+		card_set* must_choose_one = (card_set*)core.units.begin()->ptr1;
+		if(must_choose_one)
+			delete must_choose_one;
 		if(return_cards.canceled)
 			return TRUE;
 		int32 count = return_cards.list.size();
@@ -5957,7 +5963,7 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		core.unselect_cards.clear();
 		core.unselect_cards.insert(core.unselect_cards.begin(), core.operated_set.begin(), core.operated_set.end());
 
-		uint8_t finishable = core.operated_set.size() >= min;
+		uint8_t finishable = (int32)core.operated_set.size() >= min;
 		uint8_t must_chosen = !core.units.begin()->ptr1;
 
 		auto must_choose = static_cast<card_set*>(core.units.begin()->ptr1);
@@ -6010,13 +6016,14 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		return FALSE;
 	}
 	case 3: {
-		if(return_cards.canceled && (core.operated_set.empty() || core.operated_set.size() >= min)) {
+		if(return_cards.canceled && (core.operated_set.empty() || (int32)core.operated_set.size() >= min)) {
 			if(core.units.begin()->peffect)
 				core.dec_count_reserve.push_back(core.units.begin()->peffect);
 			return_cards.list.clear();
 			std::copy(core.operated_set.begin(), core.operated_set.end(), std::back_inserter(return_cards.list));
-			if(core.units.begin()->ptr1)
-				delete core.units.begin()->ptr1;
+			card_set* must_choose_one = (card_set*)core.units.begin()->ptr1;
+			if(must_choose_one)
+				delete must_choose_one;
 			if(core.operated_set.size())
 				return_cards.canceled = false;
 			return TRUE;
@@ -6031,11 +6038,12 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			if(core.release_cards_ex_oneof.find(pcard) != core.release_cards_ex_oneof.end())
 				core.units.begin()->peffect = nullptr;
 		}
-		if(core.operated_set.size() == max) {
+		if((int32)core.operated_set.size() == max) {
 			return_cards.list.clear();
 			std::copy(core.operated_set.begin(), core.operated_set.end(), std::back_inserter(return_cards.list));
-			if(core.units.begin()->ptr1)
-				delete core.units.begin()->ptr1;
+			card_set* must_choose_one = (card_set*)core.units.begin()->ptr1;
+			if(must_choose_one)
+				delete must_choose_one;
 			if(core.units.begin()->peffect)
 				core.dec_count_reserve.push_back(core.units.begin()->peffect);
 			return TRUE;
