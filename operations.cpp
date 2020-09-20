@@ -1671,13 +1671,14 @@ int32 field::equip(uint16 step, uint8 equip_player, card* equip_card, card* targ
 			return TRUE;
 		bool to_grave = false;
 		///////////kdiy//////////			
-		//if(target->current.location != LOCATION_MZONE || (target->current.position & POS_FACEDOWN))
-		if(!((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (target->current.position & POS_FACEDOWN))
-		///////////kdiy//////////	
-			// if(is_flag(DUEL_EQUIP_NOT_SENT_IF_MISSING_TARGET) && equip_card->current.location == LOCATION_MZONE)
-			if(is_flag(DUEL_EQUIP_NOT_SENT_IF_MISSING_TARGET) && equip_card->current.location == LOCATION_MZONE && !equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE))
-				return TRUE;				
+		//if(target->current.location != LOCATION_MZONE || (target->current.position & POS_FACEDOWN)) {
+		if (!((target->current.location == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (target->current.location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE))) || (target->current.position & POS_FACEDOWN)) {
+			///////////kdiy//////////	
+				// if(is_flag(DUEL_EQUIP_NOT_SENT_IF_MISSING_TARGET) && equip_card->current.location == LOCATION_MZONE)
+			if (is_flag(DUEL_EQUIP_NOT_SENT_IF_MISSING_TARGET) && ((equip_card->current.location == LOCATION_MZONE && !equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (equip_card->current.location == LOCATION_SZONE && equip_card->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+				return TRUE;
 			to_grave = true;
+		}
 		///////////kdiy//////////				
 		//if(equip_card->current.location != LOCATION_SZONE) {
 		if(!(((equip_card->current.location == LOCATION_SZONE && !equip_card->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (equip_card->current.location == LOCATION_MZONE && equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE))))) {
