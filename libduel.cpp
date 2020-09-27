@@ -15,58 +15,125 @@
 /////////////////////KDIY///
 int32 scriptlib::duel_select_field(lua_State * L) {
 	check_action_permission(L);
-	check_param_count(L, 4);
-	int32 playerid = lua_tointeger(L, 1);
+	check_param_count(L, 5);
+	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	uint32 flag1 = lua_tointeger(L, 2);
-	uint32 flag2 = lua_tointeger(L, 3);	
-	uint32 count = lua_tointeger(L, 4);
+	auto count = lua_get<uint8>(L, 2);
+	auto location1 = lua_get<uint16>(L, 3);
+	auto location2 = lua_get<uint16>(L, 4);
+	duel* pduel = interpreter::get_duel_info(L);
+	bool all_field = lua_get<bool, false>(L, 6);
+	uint32 filter = 0xe0e0e0e0;
+	if(all_field){
+		filter = pduel->game_field->is_flag(DUEL_EMZONE) ? 0x800080 : 0xE000E0;
+		if(!pduel->game_field->is_flag(DUEL_SEPARATE_PZONE))
+			filter |= 0xC000C000;
+	}
+	filter |= lua_get<uint32>(L, 5, filter);
+	uint32 ct1 = 0, ct2 = 0, ct3 = 0, ct4 = 0, plist = 0, flag = 0xffffffff;
+	// if(location1 & LOCATION_MZONE) {
+	// 	ct1 = pduel->game_field->get_useable_count(NULL, playerid, LOCATION_MZONE, PLAYER_NONE, 0, 0xff, &plist);
+	// 	if (all_field) {
+	// 		plist &= ~0x60;
+	// 		if (!pduel->game_field->is_location_useable(playerid, LOCATION_MZONE, 5))
+	// 			plist |= 0x20;
+	// 		else
+	// 			ct1++;
+	// 		if (!pduel->game_field->is_location_useable(playerid, LOCATION_MZONE, 6))
+	// 			plist |= 0x40;
+	// 		else
+	// 			ct1++;
+	// 	}
+	// 	flag = (flag & 0xffffff00) | plist;
+	// }
+	// if(location1 & LOCATION_SZONE) {
+	// 	ct2 = pduel->game_field->get_useable_count(NULL, playerid, LOCATION_SZONE, PLAYER_NONE, 0, 0xff, &plist);
+	// 	if (all_field) {
+	// 		plist &= ~0xe0;
+	// 		if (!pduel->game_field->is_location_useable(playerid, LOCATION_SZONE, 5))
+	// 			plist |= 0x20;
+	// 		else
+	// 			ct2++;
+	// 		if (!pduel->game_field->is_location_useable(playerid, LOCATION_SZONE, 6))
+	// 			plist |= 0x40;
+	// 		else
+	// 			ct2++;
+	// 		if (!pduel->game_field->is_location_useable(playerid, LOCATION_SZONE, 7))
+	// 			plist |= 0x80;
+	// 		else
+	// 			ct2++;
+	// 	}
+	// 	flag = (flag & 0xffff00ff) | (plist << 8);
+	// }
+	// if(location2 & LOCATION_MZONE) {
+	// 	ct3 = pduel->game_field->get_useable_count(NULL, 1 - playerid, LOCATION_MZONE, PLAYER_NONE, 0, 0xff, &plist);
+	// 	if (all_field) {
+	// 		plist &= ~0x60;
+	// 		if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_MZONE, 5))
+	// 			plist |= 0x20;
+	// 		else
+	// 			ct3++;
+	// 		if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_MZONE, 6))
+	// 			plist |= 0x40;
+	// 		else
+	// 			ct3++;
+	// 	}
+	// 	flag = (flag & 0xff00ffff) | (plist << 16);
+	// }
+	// if(location2 & LOCATION_SZONE) {
+	// 	ct4 = pduel->game_field->get_useable_count(NULL, 1 - playerid, LOCATION_SZONE, PLAYER_NONE, 0, 0xff, &plist);
+	// 	if (all_field) {
+	// 		plist &= ~0xe0;
+	// 		if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_SZONE, 5))
+	// 			plist |= 0x20;
+	// 		else
+	// 			ct4++;
+	// 		if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_SZONE, 6))
+	// 			plist |= 0x40;
+	// 		else
+	// 			ct4++;
+	// 		if (!pduel->game_field->is_location_useable(1 - playerid, LOCATION_SZONE, 7))
+	// 			plist |= 0x80;
+	// 		else
+	// 			ct4++;
+	// 	}
+	// 	flag = (flag & 0xffffff) | (plist << 24);
+	// }
+	// flag |= filter | ((all_field) ? 0x800080 : 0xe0e0e0e0);
+	// if(count > ct1 + ct2 + ct3 + ct4)
+	// 	count = ct1 + ct2 + ct3 + ct4;
 	if(count == 0)
 		return 0;
-	uint32 flag = (flag1 & 0xffff) | (flag2 << 16);
-	duel* pduel = interpreter::get_duel_info(L);
-	if(lua_gettop(L) >= 4) {
-		flag = (flag | (0xffffffff-0x3f7f3f7f));
-		card* pcard_1 = pduel->game_field->get_field_card(1-playerid, LOCATION_MZONE, 6);
-		card* pcard_2 = pduel->game_field->get_field_card(1-playerid, LOCATION_MZONE, 5);
-		if (pcard_1 && pcard_2) {
-			flag = (flag | (0xffffffff-0xff7fff1f));
-		} else if (!pcard_1 && pcard_2) {
-			flag = (flag | (0xffffffff-0xff5fff3f));
-		} else if (pcard_1 && !pcard_2) {
-			flag = (flag | (0xffffffff-0xff3fff5f));
-		} else {
-			flag = (flag | (0xffffffff-0xff1fff7f));
-		}
-	} else {
-		flag = (flag | (0xffffffff-0xff1fff1f));
-	}
 	pduel->game_field->add_process(PROCESSOR_SELECT_DISFIELD, 0, 0, 0, playerid, flag, count);
-	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State *L, int32 status, lua_KContext ctx) {
+	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State* L, int32/* status*/, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
-		int32 playerid = lua_tointeger(L, 1);
-		uint32 count = lua_tointeger(L, 2);
-		int32 dfflag = 0;
+		auto playerid = lua_get<uint8>(L, 1);
+		auto count = lua_get<uint8>(L, 2);
+		uint32 dfflag = 0;
 		uint8 pa = 0;
 		for(uint32 i = 0; i < count; ++i) {
 			uint8 p = pduel->game_field->returns.at<int8>(pa);
 			uint8 l = pduel->game_field->returns.at<int8>(pa + 1);
-			uint8 s = pduel->game_field->returns.at<int8>(pa + 2);			
+			uint8 s = pduel->game_field->returns.at<int8>(pa + 2);
 			dfflag |= 0x1u << (s + (p == playerid ? 0 : 16) + (l == LOCATION_MZONE ? 0 : 8));
 			pa += 3;
 		}
-		if(dfflag & (0x1 << 5))
-			dfflag |= 0x1 << (16 + 6);
-		if(dfflag & (0x1 << 6))
-			dfflag |= 0x1 << (16 + 5);
 		lua_pushinteger(L, dfflag);
 		return 1;
 	});
 }
 int32 scriptlib::duel_get_master_rule(lua_State * L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushinteger(L, lua_gettop(L));
+	uint8 rule=2;
+	if (pduel->game_field->is_flag(DUEL_PZONE) && pduel->game_field->is_flag(DUEL_EMZONE) && pduel->game_field->is_flag(DUEL_FSX_MMZONE))
+		rule=5;
+	else if(pduel->game_field->is_flag(DUEL_EMZONE)) 
+	    rule=4;
+	else if (pduel->game_field->is_flag(DUEL_PZONE) && pduel->game_field->is_flag(DUEL_SEPARATE_PZONE))
+		rule=3;
+	else rule=2;
+	lua_pushinteger(L, rule);
 	return 1;
 }
 int32 scriptlib::duel_read_card(lua_State *L) {
