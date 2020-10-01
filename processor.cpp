@@ -559,6 +559,7 @@ int32 field::process() {
 	case PROCESSOR_ANNOUNCE_RACE: {
 		if(announce_race(it->step, it->arg1 & 0xffff, it->arg1 >> 16, it->arg2)) {
 			core.units.pop_front();
+			return PROCESSOR_FLAG_CONTINUE;
 		} else {
 			it->step++;
 		}
@@ -567,6 +568,7 @@ int32 field::process() {
 	case PROCESSOR_ANNOUNCE_ATTRIB: {
 		if(announce_attribute(it->step, it->arg1 & 0xffff, it->arg1 >> 16, it->arg2)) {
 			core.units.pop_front();
+			return PROCESSOR_FLAG_CONTINUE;
 		} else {
 			it->step++;
 		}
@@ -575,6 +577,7 @@ int32 field::process() {
 	case PROCESSOR_ANNOUNCE_CARD: {
 		if(announce_card(it->step, it->arg1)) {
 			core.units.pop_front();
+			return PROCESSOR_FLAG_CONTINUE;
 		} else {
 			if(it->step == 0)
 				it->step++;
@@ -584,6 +587,7 @@ int32 field::process() {
 	case PROCESSOR_ANNOUNCE_NUMBER: {
 		if(announce_number(it->step, it->arg1)) {
 			core.units.pop_front();
+			return PROCESSOR_FLAG_CONTINUE;
 		} else {
 			it->step++;
 		}
