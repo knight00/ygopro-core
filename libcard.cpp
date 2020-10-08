@@ -2265,17 +2265,12 @@ int32 scriptlib::card_enable_counter_permit(lua_State* L) {
 	auto countertype = lua_get<uint16>(L, 2);
 	uint16 prange;
 	if(lua_gettop(L) > 2)
-		prange = lua_get<uint16>(L, 3);
-	/////////KDIY//////////	
-	//else if(pcard->data.type & TYPE_MONSTER)	
-	//	prange = LOCATION_MZONE;
-	else if((pcard->data.type & TYPE_MONSTER) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-        prange = LOCATION_MZONE | LOCATION_SZONE;
-	else if((pcard->data.type & TYPE_MONSTER) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-		prange = LOCATION_MZONE;
-	else if((pcard->data.type & TYPE_MONSTER) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-		prange = LOCATION_SZONE;		
-	/////////KDIY//////////					
+		prange = lua_get<uint16>(L, 3);		
+	else if(pcard->data.type & TYPE_MONSTER)	
+		/////////KDIY//////////	
+		//prange = LOCATION_MZONE;	
+		prange = LOCATION_MZONE | LOCATION_SZONE;
+		/////////KDIY//////////				
 	else
 		prange = LOCATION_SZONE | LOCATION_FZONE;
 	effect* peffect = pcard->pduel->new_effect();
