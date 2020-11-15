@@ -740,6 +740,10 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_setglobal(lua_state, "CARDDATA_RSCALE");
 	lua_pushinteger(lua_state, CARDDATA_LINK_MARKER);
 	lua_setglobal(lua_state, "CARDDATA_LINK_MARKER");
+
+	//music hints
+	lua_pushinteger(lua_state, HINT_MUSIC);
+	lua_setglobal(lua_state, "HINT_MUSIC");	
 //////////////kdiy///////////	
 }
 interpreter::~interpreter() {

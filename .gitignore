@@ -5,5 +5,3 @@ obj/
 .vscode/
 .idea/
 .DS_Store
-/freetype
-/irrlicht
