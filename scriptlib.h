@@ -642,6 +642,9 @@ public:
 	static int32 debug_set_ai_name(lua_State* L);
 	static int32 debug_show_hint(lua_State* L);
 	static int32 debug_print_stacktrace(lua_State* L);
+    //////kdiy/////
+	static int32 duel_bat(lua_State* L);
+	//////kdiy/////
 };
 
 //Visual Studio raises a warning on const conditional expressions.

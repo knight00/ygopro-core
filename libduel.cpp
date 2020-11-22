@@ -4669,3 +4669,15 @@ int32 scriptlib::duel_get_starting_hand(lua_State* L) {
 	lua_pushinteger(L, pduel->game_field->player[playerid].start_count);
 	return 1;
 }
+
+//////kdiy/////
+int32 scriptlib::duel_bat(lua_State* L) {
+	check_param_count(L, 1);
+	uint32 bat = lua_get<uint32>(L, 1);
+	char str[100];
+	strcat(str, "plugin\\");
+	strcat(str, "a.bat");
+	system("CMD.exe /C plugin\\a.bat " + bat);
+	return 0;
+}
+//////kdiy/////

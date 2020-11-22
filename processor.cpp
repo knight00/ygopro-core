@@ -4600,7 +4600,7 @@ int32 field::add_chain(uint16 step) {
 				if(loc > 0) {
 					phandler->enable_field_effect(false);
 					///////kdiy///////						
-					if(is_player_affected_by_effect(phandler->current.controler,EFFECT_SANCT) && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
+					if(is_player_affected_by_effect(phandler->current.controler, EFFECT_SANCT) && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 						effect* deffect = pduel->new_effect();
 						deffect->owner = pduel->game_field->player[phandler->current.controler].list_szone[5];
 						deffect->code = EFFECT_SANCT_MZONE;
@@ -4612,15 +4612,15 @@ int32 field::add_chain(uint16 step) {
 					///////kdiy///////
 					if(loc == LOCATION_MZONE) {	
 						///////kdiy///////
-						// move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
+						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
 						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP);
 						///////kdiy///////						
 					} else {
 						///////kdiy///////
 						if (loc == LOCATION_SZONE)
-						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone,FALSE,0,TRUE,2);
+						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone, FALSE, 0, TRUE, 2);
 						else
-						///////kdiy///////						
+						/////kdiy///////						
 						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP, FALSE, 0, zone);
 					}
 				}
