@@ -10,6 +10,9 @@
 #include "card.h"
 #include "effect.h"
 #include "duel.h"
+#include <algorithm>
+#include <iterator>
+#include <set>
 
 int32 scriptlib::group_new(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);

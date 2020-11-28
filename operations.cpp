@@ -5098,6 +5098,10 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 	switch(step) {
 	case 0: {
 		returns.at<int32>(0) = FALSE;
+		///////kdiy//////
+		if(((target->current.location == LOCATION_SZONE && location == LOCATION_MZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (target->current.location == LOCATION_MZONE && location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_SANCT_MZONE))) && Rloc == 0)
+		    return TRUE;
+		///////kdiy//////
 		if((ret == 1) && (!(target->current.reason & REASON_TEMPORARY) || (target->current.reason_effect->owner != core.reason_effect->owner)))
 			return TRUE;
 		if(location == LOCATION_SZONE && zone == (0x1 << 5) && (target->data.type & TYPE_FIELD)) {
