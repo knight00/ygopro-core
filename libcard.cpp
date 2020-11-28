@@ -14,12 +14,12 @@
 
 /////////////////////KDIY///
 int32 scriptlib::card_set_entity_code(lua_State *L) {
-	check_param_count(L, 2);
+	check_param_count(L, 3);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto code = lua_get<uint32>(L, 2);
 	if (pcard->recreate(code)) {
 		lua_pushinteger(L, pcard->set_entity_code(code));
-		pcard->data.alias = lua_get<uint32>(L, 3, pcard->data.alias);
+		if(!lua_isnil(L, 3)) pcard->data.alias = lua_get<uint32>(L, 3, pcard->data.alias);
 		if(lua_gettop(L) > 3 && !lua_isnil(L, 4)) {
 			if(lua_istable(L, 4)) {
 				lua_pushnil(L);

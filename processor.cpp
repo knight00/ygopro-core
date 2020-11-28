@@ -4566,7 +4566,7 @@ int32 field::add_chain(uint16 step) {
 			}
 			/////////kdiy//////////
 			//if(phandler->current.location == LOCATION_SZONE) {
-			if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
+			if((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_SZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
 			/////////kdiy//////////	
 				phandler->set_status(STATUS_ACT_FROM_HAND, FALSE);
 				change_position(phandler, 0, phandler->current.controler, POS_FACEUP, 0);
