@@ -36,6 +36,7 @@ struct tevent {
 	uint32 reason;
 	uint8 event_player;
 	uint8 reason_player;
+	uint32 global_id;
 	bool operator< (const tevent& v) const;
 };
 struct optarget {
@@ -64,6 +65,7 @@ struct chain {
 	tevent evt;
 	opmap opinfos;
 	uint32 flag;
+	uint32 event_id;
 	static bool chain_operation_sort(const chain& c1, const chain& c2);
 	void set_triggering_state(card* pcard);
 };
@@ -120,6 +122,7 @@ struct field_effect {
 	grant_effect_container grant_effect;
 };
 struct field_info {
+	int32 event_id;
 	int32 field_id;
 	int16 copy_id;
 	int16 turn_id;
@@ -179,6 +182,7 @@ struct processor {
 	processor_list units;
 	processor_list subunits;
 	processor_unit reserved;
+	card_set just_sent_cards;
 	card_vector select_cards;
 	card_vector unselect_cards;
 	card_vector summonable_cards;
@@ -287,7 +291,7 @@ struct processor {
 	int32 summon_count[2];
 	uint8 extra_summon[2];
 	int32 spe_effect[2];
-	int32 duel_options;
+	uint64 duel_options;
 	uint32 copy_reset;
 	uint8 copy_reset_count;
 	uint32 last_control_changed_id;
@@ -400,7 +404,7 @@ public:
 	bool relay_check(uint8 playerid);
 	void next_player(uint8 playerid);
 
-	bool is_flag(uint32 flag);
+	bool is_flag(uint64 flag);
 	int32 get_pzone_index(uint8 seq);
 
 	void add_effect(effect* peffect, uint8 owner_player = 2);
@@ -528,7 +532,7 @@ public:
 	void solve_continuous(uint8 playerid, effect* peffect, const tevent& e);
 	int32 solve_continuous(uint16 step);
 	int32 solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2);
-	int32 break_effect();
+	int32 break_effect(bool clear_sent = true);
 	void adjust_instant();
 	void adjust_all();
 	void refresh_location_info_instant();

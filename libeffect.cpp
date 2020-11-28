@@ -47,8 +47,8 @@ int32 scriptlib::effect_get_target_range(lua_State *L) {
 
 int32 scriptlib::effect_new(lua_State* L) {
 	check_param_count(L, 1);
+	const auto pduel = lua_get<duel*>(L);
 	auto pcard = lua_get<card*, true>(L, 1);
-	duel* pduel = pcard->pduel;
 	effect* peffect = pduel->new_effect();
 	peffect->effect_owner = pduel->game_field->core.reason_player;
 	peffect->owner = pcard;
@@ -56,7 +56,7 @@ int32 scriptlib::effect_new(lua_State* L) {
 	return 1;
 }
 int32 scriptlib::effect_newex(lua_State* L) {
-	duel* pduel = interpreter::get_duel_info(L);
+	const auto pduel = lua_get<duel*>(L);
 	effect* peffect = pduel->new_effect();
 	peffect->effect_owner = 0;
 	peffect->owner = pduel->game_field->temp_card;
@@ -71,16 +71,17 @@ int32 scriptlib::effect_clone(lua_State* L) {
 }
 int32 scriptlib::effect_reset(lua_State* L) {
 	check_param_count(L, 1);
+	const auto pduel = lua_get<duel*>(L);
 	auto peffect = lua_get<effect*, true>(L, 1);
 	if(peffect->owner == nullptr)
 		return 0;
 	if(peffect->is_flag(EFFECT_FLAG_FIELD_ONLY))
-		peffect->pduel->game_field->remove_effect(peffect);
+		pduel->game_field->remove_effect(peffect);
 	else {
 		if(peffect->handler)
 			peffect->handler->remove_effect(peffect);
 		else
-			peffect->pduel->game_field->core.reseted_effects.insert(peffect);
+			pduel->game_field->core.reseted_effects.insert(peffect);
 	}
 	return 0;
 }
@@ -210,14 +211,23 @@ int32 scriptlib::effect_set_label(lua_State* L) {
 int32 scriptlib::effect_set_label_object(lua_State* L) {
 	check_param_count(L, 2);
 	auto peffect = lua_get<effect*, true>(L, 1);
+	if(peffect->label_object) {
+		lua_rawgeti(L, LUA_REGISTRYINDEX, peffect->label_object);
+		if(lua_istable(L, -1))
+			luaL_unref(L, LUA_REGISTRYINDEX, peffect->label_object);
+		lua_pop(L, 1);
+	}
 	if(lua_isnil(L, 2)) {
 		peffect->label_object = 0;
 		return 0;
 	}
 	if(auto obj = lua_get<lua_obj*>(L, 2))
 		peffect->label_object = obj->ref_handle;
-	else
-		luaL_error(L, "Parameter 2 should be \"Card\" or \"Effect\" or \"Group\".");
+	else if(lua_istable(L, 2)) {
+		lua_pushvalue(L, 2);
+		peffect->label_object = luaL_ref(L, LUA_REGISTRYINDEX);
+	} else
+		luaL_error(L, "Parameter 2 should be \"Card\" or \"Effect\" or \"Group\" or \"table\".");
 	return 0;
 }
 int32 scriptlib::effect_set_category(lua_State* L) {
@@ -361,7 +371,7 @@ int32 scriptlib::effect_get_label_object(lua_State* L) {
 		return 1;
 	}
 	lua_rawgeti(L, LUA_REGISTRYINDEX, peffect->label_object);
-	if(lua_isuserdata(L, -1))
+	if(lua_isuserdata(L, -1) || lua_istable(L, -1))
 		return 1;
 	else {
 		lua_pop(L, 1);
@@ -466,11 +476,12 @@ int32 scriptlib::effect_is_has_type(lua_State* L) {
 }
 int32 scriptlib::effect_is_activatable(lua_State* L) {
 	check_param_count(L, 2);
+	const auto pduel = lua_get<duel*>(L);
 	auto peffect = lua_get<effect*, true>(L, 1);
 	auto playerid = lua_get<uint8>(L, 2);
 	bool neglect_loc = lua_get<bool, false>(L, 3);
 	bool neglect_target = lua_get<bool, false>(L, 4);
-	lua_pushboolean(L, peffect->is_activateable(playerid, peffect->pduel->game_field->nil_event, 0, 0, neglect_target, neglect_loc));
+	lua_pushboolean(L, peffect->is_activateable(playerid, pduel->game_field->nil_event, 0, 0, neglect_target, neglect_loc));
 	return 1;
 }
 int32 scriptlib::effect_is_activated(lua_State* L) {

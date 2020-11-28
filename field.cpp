@@ -41,6 +41,7 @@ bool tevent::operator< (const tevent& v) const {
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
+	infos.event_id = 1;
 	infos.field_id = 1;
 	infos.copy_id = 1;
 	infos.can_shuffle = TRUE;
@@ -285,6 +286,8 @@ void field::remove_card(card* pcard) {
 		player[playerid].used_location &= ~(1 << pcard->current.sequence);
 	if (pcard->current.location == LOCATION_SZONE)
 		player[playerid].used_location &= ~(256 << pcard->current.sequence);
+	if(core.current_chain.size() > 0)
+		core.just_sent_cards.insert(pcard);
 	pcard->previous.controler = pcard->current.controler;
 	pcard->previous.location = pcard->current.location;
 	pcard->previous.sequence = pcard->current.sequence;
@@ -354,6 +357,8 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					message->write<uint32>(pcard->data.code);
 					message->write(pcard->get_info_location());
 				}
+				if(core.current_chain.size() > 0)
+					core.just_sent_cards.insert(pcard);
 				pcard->previous.controler = pcard->current.controler;
 				pcard->previous.location = pcard->current.location;
 				pcard->previous.sequence = pcard->current.sequence;
@@ -1155,12 +1160,16 @@ void field::reset_sequence(uint8 playerid, uint8 location) {
 }
 void field::swap_deck_and_grave(uint8 playerid) {
 	for(auto& pcard : player[playerid].list_grave) {
+		if(core.current_chain.size() > 0)
+			core.just_sent_cards.insert(pcard);
 		pcard->previous.location = LOCATION_GRAVE;
 		pcard->previous.sequence = pcard->current.sequence;
 		pcard->enable_field_effect(false);
 		pcard->cancel_field_effect();
 	}
 	for(auto& pcard : player[playerid].list_main) {
+		if(core.current_chain.size() > 0)
+			core.just_sent_cards.insert(pcard);
 		pcard->previous.location = LOCATION_DECK;
 		pcard->previous.sequence = pcard->current.sequence;
 		pcard->enable_field_effect(false);
@@ -1351,7 +1360,7 @@ void field::next_player(uint8 playerid) {
 	message->write<uint32>(player[playerid].start_lp);
 	player[playerid].recharge = false;
 }
-bool field::is_flag(uint32 flag) {
+bool field::is_flag(uint64 flag) {
 	return (core.duel_options & flag) == flag;
 }
 int32 field::get_pzone_index(uint8 seq) {
@@ -2607,7 +2616,7 @@ void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid, 
 	}
 }
 void field::set_spsummon_counter(uint8 playerid, bool add, bool chain) {
-	if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+	if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 		if(add) {
 			core.spsummon_state_count[playerid]++;
 			if(chain)
@@ -2624,7 +2633,7 @@ void field::set_spsummon_counter(uint8 playerid, bool add, bool chain) {
 	if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
 		for(auto& peffect : effects.spsummon_count_eff) {
 			card* pcard = peffect->get_handler();
-			if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+			if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 				if(add) {
 					if(peffect->is_available()) {
 						if(((playerid == pcard->current.controler) && peffect->s_range) || ((playerid != pcard->current.controler) && peffect->o_range)) {
@@ -2849,7 +2858,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 					continue;
 				if(pcard->announced_cards.findcard(atarget) >= (uint32)peffect->get_value(atarget))
 					continue;
-				if(atype >= 2 && atarget->is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET))
+				if(atype >= 2 && atarget->is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET, pcard))
 					continue;
 				if(select_target && (atype == 2 || atype == 4)) {
 					if(atarget->is_affected_by_effect(EFFECT_CANNOT_BE_BATTLE_TARGET, pcard))
@@ -2867,7 +2876,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack, 
 	for(auto& atarget : *pv) {
 		if(!atarget)
 			continue;
-		if(atype >= 2 && atarget->is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET))
+		if(atype >= 2 && atarget->is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET, pcard))
 			continue;
 		if(atarget->current.controler != p)
 			mcount++;
@@ -3426,7 +3435,7 @@ int32 field::check_chain_target(uint8 chaincount, card* pcard) {
 	pduel->lua->add_param(pchain->evt.reason_effect , PARAM_TYPE_EFFECT);
 	pduel->lua->add_param(pchain->evt.reason, PARAM_TYPE_INT);
 	pduel->lua->add_param(pchain->evt.reason_player, PARAM_TYPE_INT);
-	pduel->lua->add_param((ptr)0, PARAM_TYPE_INT);
+	pduel->lua->add_param(nullptr, PARAM_TYPE_INT);
 	pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 	return pduel->lua->check_condition(peffect->target, 10);
 }
@@ -3542,9 +3551,10 @@ int32 field::check_nonpublic_trigger(chain& ch) {
 			|| (peffect->range & (LOCATION_HAND | LOCATION_DECK)))) {
 		ch.flag |= CHAIN_HAND_TRIGGER;
 		core.new_ochain_h.push_back(ch);
-		if((ch.triggering_location == LOCATION_HAND && phandler->is_position(POS_FACEDOWN))
+		//TCG segoc
+		if(!is_flag(DUEL_TCG_SEGOC_NONPUBLIC) && ((ch.triggering_location == LOCATION_HAND && phandler->is_position(POS_FACEDOWN))
 			|| ch.triggering_location == LOCATION_DECK
-			|| (peffect->range && !peffect->in_range(ch)))
+			|| (peffect->range && !peffect->in_range(ch))))
 			return FALSE;
 	}
 	return TRUE;

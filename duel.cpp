@@ -59,25 +59,6 @@ card* duel::new_card(uint32 code) {
 	lua->register_card(pcard);
 	return pcard;
 }
-group* duel::register_group(group* pgroup) {
-	groups.insert(pgroup);
-	if(lua->call_depth)
-		sgroups.insert(pgroup);
-	lua->register_group(pgroup);
-	return pgroup;
-}
-group* duel::new_group() {
-	group* pgroup = new group(this);
-	return register_group(pgroup);
-}
-group* duel::new_group(card* pcard) {
-	group* pgroup = new group(this, pcard);
-	return register_group(pgroup);
-}
-group* duel::new_group(const card_set& cset) {
-	group* pgroup = new group(this, cset);
-	return register_group(pgroup);
-}
 effect* duel::new_effect() {
 	effect* peffect = new effect(this);
 	effects.insert(peffect);
@@ -98,13 +79,6 @@ void duel::delete_effect(effect* peffect) {
 	lua->unregister_effect(peffect);
 	effects.erase(peffect);
 	delete peffect;
-}
-int32 duel::read_buffer(byte* buf) {
-	generate_buffer();
-	if(buf != nullptr)
-		if(buff.size())
-			std::memcpy(buf, buff.data(), buff.size());
-	return buff.size();
 }
 void duel::generate_buffer() {
 	for(auto& message : messages) {
@@ -132,10 +106,11 @@ void duel::restore_assumes() {
 	assumes.clear();
 }
 void duel::write_buffer(void* data, size_t size) {
-	const auto vec_size = buff.size();
-	buff.resize(vec_size + size);
-	if(size)
+	if(size) {
+		const auto vec_size = buff.size();
+		buff.resize(vec_size + size);
 		std::memcpy(&buff[vec_size], data, size);
+	}
 }
 void duel::clear_buffer() {
 	buff.clear();
@@ -156,7 +131,7 @@ int32 duel::get_next_integer(int32 l, int32 h) {
 	} while(n <= lim);
 	return static_cast<int32>((n % range) + l);
 }
-duel::duel_message* duel::new_message(uint32_t message) {
+duel::duel_message* duel::new_message(uint8_t message) {
 	messages.emplace_back(message);
 	return &(messages.back());
 }
@@ -166,7 +141,7 @@ card_data const* duel::read_card(uint32_t code, card_data* copyable) {
 	if(search != data_cache.end()) {
 		ret = &(search->second);
 	} else {
-		OCG_CardData data;
+		OCG_CardData data{};
 		read_card_api(read_card_payload, code, &data);
 		ret = &(data_cache.emplace(code, &data).first->second);
 		read_card_done(read_card_done_payload, &data);
@@ -176,13 +151,14 @@ card_data const* duel::read_card(uint32_t code, card_data* copyable) {
 	return ret;
 }
 duel::duel_message::duel_message(uint8_t _message) :message(_message) {
-	write(message);
+	write<uint8_t>(message);
 }
-void duel::duel_message::write(void* buff, size_t size) {
-	const auto vec_size = data.size();
-	data.resize(vec_size + size);
-	if(size)
+void duel::duel_message::write(const void* buff, size_t size) {
+	if(size) {
+		const auto vec_size = data.size();
+		data.resize(vec_size + size);
 		std::memcpy(&data[vec_size], buff, size);
+	}
 }
 void duel::duel_message::write(loc_info loc) {
 	write<uint8_t>(loc.controler);

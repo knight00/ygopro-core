@@ -10,6 +10,8 @@
 
 #include "common.h"
 #include "ocgapi.h"
+#include "group.h"
+#include "interpreter.h"
 #include <random>
 #include <set>
 #include <unordered_set>
@@ -18,10 +20,8 @@
 #include <deque>
 
 class card;
-class group;
 class effect;
 class field;
-class interpreter;
 struct loc_info;
 
 struct card_data {
@@ -47,20 +47,24 @@ struct card_data {
 class duel {
 public:
 	class duel_message {
+	private:
+		template<typename T>
+		void write_internal(T data) {
+			write(&data, sizeof(T));
+		}
 	public:
 		std::vector<uint8_t> data;
 		uint8_t message;
 		duel_message() :message(0) {};
 		duel_message(uint8_t _message);
-		void write(void* buff, size_t size);
+		void write(const void* buff, size_t size);
 		void write(loc_info loc);
-		template<typename T>
-		void write(T data) {
-			write(&data, sizeof(T));
+		template<typename T, typename T2>
+		__forceinline void write(T2 data) {
+			write_internal<T>(static_cast<T>(data));
 		}
 	};
 	typedef std::set<card*, card_sort> card_set;
-	char strbuffer[256];
 	std::vector<uint8_t> buff;
 	std::vector<uint8_t> query_buffer;
 	interpreter* lua;
@@ -79,28 +83,33 @@ public:
 	
 	std::unordered_map<uint32_t/* hashed string */, uint8_t/*0 = not loaded, 1 = loaded correctly, 2 = failed to load*/> loaded_scripts;
 	
-	duel() {};
-	duel(OCG_DuelOptions options);
+	duel() = delete;
+	explicit duel(OCG_DuelOptions options);
 	~duel();
 	void clear();
 	
 	card* new_card(uint32 code);
-	group* new_group();
-	group* new_group(card* pcard);
-	group* new_group(const card_set& cset);
+	template<typename... Args>
+	group* new_group(Args&&... args) {
+		group* pgroup = new group(this, std::forward<Args>(args)...);
+		groups.insert(pgroup);
+		if(lua->call_depth)
+			sgroups.insert(pgroup);
+		lua->register_group(pgroup);
+		return pgroup;
+	}
 	effect* new_effect();
 	void delete_card(card* pcard);
 	void delete_group(group* pgroup);
 	void delete_effect(effect* peffect);
 	void release_script_group();
 	void restore_assumes();
-	int32 read_buffer(byte* buf);
 	void generate_buffer();
 	void write_buffer(void* data, size_t size);
 	void clear_buffer();
 	void set_response(const void* resp, size_t len);
 	int32 get_next_integer(int32 l, int32 h);
-	duel_message* new_message(uint32_t message);
+	duel_message* new_message(uint8_t message);
 	card_data const* read_card(uint32_t code, card_data* copyable = nullptr);
 	void* read_card_payload;
 	void* read_script_payload;
@@ -112,7 +121,6 @@ public:
 	OCG_DataReaderDone read_card_done;
 private:
 	std::deque<duel_message> messages;
-	group* register_group(group* pgroup);
 };
 
 #endif /* DUEL_H_ */

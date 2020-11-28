@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include <utility> //std::forward
 #include <cstdio>
 #include <cstring>
 #include <cmath>
@@ -75,29 +76,37 @@ public:
 	static void pushobject(lua_State* L, int32 lua_ptr);
 	static int pushExpandedTable(lua_State* L, int32 table_index);
 	static int32 get_function_handle(lua_State* L, int32 index);
-	static void set_duel_info(lua_State* L, duel* pduel);
-	static duel* get_duel_info(lua_State* L);
+	static inline duel* get_duel_info(lua_State* L) {
+		duel* pduel;
+		memcpy(&pduel, lua_getextraspace(L), LUA_EXTRASPACE);
+		return pduel;
+	}
 	static void print_stacktrace(lua_State* L);
 
 	template <size_t N, typename... TR>
-	static int sprintf(char (&buffer)[N], const char* format, TR... args) {
-		return std::snprintf(buffer, N, format, args...);
+	static __forceinline int sprintf(char (&buffer)[N], const char* format, TR&&... args) {
+		return std::snprintf(buffer, N, format, std::forward<TR>(args)...);
+	}
+
+	template<typename T>
+	static inline void lua_table_iterate(lua_State* L, int idx, T&& func) {
+		lua_pushnil(L);
+		while(lua_next(L, idx) != 0) {
+			func();
+			lua_pop(L, 1);
+		}
 	}
 };
-
-#define	PARAM_TYPE_INT		0x01
-#define	PARAM_TYPE_STRING	0x02
-#define	PARAM_TYPE_CARD		0x04
-#define	PARAM_TYPE_GROUP	0x08
-#define PARAM_TYPE_EFFECT	0x10
-#define	PARAM_TYPE_FUNCTION	0x20
-#define PARAM_TYPE_BOOLEAN	0x40
-#define PARAM_TYPE_INDEX	0x80
 
 #define COROUTINE_FINISH	1
 #define COROUTINE_YIELD		2
 #define COROUTINE_ERROR		3
 
-static_assert(LUA_VERSION_NUM == 503, "Lua 5.3 is required, the core won't work with other lua versions");
+static_assert(LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 504, "Lua 5.3 or 5.4 is required, the core won't work with other lua versions");
+#if LUA_VERSION_NUM <= 503
+#define lua_resumec(state, from, nargs, res) lua_resume(state, from, nargs)
+#else
+#define lua_resumec(state, from, nargs, res) lua_resume(state, from, nargs, res)
+#endif
 
 #endif /* INTERPRETER_H_ */

@@ -59,7 +59,7 @@ typedef void (*OCG_LogHandler)(void* payload, const char* string, int type);
 
 typedef struct OCG_DuelOptions {
 	uint32_t seed;
-	uint32_t flags;
+	uint64_t flags;
 	OCG_Player team1;
 	OCG_Player team2;
 	OCG_DataReader cardReader;
@@ -69,7 +69,7 @@ typedef struct OCG_DuelOptions {
 	OCG_LogHandler logHandler;
 	void* payload3; /* relayed to errorHandler */
 	OCG_DataReaderDone cardReaderDone;
-	void* payload4; /* relayed to cardReader */
+	void* payload4; /* relayed to cardReaderDone */
 }OCG_DuelOptions;
 
 typedef struct OCG_NewCardInfo {

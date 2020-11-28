@@ -397,8 +397,8 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 		message->write<uint8>(playerid);
 		message->write<uint8>(spe_count);
 		message->write<uint8>(forced);
-		message->write<uint32>(pduel->game_field->core.hint_timing[playerid]);
-		message->write<uint32>(pduel->game_field->core.hint_timing[1 - playerid]);
+		message->write<uint32>(core.hint_timing[playerid]);
+		message->write<uint32>(core.hint_timing[1 - playerid]);
 		std::sort(core.select_chains.begin(), core.select_chains.end(), chain::chain_operation_sort);
 		message->write<uint32>(core.select_chains.size());
 		for(const auto& ch : core.select_chains) {
@@ -776,7 +776,7 @@ int32 field::sort_card(int16 step, uint8 playerid, uint8 is_chain) {
 	} else {
 		if(returns.at<int8>(0) == -1)
 			return TRUE;
-		byte c[64] = {};
+		bool c[64] = {};
 		uint8 m = static_cast<uint8>(core.select_cards.size());
 		for(uint8 i = 0; i < m; ++i) {
 			int8 v = returns.at<int8>(i);
@@ -784,7 +784,7 @@ int32 field::sort_card(int16 step, uint8 playerid, uint8 is_chain) {
 				pduel->new_message(MSG_RETRY);
 				return FALSE;
 			}
-			c[v] = 1;
+			c[v] = true;
 		}
 		return TRUE;
 	}
@@ -870,9 +870,9 @@ int32 field::announce_attribute(int16 step, uint8 playerid, int32 count, int32 a
 }
 #define BINARY_OP(opcode,op) case opcode: {\
 								if (stack.size() >= 2) {\
-									int32 rhs = stack.top();\
+									int32 rhs = (int32)stack.top();\
 									stack.pop();\
-									int32 lhs = stack.top();\
+									int32 lhs = (int32)stack.top();\
 									stack.pop();\
 									stack.push(lhs op rhs);\
 								}\
@@ -880,7 +880,7 @@ int32 field::announce_attribute(int16 step, uint8 playerid, int32 count, int32 a
 							}
 #define UNARY_OP(opcode,op) case opcode: {\
 								if (stack.size() >= 1) {\
-									int32 val = stack.top();\
+									int32 val = (int32)stack.top();\
 									stack.pop();\
 									stack.push(op val);\
 								}\
@@ -893,6 +893,7 @@ int32 field::announce_attribute(int16 step, uint8 playerid, int32 count, int32 a
 							}
 static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcodes) {
 	std::stack<int64> stack;
+	bool alias = false, token = false;
 	for(auto& opcode : opcodes) {
 		switch(opcode) {
 		BINARY_OP(OPCODE_ADD, +);
@@ -920,7 +921,7 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 		//GET_OP(OPCODE_GETSETCARD, setcode);
 		case OPCODE_ISSETCARD: {
 			if(stack.size() >= 1) {
-				int32 set_code = stack.top();
+				int32 set_code = (int32)stack.top();
 				stack.pop();
 				bool res = false;
 				uint16 settype = set_code & 0xfff;
@@ -935,6 +936,14 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 			}
 			break;
 		}
+		case OPCODE_ALLOW_ALIASES: {
+			alias = true;
+			break;
+		}
+		case OPCODE_ALLOW_TOKENS: {
+			token = true;
+			break;
+		}
 		default: {
 			stack.push(opcode);
 			break;
@@ -944,10 +953,10 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 	if(stack.size() != 1 || stack.top() == 0)
 		return FALSE;
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
-	///////kdiy//////
+		///////kdiy//////
+		|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN))));
 		//|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
-		|| (cd->alias || cd->code);
-	///////kdiy//////			
+		///////kdiy//////
 }
 #undef BINARY_OP
 #undef UNARY_OP

@@ -130,9 +130,7 @@ uint32 card::attacker_map::findcard(card* pcard) {
 	else
 		return it->second.second;
 }
-card::card(duel* pd) {
-	lua_type = PARAM_TYPE_CARD;
-	pduel = pd;
+card::card(duel* pd) : lua_obj_helper(pd) {
 	owner = PLAYER_NONE;
 	sendto_param.clear();
 	release_param = 0;
@@ -419,11 +417,9 @@ int32 card::is_set_card(uint32 set_code) {
 	}
 	//another code
 	uint32 code2 = get_another_code();
-	if (code2 != 0) {
-		setcodes = pduel->read_card(code2)->setcodes;
-	} else {
+	if (code2 == 0)
 		return FALSE;
-	}
+	setcodes = pduel->read_card(code2)->setcodes;
 	for(auto& setcode : setcodes) {
 		if((setcode & 0xfffu) == settype && (setcode & 0xf000u & setsubtype) == setsubtype)
 			return TRUE;
@@ -442,9 +438,8 @@ int32 card::is_origin_set_card(uint32 set_code) {
 int32 card::is_pre_set_card(uint32 set_code) {
 	uint32 code = previous.code;
 	std::set<uint16> setcodes = data.setcodes;
-	if(code != data.code) {
+	if(code != data.code)
 		setcodes = pduel->read_card(code)->setcodes;
-	}
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for(auto& setcode : setcodes) {
@@ -2203,6 +2198,8 @@ void card::xyz_remove(card* mat) {
 	if(mat->overlay_target != this)
 		return;
 	xyz_materials.erase(xyz_materials.begin() + mat->current.sequence);
+	if(pduel->game_field->core.current_chain.size() > 0)
+		pduel->game_field->core.just_sent_cards.insert(mat);
 	mat->previous.controler = mat->current.controler;
 	mat->previous.location = mat->current.location;
 	mat->previous.sequence = mat->current.sequence;
@@ -2762,18 +2759,31 @@ void card::release_relation(effect* peffect) {
 int32 card::leave_field_redirect(uint32 /*reason*/) {
 	effect_set es;
 	uint32 redirect;
+	uint32 redirects = 0;
 	if(data.type & TYPE_TOKEN)
 		return 0;
 	filter_effect(EFFECT_LEAVE_FIELD_REDIRECT, &es);
 	for(const auto& peff : es) {
 		redirect = peff->get_value(this, 0);
 		if((redirect & LOCATION_HAND) && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(peff->get_handler_player(), this))
-			return redirect;
+			redirects |= redirect;
 		else if((redirect & LOCATION_DECK) && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(peff->get_handler_player(), this))
-			return redirect;
+			redirects |= redirect;
 		else if((redirect & LOCATION_REMOVED) && !is_affected_by_effect(EFFECT_CANNOT_REMOVE) && pduel->game_field->is_player_can_remove(peff->get_handler_player(), this, REASON_EFFECT))
-			return redirect;
+			redirects |= redirect;
 	}
+	if(redirects & LOCATION_REMOVED)
+		return LOCATION_REMOVED;
+	// the ruling for the priority of the following redirects can't be confirmed for now
+	if(redirects & LOCATION_DECK) {
+		if((redirects & LOCATION_DECKBOT) == LOCATION_DECKBOT)
+			return LOCATION_DECKBOT;
+		if((redirects & LOCATION_DECKSHF) == LOCATION_DECKSHF)
+			return LOCATION_DECKSHF;
+		return LOCATION_DECK;
+	}
+	if(redirects & LOCATION_HAND)
+		return LOCATION_HAND;
 	return 0;
 }
 int32 card::destination_redirect(uint8 destination, uint32 /*reason*/) {
@@ -4441,7 +4451,7 @@ int32 card::is_capable_be_battle_target(card* pcard) {
 		return FALSE;
 	if(pcard->is_affected_by_effect(EFFECT_CANNOT_SELECT_BATTLE_TARGET, this))
 		return FALSE;
-	if(is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET))
+	if(is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET, pcard))
 		return FALSE;
 	return TRUE;
 }

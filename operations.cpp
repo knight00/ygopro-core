@@ -31,7 +31,7 @@ int32 field::negate_chain(uint8 chaincount) {
 		auto message = pduel->new_message(MSG_CHAIN_NEGATED);
 		message->write<uint8>(chaincount);
 		if(pchain.triggering_location == LOCATION_DECK
-				|| (!pduel->game_field->is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
+				|| (!is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
 			pchain.triggering_effect->handler->release_relation(pchain);
 		return TRUE;
 	}
@@ -51,7 +51,7 @@ int32 field::disable_chain(uint8 chaincount) {
 		auto message = pduel->new_message(MSG_CHAIN_DISABLED);
 		message->write<uint8>(chaincount);
 		if(pchain.triggering_location == LOCATION_DECK
-				|| (!pduel->game_field->is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
+				|| (!is_flag(DUEL_RETURN_TO_EXTRA_DECK_TRIGGERS) && pchain.triggering_location == LOCATION_EXTRA && (pchain.triggering_position & POS_FACEDOWN)))
 			pchain.triggering_effect->handler->release_relation(pchain);
 		return TRUE;
 	}
@@ -415,6 +415,8 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			pcard->enable_field_effect(false);
 			pcard->cancel_field_effect();
 			player[playerid].list_main.pop_back();
+			if(core.current_chain.size() > 0)
+				core.just_sent_cards.insert(pcard);
 			pcard->previous.controler = pcard->current.controler;
 			pcard->previous.location = pcard->current.location;
 			pcard->previous.sequence = pcard->current.sequence;
@@ -919,7 +921,7 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 chose_player,
 				change = false;
 			if(!pcard->is_affect_by_effect(reason_effect))
 				change = false;
-			if(!pduel->game_field->is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && ((pcard->get_type() & TYPE_TRAPMONSTER) && get_useable_count(pcard, playerid, LOCATION_SZONE, playerid, LOCATION_REASON_CONTROL) <= 0))
+			if(!is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && ((pcard->get_type() & TYPE_TRAPMONSTER) && get_useable_count(pcard, playerid, LOCATION_SZONE, playerid, LOCATION_REASON_CONTROL) <= 0))
 				change = false;
 			if(!change)
 				targets->container.erase(pcard);
@@ -969,7 +971,7 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 chose_player,
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+			deffect->owner = player[playerid].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -989,7 +991,7 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 chose_player,
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(playerid,EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+			deffect->owner = player[playerid].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1130,7 +1132,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 		uint8 p2 = pcard2->current.controler;	
 	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA)) {
 			effect* deffect = pduel->new_effect();
-		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->owner = player[p1].list_szone[5];
 		    deffect->code = EFFECT_ORICA_SZONE;
 		    deffect->type = EFFECT_TYPE_SINGLE;
 		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1139,7 +1141,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 	    }	
 	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA)) {
 			effect* deffect = pduel->new_effect();
-		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->owner = player[p1].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1207,7 +1209,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 	    ///////kdiy///////
 	    if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard2->current.location == LOCATION_SZONE) {
 			effect* deffect = pduel->new_effect();
-		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->owner = player[p1].list_szone[5];
 		    deffect->code = EFFECT_ORICA_SZONE;
 		    deffect->type = EFFECT_TYPE_SINGLE;
 		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1216,7 +1218,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 	    }	
 	    if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard1->current.location == LOCATION_SZONE) {
 			effect* deffect = pduel->new_effect();
-		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->owner = player[p1].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1346,7 +1348,7 @@ int32 field::control_adjust(uint16 step) {
 			uint8 p2 = pcard2->current.controler;		
 			if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA)) {
 				effect* deffect = pduel->new_effect();
-				deffect->owner = pduel->game_field->player[p1].list_szone[5];
+				deffect->owner = player[p1].list_szone[5];
 				deffect->code = EFFECT_ORICA_SZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1355,7 +1357,7 @@ int32 field::control_adjust(uint16 step) {
 	        }	
 	        if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA)) {
 				effect* deffect = pduel->new_effect();
-			    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+			    deffect->owner = player[p1].list_szone[5];
 				deffect->code = EFFECT_ORICA_SZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1369,7 +1371,7 @@ int32 field::control_adjust(uint16 step) {
 		    //kdiy///////			
 	        if(!pcard2->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p1,EFFECT_ORICA) && pcard2->current.location == LOCATION_SZONE) {
 			effect* deffect = pduel->new_effect();
-		    deffect->owner = pduel->game_field->player[p1].list_szone[5];
+		    deffect->owner = player[p1].list_szone[5];
 		    deffect->code = EFFECT_ORICA_SZONE;
 		    deffect->type = EFFECT_TYPE_SINGLE;
 		    deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1378,7 +1380,7 @@ int32 field::control_adjust(uint16 step) {
 			}	
 			if(!pcard1->is_affected_by_effect(EFFECT_ORICA_SZONE) && is_player_affected_by_effect(p2,EFFECT_ORICA) && pcard1->current.location == LOCATION_SZONE) {
 				effect* deffect = pduel->new_effect();
-				deffect->owner = pduel->game_field->player[p1].list_szone[5];
+				deffect->owner = player[p1].list_szone[5];
 				deffect->code = EFFECT_ORICA_SZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1404,7 +1406,7 @@ int32 field::control_adjust(uint16 step) {
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(1 - pcard->current.controler,EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[1 - pcard->current.controler].list_szone[5];
+			deffect->owner = player[1 - pcard->current.controler].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1637,7 +1639,7 @@ int32 field::trap_monster_adjust(uint16 step) {
 				///////kdiy///////
 				if(is_player_affected_by_effect(tp,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 					effect* deffect = pduel->new_effect();
-					deffect->owner = pduel->game_field->player[tp].list_szone[5];
+					deffect->owner = player[tp].list_szone[5];
 					deffect->code = EFFECT_SANCT_MZONE;
 					deffect->type = EFFECT_TYPE_SINGLE;
 					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -1712,7 +1714,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card* equip_card, card* targ
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(equip_player,EFFECT_SANCT) && !equip_card->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[equip_player].list_szone[5];
+			deffect->owner = player[equip_player].list_szone[5];
 			deffect->code = EFFECT_SANCT_MZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -2222,7 +2224,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(targetplayer,EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[targetplayer].list_szone[5];
+			deffect->owner = player[targetplayer].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -2285,7 +2287,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		message->write(target->get_info_location());
 		core.summon_state_count[sumplayer]++;
 		core.normalsummon_state_count[sumplayer]++;
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			check_card_counter(target, 1, sumplayer);
 			check_card_counter(target, 2, sumplayer);
 		}
@@ -2322,7 +2324,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			core.units.begin()->step = 15;
 			return FALSE;
 		}
-		if(proc && !pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(proc && !is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			remove_oath_effect(proc);
 			if(proc->is_flag(EFFECT_FLAG_COUNT_LIMIT) && (proc->count_code & EFFECT_COUNT_CODE_OATH)) {
 				dec_effect_code(proc->count_code, proc->count_flag, sumplayer);
@@ -2373,7 +2375,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		return FALSE;
 	}
 	case 18: {
-		if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			check_card_counter(target, 1, sumplayer);
 			check_card_counter(target, 2, sumplayer);
 		}
@@ -2423,7 +2425,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card* target) {
 		target->current.position = POS_FACEUP_ATTACK;
 		target->fieldid = infos.field_id++;
 		core.phase_action = TRUE;
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			core.flipsummon_state_count[sumplayer]++;
 			check_card_counter(target, 4, sumplayer);
 		}
@@ -2474,7 +2476,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card* target) {
 	}
 	case 4: {
 		pduel->new_message(MSG_FLIPSUMMONED);
-		if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			core.flipsummon_state_count[sumplayer]++;
 			check_card_counter(target, 4, sumplayer);
 		}
@@ -2820,7 +2822,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card* target, effect* proc, uint
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(targetplayer,EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[targetplayer].list_szone[5];
+			deffect->owner = player[targetplayer].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -2888,7 +2890,7 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card* target, ef
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(toplayer,EFFECT_SANCT) && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[toplayer].list_szone[5];
+			deffect->owner = player[toplayer].list_szone[5];
 			deffect->code = EFFECT_SANCT_MZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -3080,7 +3082,7 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 			if(pcard->data.type & TYPE_FIELD)
 				continue;
 			message->write(pcard->get_info_location());
-			pduel->game_field->player[toplayer].list_szone[seq] = pcard;
+			player[toplayer].list_szone[seq] = pcard;
 			pcard->current.sequence = seq;
 		}
 		for(i = 0; i < ct; ++i) {
@@ -3242,7 +3244,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(targetplayer,EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[targetplayer].list_szone[5];
+			deffect->owner = player[targetplayer].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -3256,11 +3258,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		target->current.reason_effect = peffect;
 		target->current.reason_player = sumplayer;
 		target->summon_player = sumplayer;
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			set_spsummon_counter(sumplayer);
 			check_card_counter(target, 3, sumplayer);
 		}
-		if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && target->spsummon_code)
+		if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && target->spsummon_code)
 			core.spsummon_once_map[sumplayer][target->spsummon_code]++;
 		break_effect();
 		return FALSE;
@@ -3324,7 +3326,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 			delete peset;
 			core.units.begin()->ptr1 = nullptr;
 		}
-		if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			effect* peffect = core.units.begin()->peffect;
 			remove_oath_effect(peffect);
 			if(peffect->is_flag(EFFECT_FLAG_COUNT_LIMIT) && (peffect->count_code & EFFECT_COUNT_CODE_OATH)) {
@@ -3376,11 +3378,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 		return FALSE;
 	}
 	case 17: {
-		if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			set_spsummon_counter(sumplayer);
 			check_card_counter(target, 3, sumplayer);
 		}
-		if(!pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && target->spsummon_code)
+		if(!is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE) && target->spsummon_code)
 			core.spsummon_once_map[sumplayer][target->spsummon_code]++;
 		raise_single_event(target, 0, EVENT_SPSUMMON_SUCCESS, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);	
 		process_single_event();		
@@ -3476,7 +3478,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 			}
 			positions &= eff->get_value();
 		}
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			check_card_counter(pcard, 3, sumplayer);
 		}
 		uint32 zone = 0xff;
@@ -3499,7 +3501,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(sumplayer,EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[sumplayer].list_szone[5];
+			deffect->owner = player[sumplayer].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -3524,10 +3526,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 	}
 	case 25: {
 		group* pgroup = core.units.begin()->ptarget; 
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			set_spsummon_counter(sumplayer);
 		}
-		if(pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
+		if(is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
 			std::set<uint32> spsummon_once_set;
 			for(auto& pcard : pgroup->container) {
 				if(pcard->spsummon_code)
@@ -3569,7 +3571,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 			adjust_instant();
 		}
 		if(pgroup->container.size() == 0) {
-			if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+			if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 				effect* peffect = core.units.begin()->peffect;
 				remove_oath_effect(peffect);
 				if(peffect->is_flag(EFFECT_FLAG_COUNT_LIMIT) && (peffect->count_code & EFFECT_COUNT_CODE_OATH)) {
@@ -3608,11 +3610,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card* target, uin
 	case 28: {
 		group* pgroup = core.units.begin()->ptarget;
 		pduel->new_message(MSG_SPSUMMONED);
-		if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			set_spsummon_counter(sumplayer);
 			check_card_counter(pgroup, 3, sumplayer);
 		}
-		if(!pduel->game_field->is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
+		if(!is_flag(DUEL_SPSUMMON_ONCE_OLD_NEGATE)) {
 			std::set<uint32> spsummon_once_set;
 			for(auto& pcard : pgroup->container) {
 				if(pcard->spsummon_code)
@@ -3706,13 +3708,13 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(false);
-		if(pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 			check_card_counter(target, 3, target->summon_player);
 		}
 		// UNUSED VARIABLE	
 		// uint32 move_player = (target->data.type & TYPE_TOKEN) ? target->owner : target->summon_player;
 		bool extra = !(zone & 0xff);
-		if(targets && pduel->game_field->is_flag(DUEL_EMZONE)) {
+		if(targets && is_flag(DUEL_EMZONE)) {
 			uint32 flag1, flag2;
 			int32 ct1 = get_tofield_count(target, playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD, zone, &flag1);
 			int32 ct2 = get_spsummonable_count_fromex(target, playerid, target->summon_player, zone, &flag2);			
@@ -3741,7 +3743,7 @@ int32 field::special_summon_step(uint16 step, group* targets, card* target, uint
 	    ///////kdiy///////
 	    if(is_player_affected_by_effect(playerid, EFFECT_ORICA) && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 		    effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+			deffect->owner = player[playerid].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -3846,7 +3848,7 @@ int32 field::special_summon(uint16 step, effect* reason_effect, uint8 reason_pla
 	case 3: {
 		pduel->new_message(MSG_SPSUMMONED);
 		for(auto& pcard : targets->container) {
-			if(!pduel->game_field->is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
+			if(!is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
 				check_card_counter(pcard, 3, pcard->summon_player);
 			}
 			if(!(pcard->current.position & POS_FACEDOWN))
@@ -3896,7 +3898,7 @@ int32 field::destroy_replace(uint16 /*step*/, group* targets, card* target, uint
 		targets->container.erase(target);
 		return TRUE;
 	}
-	if(targets->container.find(target) == targets->container.end())
+	if(!targets->has_card(target))
 		return TRUE;
 	returns.at<int32>(0) = FALSE;
 	effect_set eset;
@@ -4027,7 +4029,7 @@ int32 field::destroy(uint16 step, group* targets, effect* reason_effect, uint32 
 			targets->container.erase(pcard);
 		}
 		for (auto& rep : extra) {
-			if(targets->container.count(rep) == 0) {
+			if(!targets->has_card(rep)) {
 				rep->temp.reason = rep->current.reason;
 				rep->temp.reason_effect = rep->current.reason_effect;
 				rep->temp.reason_player = rep->current.reason_player;
@@ -4253,7 +4255,7 @@ int32 field::release_replace(uint16 /*step*/, group* targets, card* target) {
 		targets->container.erase(target);
 		return TRUE;
 	}
-	if(targets->container.find(target) == targets->container.end())
+	if(!targets->has_card(target))
 		return TRUE;
 	////////kdiy//////////	
 	//if(!(target->current.reason & REASON_RULE)) {
@@ -4333,6 +4335,12 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 		return FALSE;
 	}
 	case 3: {
+		for(auto& peffect : core.dec_count_reserve) {
+			auto message = pduel->new_message(MSG_HINT);
+			message->write<uint8>(HINT_CARD);
+			message->write<uint8>(0);
+			message->write<uint64>(peffect->get_handler()->data.code);
+		}
 		group* sendtargets = pduel->new_group(targets->container);
 		sendtargets->is_readonly = TRUE;
 		operation_replace(EFFECT_SEND_REPLACE, 5, sendtargets);
@@ -4355,7 +4363,7 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 int32 field::send_replace(uint16 /*step*/, group* targets, card* target) {
 	uint8 playerid = target->sendto_param.playerid;
 	uint8 dest = target->sendto_param.location;
-	if(targets->container.find(target) == targets->container.end())
+	if(!targets->has_card(target))
 		return TRUE;
 	if(target->current.location == dest && target->current.controler == playerid) {
 		target->current.reason = target->temp.reason;
@@ -4606,6 +4614,8 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 			message->write(pcard->get_info_location());
 			message->write(loc_info{});
 			message->write<uint32>(pcard->current.reason);
+			if(core.current_chain.size() > 0)
+				core.just_sent_cards.insert(pcard);
 			pcard->previous.controler = pcard->current.controler;
 			pcard->previous.location = pcard->current.location;
 			pcard->previous.sequence = pcard->current.sequence;
@@ -4717,7 +4727,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 		//kdiy///////
 		if(is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+			deffect->owner = player[pcard->current.controler].list_szone[5];
 			deffect->code = EFFECT_ORICA_SZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -4726,7 +4736,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 		}		
 		if(is_player_affected_by_effect(pcard->current.controler, EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 			effect* deffect = pduel->new_effect();
-			deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+			deffect->owner = player[pcard->current.controler].list_szone[5];
 			deffect->code = EFFECT_SANCT_MZONE;
 			deffect->type = EFFECT_TYPE_SINGLE;
 			deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -4875,7 +4885,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 			//kdiy///////
 			if((nloc && LOCATION_ONFIELD) && is_player_affected_by_effect(pcard->current.controler, EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 				effect* deffect = pduel->new_effect();
-				deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+				deffect->owner = player[pcard->current.controler].list_szone[5];
 				deffect->code = EFFECT_ORICA_SZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -4884,7 +4894,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 			}		
 			if((nloc && LOCATION_ONFIELD) && is_player_affected_by_effect(pcard->current.controler, EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 				effect* deffect = pduel->new_effect();
-				deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+				deffect->owner = player[pcard->current.controler].list_szone[5];
 				deffect->code = EFFECT_SANCT_MZONE;
 				deffect->type = EFFECT_TYPE_SINGLE;		
 				deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -5007,6 +5017,8 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 			pcard->enable_field_effect(false);
 			pcard->cancel_field_effect();
 			player[playerid].list_main.pop_back();
+			if(core.current_chain.size() > 0)
+				core.just_sent_cards.insert(pcard);
 			pcard->previous.controler = pcard->current.controler;
 			pcard->previous.location = pcard->current.location;
 			pcard->previous.sequence = pcard->current.sequence;
@@ -5091,21 +5103,21 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 		if(location == LOCATION_SZONE && zone == (0x1 << 5) && (target->data.type & TYPE_FIELD)) {
 			card* pcard = get_field_card(playerid, LOCATION_SZONE, 5);
 			if(pcard) {
-				if(!pduel->game_field->is_flag(DUEL_1_FACEUP_FIELD))
+				if(!is_flag(DUEL_1_FACEUP_FIELD))
 					send_to(pcard, 0, REASON_RULE, pcard->current.controler, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
 				else
 					destroy(pcard, 0, REASON_RULE, pcard->current.controler);
 				adjust_all();
 			}
 		//////////kdiy////////////
-		//} else if(pzone && location == LOCATION_SZONE && (target->data.type & TYPE_PENDULUM) && pduel->game_field->is_flag(DUEL_PZONE)) {
-		} else if(pzone && location == LOCATION_SZONE && !target->is_affected_by_effect(EFFECT_ORICA_SZONE) && (target->data.type & TYPE_PENDULUM) && pduel->game_field->is_flag(DUEL_PZONE)) {
+		//} else if(pzone && location == LOCATION_SZONE && (target->data.type & TYPE_PENDULUM) && is_flag(DUEL_PZONE)) {
+		} else if(pzone && location == LOCATION_SZONE && !target->is_affected_by_effect(EFFECT_ORICA_SZONE) && (target->data.type & TYPE_PENDULUM) && is_flag(DUEL_PZONE)) {
 		//////////kdiy////////////			
 			uint32 flag = 0;
 			if(is_location_useable(playerid, LOCATION_PZONE, 0) && zone & 1)
-				flag |= 0x1u << (pduel->game_field->get_pzone_index(0) + 8);
+				flag |= 0x1u << (get_pzone_index(0) + 8);
 			if(is_location_useable(playerid, LOCATION_PZONE, 1) && zone & 2)
-				flag |= 0x1u << (pduel->game_field->get_pzone_index(1) + 8);
+				flag |= 0x1u << (get_pzone_index(1) + 8);
 			if(!flag)
 				return TRUE;
 			if(move_player != playerid)
@@ -5124,11 +5136,11 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 			//////////kdiy//////////			
 			int32 ct = get_useable_count(target, playerid, location, move_player, lreason, zone, &flag);
 			if(location == LOCATION_MZONE && (zone & 0x60) && (zone != 0xff) && !rule) {				
-				if((zone & 0x20) && pduel->game_field->is_location_useable(playerid, location, 5)) {
+				if((zone & 0x20) && is_location_useable(playerid, location, 5)) {
 					flag = flag & ~(1u << 5);
 					ct++;
 				}
-				if((zone & 0x40) && pduel->game_field->is_location_useable(playerid, location, 6)) {
+				if((zone & 0x40) && is_location_useable(playerid, location, 6)) {
 					flag = flag & ~(1u << 6);
 					ct++;
 				}
@@ -5153,7 +5165,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 					}
 				}
 			}
-			if(!pduel->game_field->is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && (ret == 2)) {
+			if(!is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && (ret == 2)) {
 				returns.at<int8>(2) = target->previous.sequence;
 				return FALSE;
 			}
@@ -5246,7 +5258,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 				///kdiy////////
 				if(orica==1 && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) {
 					effect* deffect = pduel->new_effect();
-					deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+					deffect->owner = player[playerid].list_szone[5];
 					deffect->code = EFFECT_ORICA_SZONE;
 					deffect->type = EFFECT_TYPE_SINGLE;
 					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -5255,7 +5267,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 				}	
 				if(sanct==1 && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 					effect* deffect = pduel->new_effect();
-					deffect->owner = pduel->game_field->player[playerid].list_szone[5];
+					deffect->owner = player[playerid].list_szone[5];
 					deffect->code = EFFECT_SANCT_MZONE;
 					deffect->type = EFFECT_TYPE_SINGLE;
 					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
@@ -5403,7 +5415,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 				peffect->reset_flag = RESET_EVENT + 0x1fc0000;
 				peffect->value = TYPE_MONSTER | type;
 				target->add_effect(peffect);
-				if(!pduel->game_field->is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) &&(type & TYPE_TRAPMONSTER)) {
+				if(!is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) &&(type & TYPE_TRAPMONSTER)) {
 					peffect = pduel->new_effect();
 					peffect->owner = target;
 					peffect->type = EFFECT_TYPE_FIELD;
@@ -5607,7 +5619,7 @@ int32 field::change_position(uint16 step, group* targets, effect* reason_effect,
 				///////kdiy///////	
 				if(is_player_affected_by_effect(pcard->current.controler,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 					effect* deffect = pduel->new_effect();
-					deffect->owner = pduel->game_field->player[pcard->current.controler].list_szone[5];
+					deffect->owner = player[pcard->current.controler].list_szone[5];
 					deffect->code = EFFECT_SANCT_MZONE;
 					deffect->type = EFFECT_TYPE_SINGLE;
 					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;

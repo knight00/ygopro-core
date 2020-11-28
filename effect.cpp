@@ -14,10 +14,7 @@
 bool effect_sort_id(const effect* e1, const effect* e2) {
 	return e1->id < e2->id;
 }
-effect::effect(duel* pd) {
-	lua_type = PARAM_TYPE_EFFECT;
-	ref_handle = 0;
-	pduel = pd;
+effect::effect(duel* pd) : lua_obj_helper(pd) {
 	owner = 0;
 	handler = 0;
 	description = 0;
@@ -386,7 +383,7 @@ int32 effect::is_activate_ready(effect* reason_effect, uint8 playerid, const tev
 		pduel->lua->add_param(e.reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(e.reason, PARAM_TYPE_INT);
 		pduel->lua->add_param(e.reason_player, PARAM_TYPE_INT);
-		pduel->lua->add_param((ptr)0, PARAM_TYPE_INT);
+		pduel->lua->add_param(nullptr, PARAM_TYPE_INT);
 		if(!pduel->lua->check_condition(cost, 9)) {
 			return FALSE;
 		}
@@ -400,7 +397,7 @@ int32 effect::is_activate_ready(effect* reason_effect, uint8 playerid, const tev
 		pduel->lua->add_param(e.reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(e.reason, PARAM_TYPE_INT);
 		pduel->lua->add_param(e.reason_player, PARAM_TYPE_INT);
-		pduel->lua->add_param((ptr)0, PARAM_TYPE_INT);
+		pduel->lua->add_param(nullptr, PARAM_TYPE_INT);
 		if(!pduel->lua->check_condition(target, 9)) {
 			return FALSE;
 		}

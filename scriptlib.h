@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "interpreter.h"
+#include "lua_obj.h"
 
 class scriptlib {
 public:
@@ -473,6 +474,7 @@ public:
 	static int32 duel_discard_deck(lua_State* L);
 	static int32 duel_discard_hand(lua_State* L);
 	static int32 duel_disable_shuffle_check(lua_State* L);
+	static int32 duel_disable_self_destroy_check(lua_State* L);
 	static int32 duel_shuffle_deck(lua_State* L);
 	static int32 duel_shuffle_extra(lua_State* L);
 	static int32 duel_shuffle_hand(lua_State* L);
@@ -659,6 +661,13 @@ template<typename T, typename type>
 using EnableIf = typename std::enable_if_t<std::is_same<T, type>::value, T>;
 
 template<typename T>
+inline duel* lua_get(lua_State* L) {
+	duel* pduel = nullptr;
+	memcpy(&pduel, lua_getextraspace(L), LUA_EXTRASPACE);
+	return pduel;
+}
+
+template<typename T>
 EnableIf<T, lua_obj*> lua_get(lua_State* L, int idx) {
 	if(lua_gettop(L) < idx)
 		return nullptr;
@@ -739,5 +748,16 @@ lua_get(lua_State* L, int idx) {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+
+inline void get_card_or_group(lua_State* L, int idx, card*& pcard, group*& pgroup) {
+	if((pcard = lua_get<card*>(L, idx)) == nullptr && (pgroup = lua_get<group*>(L, idx)) == nullptr)
+		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", idx);
+}
+//always return a string, whereas lua might return nullptr
+inline const char* lua_tostring_or_empty(lua_State *L, int idx) {
+	size_t retlen = 0;
+	auto str = lua_tolstring(L, idx, &retlen);
+	return (!str || retlen == 0) ? "" : str;
+}
 
 #endif /* SCRIPTLIB_H_ */
