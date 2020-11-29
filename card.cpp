@@ -947,24 +947,24 @@ int32 card::get_attack() {
 			break;
 		}
 		temp.base_attack = batk;
-//////////kdiy/////////////
+        //////////kdiy/////////////
         if (((atk < 0) ? batk : atk)>=999999) 
 		{
 			up_atk=0; upc_atk=0;
 		}
         if (((atk < 0) ? batk : atk)<999999 && up_atk+upc_atk+((atk < 0) ? batk : atk)>999998)
 		{		 
-			upc_atk=999998-((atk < 0) ? batk : atk); up_atk=0;
+			upc_atk=999999-((atk < 0) ? batk : atk); up_atk=0;
 		} 		
         if (((atk < 0) ? batk : atk)<999999 && up_atk+((atk < 0) ? batk : atk)>999998)
 		{		 
-			up_atk=999998-((atk < 0) ? batk : atk);
+			up_atk=999999-((atk < 0) ? batk : atk);
 		} 
         if (((atk < 0) ? batk : atk)<999999 && upc_atk+((atk < 0) ? batk : atk)>999998)
 		{		 
-			upc_atk=999998-((atk < 0) ? batk : atk);
+			upc_atk=999999-((atk < 0) ? batk : atk);
 		}		 
-//////////kdiy/////////////
+        //////////kdiy/////////////
 		if(!rev) {
 			temp.attack = ((atk < 0) ? batk : atk) + up_atk + upc_atk;
 		} else {
@@ -1257,24 +1257,24 @@ int32 card::get_defense() {
 			break;
 		}
 		temp.base_defense = bdef;
-//////////kdiy/////////////
+        //////////kdiy/////////////
         if (((def < 0) ? bdef : def)>=999999) 
 		{
 			up_def=0; upc_def=0;
 		}
         if (((def < 0) ? bdef : def)<999999 && up_def+upc_def+((def < 0) ? bdef : def)>=999998)
 		{		 
-			upc_def=999998-((def < 0) ? bdef : def); up_def=0;
+			upc_def=999999-((def < 0) ? bdef : def); up_def=0;
 		} 		
         if (((def < 0) ? bdef : def)<999999 && up_def+((def < 0) ? bdef : def)>=999998)
 		{		 
-			up_def=999998-((def < 0) ? bdef : def);
+			up_def=999999-((def < 0) ? bdef : def);
 		} 
         if (((def < 0) ? bdef : def)<999999 && upc_def+((def < 0) ? bdef : def)>=999998)
 		{		 
-			upc_def=999998-((def < 0) ? bdef : def);
+			upc_def=999999-((def < 0) ? bdef : def);
 		}		 
-//////////kdiy/////////////		
+        //////////kdiy/////////////		
 		if(!rev) {
 			temp.defense = ((def < 0) ? bdef : def) + up_def + upc_def;
 		} else {
@@ -1282,7 +1282,7 @@ int32 card::get_defense() {
 		}
 		if(temp.defense < 0)
 			temp.defense = 0;
-//////////kdiy/////////////
+        //////////kdiy/////////////
 	    if(temp.defense > 999999) {
 			if (!is_affected_by_effect(EFFECT_OVERINFINITE_DEFENSE))
 			   temp.defense = 999999;

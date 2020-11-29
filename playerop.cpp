@@ -955,7 +955,7 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
 		///////kdiy//////
 		|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN))));
-		//|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+		//|| (cd->alias || cd->code);
 		///////kdiy//////
 }
 #undef BINARY_OP

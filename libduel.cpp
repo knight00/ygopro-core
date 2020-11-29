@@ -1412,7 +1412,7 @@ int32 scriptlib::duel_recover(lua_State* L) {
 	else if (pduel->game_field->player[playerid].lp<999999 && amount>=999999) 
 	    amount=999999-pduel->game_field->player[playerid].lp;
 	else if (pduel->game_field->player[playerid].lp<999999 && pduel->game_field->player[playerid].lp<999999+amount>=999999) 
-	    amount=999998-pduel->game_field->player[playerid].lp;
+	    amount=999999-pduel->game_field->player[playerid].lp;
     ///////////kdiy//////////		
 	pduel->game_field->recover(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, playerid, amount, is_step);
 	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State* L, int32/* status*/, lua_KContext ctx) {
