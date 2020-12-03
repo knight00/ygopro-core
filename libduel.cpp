@@ -4561,7 +4561,7 @@ int32 scriptlib::duel_get_starting_hand(lua_State* L) {
 int32 scriptlib::duel_bat(lua_State* L) {
 	check_param_count(L, 1);
 	uint32 bat = lua_get<uint32>(L, 1);
-	std::string s1 = "C:\\Users\\Knight00\\Downloads\\YGOPro\\Git\\EdoproKCG\\plugin\\";
+	std::string s1 = "plugin\\";
 	char numstr[21]; // enough to hold all numbers up to 64-bits
 	s1 += itoa(bat, numstr, 10);
 	s1 += ".mp4";
