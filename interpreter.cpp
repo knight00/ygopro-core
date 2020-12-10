@@ -657,10 +657,6 @@ static const struct luaL_Reg duellib[] = {
 	{ "GetCardFromCardID", scriptlib::duel_get_card_from_cardid },
 	{ "LoadScript", scriptlib::duel_load_script },
 	{ "GetStartingHand", scriptlib::duel_get_starting_hand },
-
-    //////kdiy/////
-	{ "bat", scriptlib::duel_bat },	
-	//////kdiy/////
 	{ NULL, NULL }
 };
 
@@ -748,6 +744,8 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	//music hints
 	lua_pushinteger(lua_state, HINT_MUSIC);
 	lua_setglobal(lua_state, "HINT_MUSIC");	
+	lua_pushinteger(lua_state, HINT_ANIME);
+	lua_setglobal(lua_state, "HINT_ANIME");		
 //////////////kdiy///////////	
 }
 interpreter::~interpreter() {

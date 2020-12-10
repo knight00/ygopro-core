@@ -5,10 +5,6 @@
  *      Author: Argon
  */
 
-////kdiy///
-#include <Windows.h>
-///kdiy///
-
 #include "scriptlib.h"
 #include "duel.h"
 #include "field.h"
@@ -4556,21 +4552,3 @@ int32 scriptlib::duel_get_starting_hand(lua_State* L) {
 	lua_pushinteger(L, pduel->game_field->player[playerid].start_count);
 	return 1;
 }
-
-//////kdiy/////
-int32 scriptlib::duel_bat(lua_State* L) {
-	check_param_count(L, 1);
-	uint32 bat = lua_get<uint32>(L, 1);
-	std::string s1 = "plugin\\";
-	char numstr[21]; // enough to hold all numbers up to 64-bits
-	s1 += itoa(bat, numstr, 10);
-	s1 += ".mp4";
-	//system(s1.c_str());
-
-	SHELLEXECUTEINFO ShExecInfo = { 0 };
-	ShellExecuteA(NULL, "open", "mpc-hc.exe", s1.c_str(), NULL, SW_SHOW);
-	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-	CloseHandle(ShExecInfo.hProcess);
-	return 0;
-}
-//////kdiy/////
