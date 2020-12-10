@@ -22,11 +22,9 @@ int32 scriptlib::card_set_entity_code(lua_State *L) {
 		if(!lua_isnil(L, 3)) pcard->data.alias = lua_get<uint32>(L, 3, pcard->data.alias);
 		if(lua_gettop(L) > 3 && !lua_isnil(L, 4)) {
 			if(lua_istable(L, 4)) {
-				lua_pushnil(L);
-				while(lua_next(L, 4) != 0) {
-					pcard->data.setcodes.insert(lua_get<uint16>(L, -1));
-					lua_pop(L, 1);
-				}
+				interpreter::lua_table_iterate(L, 4, [&setcodes = pcard->data.setcodes, &L]() {
+					setcodes.insert(lua_get<uint16>(L, -1));
+				});
 			} else
 				pcard->data.setcodes.insert(lua_get<uint16>(L, 4));
 		}
@@ -60,11 +58,9 @@ int32 scriptlib::card_set_card_data(lua_State *L) {
 	case CARDDATA_SETCODE:
 		pcard->data.setcodes.clear();
 		if(lua_istable(L, 3)) {
-			lua_pushnil(L);
-			while(lua_next(L, 3) != 0) {
-				pcard->data.setcodes.insert(lua_get<uint16>(L, -1));
-				lua_pop(L, 1);
-			}
+			interpreter::lua_table_iterate(L, 3, [&setcodes = pcard->data.setcodes, &L]() {
+			setcodes.insert(lua_get<uint16>(L, -1));
+			});
 		} else
 			pcard->data.setcodes.insert(lua_get<uint16>(L, 3));
 		break;
