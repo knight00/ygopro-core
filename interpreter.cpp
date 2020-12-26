@@ -745,7 +745,9 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_pushinteger(lua_state, HINT_MUSIC);
 	lua_setglobal(lua_state, "HINT_MUSIC");	
 	lua_pushinteger(lua_state, HINT_ANIME);
-	lua_setglobal(lua_state, "HINT_ANIME");		
+	lua_setglobal(lua_state, "HINT_ANIME");	
+	lua_pushinteger(lua_state, HINT_BGM);
+	lua_setglobal(lua_state, "HINT_BGM");			
 //////////////kdiy///////////	
 }
 interpreter::~interpreter() {
