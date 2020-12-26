@@ -151,7 +151,7 @@ int32 scriptlib::card_get_code(lua_State* L) {
 	if (lua_gettop(L) > 1) {
 		card* scard = 0;
 		uint8 playerid = PLAYER_NONE;
-		if (lua_gettop(L) > 1 && !lua_isnil(L, 2))
+		if (lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 			scard = lua_get<card*, true>(L, 2);
 		auto sumtype = lua_get<uint64, 0>(L, 3);
 		if (lua_gettop(L) > 3)
@@ -214,7 +214,7 @@ int32 scriptlib::card_get_set_card(lua_State* L) {
 	if (lua_gettop(L) > 1) {
 		card* scard = 0;
 		uint8 playerid = PLAYER_NONE;
-		if (lua_gettop(L) > 1 && !lua_isnil(L, 2))
+		if (lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 			scard = lua_get<card*, true>(L, 2);
 		auto sumtype = lua_get<uint64, 0>(L, 3);
 		if (lua_gettop(L) > 3)
@@ -261,7 +261,7 @@ int32 scriptlib::card_get_type(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	card* scard = 0;
 	uint8 playerid = PLAYER_NONE;
-	if (lua_gettop(L) > 1 && !lua_isnil(L, 2))
+	if (lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 		scard = lua_get<card*, true>(L, 2);
 	auto sumtype = lua_get<uint64, 0>(L, 3);
 	if (lua_gettop(L) > 3)
@@ -501,7 +501,7 @@ int32 scriptlib::card_get_attribute(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	card* scard = 0;
 	uint8 playerid = PLAYER_NONE;
-	if (lua_gettop(L) > 1 && !lua_isnil(L, 2))
+	if (lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 		scard = lua_get<card*, true>(L, 2);
 	auto sumtype = lua_get<uint64, 0>(L, 3);
 	if (lua_gettop(L) > 3)
@@ -526,7 +526,7 @@ int32 scriptlib::card_get_race(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	card* scard = 0;
 	uint8 playerid = PLAYER_NONE;
-	if (lua_gettop(L) > 1 && !lua_isnil(L, 2))
+	if (lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 		scard = lua_get<card*, true>(L, 2);
 	auto sumtype = lua_get<uint64, 0>(L, 3);
 	if (lua_gettop(L) > 3)
@@ -841,7 +841,7 @@ int32 scriptlib::card_is_origin_code_rule(lua_State* L) {
 	}
 	uint32 count = lua_gettop(L) - 1;
 	for(uint32 i = 0; i < count; ++i) {
-		if(lua_isnil(L, i + 2))
+		if(lua_isnoneornil(L, i + 2))
 			continue;
 		auto tcode = lua_get<uint32>(L, i + 2);
 		if(code1 == tcode || (code2 && code2 == tcode)) {
@@ -862,7 +862,7 @@ int32 scriptlib::card_is_code(lua_State* L) {
 	////kdiy/////	
 	uint32 count = lua_gettop(L) - 1;
 	for(uint32 i = 0; i < count; ++i) {
-		if(lua_isnil(L, i + 2))
+		if(lua_isnoneornil(L, i + 2))
 			continue;
 		uint32 tcode = lua_get<uint32>(L, i + 2);
 		////kdiy/////	
@@ -921,7 +921,7 @@ int32 scriptlib::card_is_summon_code(lua_State* L) {
 	}
 	uint32 count = lua_gettop(L) - 4;
 	for(uint32 i = 0; i < count; ++i) {
-		if(lua_isnil(L, i + 5))
+		if(lua_isnoneornil(L, i + 5))
 			continue;
 		auto tcode = lua_get<uint32>(L, i + 5);
 		if(codes.find(tcode) != codes.end()) {
@@ -939,7 +939,7 @@ int32 scriptlib::card_is_set_card(lua_State* L) {
 	if (lua_gettop(L) > 2) {
 		card* scard = 0;
 		uint8 playerid = PLAYER_NONE;
-		if (lua_gettop(L) > 2 && !lua_isnil(L, 3))
+		if (lua_gettop(L) > 2 && !lua_isnoneornil(L, 3))
 			scard = lua_get<card*, true>(L, 3);
 		auto sumtype = lua_get<uint64, 0>(L, 4);
 		playerid = lua_get<uint8, PLAYER_NONE>(L, 5);
@@ -969,7 +969,7 @@ int32 scriptlib::card_is_type(lua_State* L) {
 	auto ttype = lua_get<uint32>(L, 2);
 	card* scard = 0;
 	uint8 playerid = PLAYER_NONE;
-	if (lua_gettop(L) > 2 && !lua_isnil(L, 3))
+	if (lua_gettop(L) > 2 && !lua_isnoneornil(L, 3))
 		scard = lua_get<card*, true>(L, 3);
 	auto sumtype = lua_get<uint64, 0>(L, 4);
 	if (lua_gettop(L) > 4)
@@ -985,7 +985,7 @@ inline int32 is_prop(lua_State* L, int32 val) {
 ////////kdiy///////////	
 	uint32 count = lua_gettop(L) - 1;
 	for(uint32 i = 0; i < count; ++i) {
-		if(lua_isnil(L, i + 2))
+		if(lua_isnoneornil(L, i + 2))
 			continue;
 		////////kdiy///////////	
 		//if(val == lua_get<uint32>(L, i + 2)) {
@@ -1042,7 +1042,7 @@ int32 scriptlib::card_is_race(lua_State* L) {
 	auto trace = lua_get<uint32>(L, 2);
 	card* scard = 0;
 	auto playerid = PLAYER_NONE;
-	if(lua_gettop(L) > 2 && !lua_isnil(L, 3))
+	if(lua_gettop(L) > 2 && !lua_isnoneornil(L, 3))
 		scard = lua_get<card*, true>(L, 3);
 	auto sumtype = lua_get<uint64, 0>(L, 4);
 	if(lua_gettop(L) > 4)
@@ -1059,7 +1059,7 @@ int32 scriptlib::card_is_attribute(lua_State* L) {
 	auto tattrib = lua_get<uint32>(L, 2);
 	card* scard = 0;
 	uint8 playerid = PLAYER_NONE;
-	if(lua_gettop(L) > 2 && !lua_isnil(L, 3))
+	if(lua_gettop(L) > 2 && !lua_isnoneornil(L, 3))
 		scard = lua_get<card*, true>(L, 3);
 	auto sumtype = lua_get<uint64, 0>(L, 4);
 	if(lua_gettop(L) > 4)
@@ -1082,7 +1082,7 @@ int32 scriptlib::card_is_summon_type(lua_State* L) {
 	uint32 count = lua_gettop(L) - 1;
 	uint32 result = FALSE;
 	for(uint32 i = 0; i < count; ++i) {
-		if(lua_isnil(L, i + 2))
+		if(lua_isnoneornil(L, i + 2))
 			continue;
 		auto ttype = lua_get<uint32>(L, i + 2);
 		if(((pcard->summon_info & 0xff00ffff) & ttype) == ttype) {
@@ -1154,7 +1154,7 @@ int32 scriptlib::card_get_turn_counter(lua_State* L) {
 int32 scriptlib::card_set_material(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	if(!lua_isnil(L, 2)) {
+	if(!lua_isnoneornil(L, 2)) {
 		auto pgroup = lua_get<group*, true>(L, 2);
 		pcard->set_material(&pgroup->container);
 	} else
@@ -1750,7 +1750,7 @@ int32 scriptlib::card_is_msetable(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	bool ign = lua_get<bool>(L, 2);
 	effect* peffect = 0;
-	if(!lua_isnil(L, 3))
+	if(!lua_isnoneornil(L, 3))
 		peffect = lua_get<effect*, true>(L, 3);
 	auto minc = lua_get<uint16, 0>(L, 4);
 	auto zone = lua_get<uint32, 0xff>(L, 5);
@@ -1825,7 +1825,7 @@ int32 scriptlib::card_is_can_be_summoned(lua_State* L) {
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto ign = lua_get<bool>(L, 2);
 	effect* peffect = 0;
-	if(!lua_isnil(L, 3))
+	if(!lua_isnoneornil(L, 3))
 		peffect = lua_get<effect*, true>(L, 3);
 	auto minc = lua_get<uint16, 0>(L, 4);
 	auto zone = lua_get<uint16, 0x1f>(L, 5);
@@ -1850,7 +1850,8 @@ int32 scriptlib::card_is_able_to_hand(lua_State* L) {
 	check_param_count(L, 1);
 	const auto pduel = lua_get<duel*>(L);
 	auto pcard = lua_get<card*, true>(L, 1);
-	lua_pushboolean(L, pcard->is_capable_send_to_hand(pduel->game_field->core.reason_player));
+	auto p = lua_get<uint8_t>(L, 2, pduel->game_field->core.reason_player);
+	lua_pushboolean(L, pcard->is_capable_send_to_hand(p));
 	return 1;
 }
 int32 scriptlib::card_is_able_to_grave(lua_State* L) {
@@ -2368,7 +2369,7 @@ int32 scriptlib::card_is_can_be_fusion_material(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);
 	auto pcard = lua_get<card*, true>(L, 1);
 	card* fcard = 0;
-	if(lua_gettop(L) >= 2 && !lua_isnil(L, 2))
+	if(lua_gettop(L) >= 2 && !lua_isnoneornil(L, 2))
 		fcard = lua_get<card*, true>(L, 2);
 	auto summon_type = lua_get<uint64, SUMMON_TYPE_FUSION>(L, 3);
 	auto playerid = lua_get<uint8>(L, 3, pduel->game_field->core.reason_player);
@@ -2382,7 +2383,7 @@ int32 scriptlib::card_is_can_be_synchro_material(lua_State* L) {
 	card* tuner = 0;
 	if(lua_gettop(L) >= 2)
 		scard = lua_get<card*, true>(L, 2);
-	if(lua_gettop(L) >= 3 && !lua_isnil(L, 3))
+	if(lua_gettop(L) >= 3 && !lua_isnoneornil(L, 3))
 		tuner = lua_get<card*, true>(L, 3);
 	auto playerid = lua_get<uint8, PLAYER_NONE>(L, 4);
 	lua_pushboolean(L, pcard->is_can_be_synchro_material(scard, playerid, tuner));
@@ -2393,7 +2394,7 @@ int32 scriptlib::card_is_can_be_ritual_material(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);
 	auto pcard = lua_get<card*, true>(L, 1);
 	card* scard = 0;
-	if(lua_gettop(L) >= 2 && !lua_isnil(L, 2))
+	if(lua_gettop(L) >= 2 && !lua_isnoneornil(L, 2))
 		scard = lua_get<card*, true>(L, 2);
 	auto playerid = lua_get<uint8>(L, 3, pduel->game_field->core.reason_player);
 	lua_pushboolean(L, pcard->is_can_be_ritual_material(scard, playerid));
@@ -2435,7 +2436,7 @@ int32 scriptlib::card_check_fusion_material(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);
 	auto pcard = lua_get<card*, true>(L, 1);
 	group* pgroup = 0;
-	if(lua_gettop(L) > 1 && !lua_isnil(L, 2))
+	if(lua_gettop(L) > 1 && !lua_isnoneornil(L, 2))
 		pgroup = lua_get<group*, true>(L, 2);
 	group* cg = 0;
 	if(auto _pcard = lua_get<card*>(L, 3))
@@ -2722,7 +2723,7 @@ int32 scriptlib::card_setcode(lua_State* L) {
 	if(lua_gettop(L) > 1) {
 		pcard->data.setcodes.clear();
 		if(lua_istable(L, 2)) {
-			interpreter::lua_table_iterate(L, 2, [&setcodes = pcard->data.setcodes, &L](){
+			lua_table_iterate(L, 2, [&setcodes = pcard->data.setcodes, &L] {
 				setcodes.insert(lua_get<uint16>(L, -1));
 			});
 		} else
@@ -2740,9 +2741,9 @@ int32 scriptlib::card_recreate(lua_State* L) {
 	auto code = lua_get<uint32>(L, 2);
 	if (pcard->recreate(code)) {
 		pcard->data.alias = lua_get<uint32>(L, 3, pcard->data.alias);
-		if(lua_gettop(L) > 3 && !lua_isnil(L, 4)) {
+		if(lua_gettop(L) > 3 && !lua_isnoneornil(L, 4)) {
 			if(lua_istable(L, 4)) {
-				interpreter::lua_table_iterate(L, 4, [&setcodes = pcard->data.setcodes, &L]() {
+				lua_table_iterate(L, 4, [&setcodes = pcard->data.setcodes, &L] {
 					setcodes.insert(lua_get<uint16>(L, -1));
 				});
 			} else

@@ -1185,7 +1185,7 @@ int32 scriptlib::duel_raise_event(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);
 	auto code = lua_get<uint32>(L, 2);
 	effect* peffect = 0;
-	if(!lua_isnil(L, 3))
+	if(!lua_isnoneornil(L, 3))
 		peffect = lua_get<effect*, true>(L, 3);
 	auto r = lua_get<uint32>(L, 4);
 	auto rp = lua_get<uint8>(L, 5);
@@ -1555,7 +1555,7 @@ int32 scriptlib::duel_discard_deck(lua_State* L) {
 int32 scriptlib::duel_discard_hand(lua_State* L) {
 	check_action_permission(L);
 	check_param_count(L, 5);
-	if(!lua_isnil(L, 2))
+	if(!lua_isnoneornil(L, 2))
 		check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -1836,6 +1836,8 @@ int32 scriptlib::duel_break_effect(lua_State* L) {
 	check_action_permission(L);
 	const auto pduel = lua_get<duel*>(L);
 	pduel->game_field->break_effect();
+	pduel->game_field->raise_event((card*)0, EVENT_BREAK_EFFECT, 0, 0, PLAYER_NONE, PLAYER_NONE, 0);
+	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_change_effect(lua_State* L) {
@@ -1973,7 +1975,7 @@ int32 scriptlib::duel_get_mzone_count(lua_State* L) {
 	///////kdiy//////
 	player_info::card_vector list_szone[2];
 	///////kdiy//////
-	if(!lua_isnil(L, 2)) {
+	if(!lua_isnoneornil(L, 2)) {
 		get_card_or_group(L, 2, mcard, mgroup);
 		for(int32 p = 0; p < 2; p++) {
 			uint32 digit = 1;
@@ -2044,7 +2046,7 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State* L) {
 	///////kdiy//////
 	player_info::card_vector list_szone[2];
 	///////kdiy//////
-	if(!lua_isnil(L, 3)) {
+	if(!lua_isnoneornil(L, 3)) {
 		get_card_or_group(L, 3, mcard, mgroup);
 		for(int32 p = 0; p < 2; p++) {
 			uint32 digit = 1;
@@ -2083,7 +2085,7 @@ int32 scriptlib::duel_get_location_count_fromex(lua_State* L) {
 	}
 	bool use_temp_card = false;
 	card* scard = 0;
-	if(!lua_isnil(L, 4)) {
+	if(!lua_isnoneornil(L, 4)) {
 		if((scard = lua_get<card*>(L, 4)) == nullptr) {
 			use_temp_card = true;
 			auto type = lua_get<uint32>(L, 4);
@@ -2535,7 +2537,7 @@ int32 scriptlib::duel_get_extratop_group(lua_State* L) {
 */
 int32 scriptlib::duel_get_matching_group(lua_State* L) {
 	check_param_count(L, 5);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2558,7 +2560,7 @@ int32 scriptlib::duel_get_matching_group(lua_State* L) {
 */
 int32 scriptlib::duel_get_matching_count(lua_State* L) {
 	check_param_count(L, 5);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2582,7 +2584,7 @@ int32 scriptlib::duel_get_matching_count(lua_State* L) {
 */
 int32 scriptlib::duel_get_first_matching_card(lua_State* L) {
 	check_param_count(L, 5);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2607,7 +2609,7 @@ int32 scriptlib::duel_get_first_matching_card(lua_State* L) {
 */
 int32 scriptlib::duel_is_existing_matching_card(lua_State* L) {
 	check_param_count(L, 6);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2630,7 +2632,7 @@ int32 scriptlib::duel_is_existing_matching_card(lua_State* L) {
 int32 scriptlib::duel_select_matching_cards(lua_State* L) {
 	check_action_permission(L);
 	check_param_count(L, 8);
-	if(!lua_isnil(L, 2))
+	if(!lua_isnoneornil(L, 2))
 		check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2669,6 +2671,7 @@ int32 scriptlib::duel_select_matching_cards(lua_State* L) {
 	});
 }
 int32 scriptlib::duel_select_cards_code(lua_State * L) {
+	using container = std::pair<uint32_t, uint32_t>;
 	check_action_permission(L);
 	check_param_count(L, 6);
 	const auto pduel = lua_get<duel*>(L);
@@ -2679,9 +2682,9 @@ int32 scriptlib::duel_select_cards_code(lua_State * L) {
 	auto min = lua_get<uint16>(L, 2);
 	auto max = lua_get<uint16>(L, 3);
 	bool cancelable = lua_get<bool>(L, 4);
-	//bool ret_index = lua_get<bool>(L, 5);
+	/*bool ret_index = */(void)lua_get<bool>(L, 5);
 	for(int32 i = 6, tot = lua_gettop(L); i <= tot; ++i) {
-		auto cardobj = new std::pair<uint32_t, uint32_t>(lua_get<uint32>(L, i), i - 5);
+		auto cardobj = new container(lua_get<uint32>(L, i), i - 5);
 		pduel->game_field->core.select_cards.push_back((card*)cardobj);
 	}
 	pduel->game_field->add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid + (cancelable << 16), min + (max << 16), TRUE);
@@ -2689,13 +2692,13 @@ int32 scriptlib::duel_select_cards_code(lua_State * L) {
 		duel* pduel = (duel*)ctx;
 		if(pduel->game_field->return_cards.canceled) {
 			for(auto& obj : pduel->game_field->core.select_cards)
-				delete obj;
+				delete ((container*)obj);
 			lua_pushnil(L);
 			return 1;
 		}  else {
 			bool ret_index = lua_get<bool>(L, 5);
 			for(auto& code : pduel->game_field->return_cards.list) {
-				auto obj = (std::pair<uint32_t, uint32_t>*)code;
+				auto obj = (container*)code;
 				if(ret_index) {
 					lua_newtable(L);
 					lua_pushinteger(L, 1);
@@ -2709,7 +2712,7 @@ int32 scriptlib::duel_select_cards_code(lua_State * L) {
 				}
 			}
 			for(auto& obj : pduel->game_field->core.select_cards)
-				delete ((std::pair<uint32_t, uint32_t>*)obj);
+				delete ((container*)obj);
 			return (int)pduel->game_field->return_cards.list.size();
 		}
 	});
@@ -2753,7 +2756,7 @@ int32 check_release_group(lua_State* L, uint8 use_hand) {
 	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	bool use_con = !lua_isnil(L, 2) && scriptlib::check_param(L, PARAM_TYPE_FUNCTION, 2);
+	bool use_con = !lua_isnoneornil(L, 2) && scriptlib::check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
 	uint32 lastarg = 4;
@@ -2802,7 +2805,7 @@ int32 select_release_group(lua_State* L, uint8 use_hand) {
 	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	bool use_con = !lua_isnil(L, 2) && scriptlib::check_param(L, PARAM_TYPE_FUNCTION, 2);
+	bool use_con = !lua_isnoneornil(L, 2) && scriptlib::check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
 	bool cancelable = false;
@@ -2879,7 +2882,7 @@ int32 scriptlib::duel_get_tribute_count(lua_State* L) {
 	check_param_count(L, 1);
 	auto target = lua_get<card*, true>(L, 1);
 	group* mg = 0;
-	if(!lua_isnil(L, 2))
+	if(!lua_isnoneornil(L, 2))
 		mg = lua_get<group*, true>(L, 2);
 	bool ex = lua_get<bool, false>(L, 3);
 	const auto pduel = lua_get<duel*>(L);
@@ -2893,7 +2896,7 @@ int32 scriptlib::duel_check_tribute(lua_State* L) {
 	auto min = lua_get<uint16>(L, 2);
 	auto max = lua_get<uint16>(L, 3, min);
 	group* mg = 0;
-	if(!lua_isnil(L, 4))
+	if(!lua_isnoneornil(L, 4))
 		mg = lua_get<group*, true>(L, 4);
 	auto toplayer = lua_get<uint8>(L, 5, target->current.controler);
 	auto zone = lua_get<uint32, 0x1f>(L, 6);
@@ -2910,7 +2913,7 @@ int32 scriptlib::duel_select_tribute(lua_State* L) {
 	auto min = lua_get<uint16>(L, 3);
 	auto max = lua_get<uint16>(L, 4);
 	group* mg = 0;
-	if(!lua_isnil(L, 5))
+	if(!lua_isnoneornil(L, 5))
 		mg = lua_get<group*, true>(L, 5);
 	auto toplayer = lua_get<uint8>(L, 6, playerid);
 	if(toplayer != 0 && toplayer != 1)
@@ -2944,7 +2947,7 @@ int32 scriptlib::duel_select_tribute(lua_State* L) {
 */
 int32 scriptlib::duel_get_target_count(lua_State* L) {
 	check_param_count(L, 5);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2969,7 +2972,7 @@ int32 scriptlib::duel_get_target_count(lua_State* L) {
 */
 int32 scriptlib::duel_is_existing_target(lua_State* L) {
 	check_param_count(L, 6);
-	if(!lua_isnil(L, 1))
+	if(!lua_isnoneornil(L, 1))
 		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -2992,7 +2995,7 @@ int32 scriptlib::duel_is_existing_target(lua_State* L) {
 int32 scriptlib::duel_select_target(lua_State* L) {
 	check_action_permission(L);
 	check_param_count(L, 8);
-	if(!lua_isnil(L, 2))
+	if(!lua_isnoneornil(L, 2))
 		check_param(L, PARAM_TYPE_FUNCTION, 2);
 	card* pexception = 0;
 	group* pexgroup = 0;
@@ -3693,7 +3696,7 @@ int32 scriptlib::duel_announce_card(lua_State* L) {
 	pduel->game_field->core.select_options.clear();
 	auto paramcount = lua_gettop(L);
 	if(lua_istable(L, 2)) {
-		interpreter::lua_table_iterate(L, 2, [&options = pduel->game_field->core.select_options, L]() {
+		lua_table_iterate(L, 2, [&options = pduel->game_field->core.select_options, L] {
 			options.push_back(lua_get<uint64>(L, -1));
 		});
 	} else if(paramcount <= 2) {
@@ -4074,25 +4077,25 @@ int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State* L) {
 	pduel->read_card(code, &dat);
 	dat.code = code;
 	dat.alias = 0;
-	if(!lua_isnil(L, 3)) {
+	if(!lua_isnoneornil(L, 3)) {
 		if(lua_istable(L, 3)) {
-			interpreter::lua_table_iterate(L, 3, [&setcodes = dat.setcodes, &L]() {
+			lua_table_iterate(L, 3, [&setcodes = dat.setcodes, &L] {
 				setcodes.insert(lua_get<uint16>(L, -1));
 			});
 		} else
 			dat.setcodes.insert(lua_get<uint16>(L, 3));
 	}
-	if(!lua_isnil(L, 4))
+	if(!lua_isnoneornil(L, 4))
 		dat.type = lua_get<uint32>(L, 4);
-	if(!lua_isnil(L, 5))
+	if(!lua_isnoneornil(L, 5))
 		dat.attack = lua_get<int32>(L, 5);
-	if(!lua_isnil(L, 6))
+	if(!lua_isnoneornil(L, 6))
 		dat.defense = lua_get<int32>(L, 6);
-	if(!lua_isnil(L, 7))
+	if(!lua_isnoneornil(L, 7))
 		dat.level = lua_get<uint32>(L, 7);
-	if(!lua_isnil(L, 8))
+	if(!lua_isnoneornil(L, 8))
 		dat.race = lua_get<uint32>(L, 8);
-	if(!lua_isnil(L, 9))
+	if(!lua_isnoneornil(L, 9))
 		dat.attribute = lua_get<uint32>(L, 9);
 	auto pos = lua_get<uint8, POS_FACEUP>(L, 10);
 	auto toplayer = lua_get<uint8>(L, 11, playerid);

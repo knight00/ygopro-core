@@ -1925,7 +1925,7 @@ int32 field::process_instant_event() {
 				}
 			}
 		}
-		if(ev.event_code == EVENT_ADJUST || ((ev.event_code & 0xf000) == EVENT_PHASE_START))
+		if(ev.event_code == EVENT_ADJUST || ev.event_code == EVENT_BREAK_EFFECT || ((ev.event_code & 0xf000) == EVENT_PHASE_START))
 			continue;
 		//triggers
 		pr = effects.trigger_f_effect.equal_range(ev.event_code);
@@ -2449,7 +2449,6 @@ int32 field::process_idle_command(uint16 step) {
 		} else
 			add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
 		target->set_status(STATUS_FORM_CHANGED, TRUE);
-		target->set_status(STATUS_CONTROL_CHANGED, FALSE);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
@@ -2512,7 +2511,6 @@ int32 field::process_idle_command(uint16 step) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
 		target->set_status(STATUS_FORM_CHANGED, TRUE);
-		target->set_status(STATUS_CONTROL_CHANGED, FALSE);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
@@ -4275,6 +4273,10 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		message->write<uint16>(infos.phase);
 		raise_event((card*)0, EVENT_PREDRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
+		message = pduel->new_message(MSG_HINT);
+		message->write<uint8_t>(HINT_EVENT);
+		message->write<uint8_t>(turn_player);
+		message->write<uint32_t>(27);
 		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		/*if(core.set_forced_attack)

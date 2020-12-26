@@ -919,7 +919,7 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 chose_player,
 				change = false;
 			if(!pcard->is_capable_change_control())
 				change = false;
-			if(!pcard->is_affect_by_effect(reason_effect))
+			if(reason_effect && !pcard->is_affect_by_effect(reason_effect))
 				change = false;
 			if(!is_flag(DUEL_TRAP_MONSTERS_NOT_USE_ZONE) && ((pcard->get_type() & TYPE_TRAPMONSTER) && get_useable_count(pcard, playerid, LOCATION_SZONE, playerid, LOCATION_REASON_CONTROL) <= 0))
 				change = false;
@@ -1016,7 +1016,6 @@ int32 field::get_control(uint16 step, effect* reason_effect, uint8 chose_player,
 				add_unique_card(pcard);
 			raise_single_event(pcard, 0, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, playerid, 0);
 			raise_single_event(pcard, 0, EVENT_MOVE, reason_effect, REASON_EFFECT, reason_player, playerid, 0);
-			pcard->set_status(STATUS_CONTROL_CHANGED, !pcard->get_status(STATUS_CONTROL_CHANGED));
 		}
 		if(targets->container.size()) {
 			raise_event(&targets->container, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, playerid, 0);
@@ -1073,7 +1072,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 				return FALSE;
 			if(!pcard->is_capable_change_control())
 				return FALSE;
-			if(!pcard->is_affect_by_effect(reason_effect))
+			if((reason_effect && !pcard->is_affect_by_effect(reason_effect)))
 				return FALSE;
 		}
 		for(auto& pcard : targets2->container) {
@@ -1088,7 +1087,7 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 				return FALSE;
 			if(!pcard->is_capable_change_control())
 				return FALSE;
-			if(!pcard->is_affect_by_effect(reason_effect))
+			if((reason_effect && !pcard->is_affect_by_effect(reason_effect)))
 				return FALSE;
 		}
 		int32 ct = get_useable_count(NULL, p1, LOCATION_MZONE, reason_player, LOCATION_REASON_CONTROL);
@@ -1243,7 +1242,6 @@ int32 field::swap_control(uint16 step, effect* reason_effect, uint8 reason_playe
 				add_unique_card(pcard);
 			raise_single_event(pcard, 0, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, pcard->current.controler, 0);
 			raise_single_event(pcard, 0, EVENT_MOVE, reason_effect, REASON_EFFECT, reason_player, pcard->current.controler, 0);
-			pcard->set_status(STATUS_CONTROL_CHANGED, !pcard->get_status(STATUS_CONTROL_CHANGED));
 		}
 		raise_event(&targets1->container, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, 0, 0);
 		raise_event(&targets1->container, EVENT_MOVE, reason_effect, REASON_EFFECT, reason_player, 0, 0);
@@ -2423,6 +2421,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card* target) {
 	case 1: {
 		target->previous.position = target->current.position;
 		target->current.position = POS_FACEUP_ATTACK;
+		target->summon_player = sumplayer;
 		target->fieldid = infos.field_id++;
 		core.phase_action = TRUE;
 		if(is_flag(DUEL_CANNOT_SUMMON_OATH_OLD)) {
@@ -4404,7 +4403,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 			if(!(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) &&
 			/////////kdiy////////
 				(pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)
-					|| (!(pcard->current.reason & REASON_COST) && !pcard->is_affect_by_effect(pcard->current.reason_effect))
+					|| (!(pcard->current.reason & (REASON_COST | REASON_SUMMON | REASON_MATERIAL)) && !pcard->is_affect_by_effect(pcard->current.reason_effect))
 					|| (dest == LOCATION_HAND && !pcard->is_capable_send_to_hand(core.reason_player))
 					|| (dest == LOCATION_DECK && !pcard->is_capable_send_to_deck(core.reason_player))
 					|| (dest == LOCATION_REMOVED && !pcard->is_removeable(core.reason_player, pcard->sendto_param.position, reason))
@@ -5465,7 +5464,7 @@ int32 field::change_position(uint16 step, group* targets, effect* reason_effect,
 			if((pcard->current.location != LOCATION_MZONE && pcard->current.location != LOCATION_SZONE)
 				|| ((pcard->data.type & TYPE_LINK) && (pcard->data.type & TYPE_MONSTER))
 				|| pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)
-				|| !pcard->is_affect_by_effect(reason_effect) || npos == opos
+				|| (reason_effect && !pcard->is_affect_by_effect(reason_effect)) || npos == opos
 				|| (!(pcard->data.type & TYPE_TOKEN) && (opos & POS_FACEUP) && (npos & POS_FACEDOWN) && !pcard->is_capable_turn_set(reason_player))
 				|| (reason_effect && pcard->is_affected_by_effect(EFFECT_CANNOT_CHANGE_POS_E))) {
 				targets->container.erase(pcard);
