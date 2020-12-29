@@ -443,7 +443,7 @@ int32 scriptlib::duel_remove(lua_State* L) {
 	group* pgroup = nullptr;
 	get_card_or_group(L, 1, pcard, pgroup);
 	const auto pduel = lua_get<duel*>(L);
-	auto pos = lua_get<uint8>(L, 2);
+	auto pos = lua_get<uint8, 0>(L, 2);
 	auto reason = lua_get<uint32>(L, 3);
 	auto playerid = lua_get<uint8, PLAYER_NONE>(L, 4);
 	if (pcard)
@@ -840,8 +840,8 @@ int32 scriptlib::duel_remove_counter(lua_State* L) {
 	auto rplayer = lua_get<uint8>(L, 1);
 	if(rplayer != 0 && rplayer != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	auto countertype = lua_get<uint16>(L, 4);
 	auto count = lua_get<uint32>(L, 5);
 	auto reason = lua_get<uint32>(L, 6);
@@ -858,8 +858,8 @@ int32 scriptlib::duel_is_can_remove_counter(lua_State* L) {
 	auto rplayer = lua_get<uint8>(L, 1);
 	if(rplayer != 0 && rplayer != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	auto countertype = lua_get<uint16>(L, 4);
 	auto count = lua_get<uint32>(L, 5);
 	auto reason = lua_get<uint32>(L, 6);
@@ -872,8 +872,8 @@ int32 scriptlib::duel_get_counter(lua_State* L) {
 	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	auto countertype = lua_get<uint16>(L, 4);
 	const auto pduel = lua_get<duel*>(L);
 	lua_pushinteger(L, pduel->game_field->get_field_counter(playerid, self, oppo, countertype));
@@ -3313,8 +3313,8 @@ int32 scriptlib::duel_get_overlay_group(lua_State* L) {
 	auto rplayer = lua_get<uint8>(L, 1);
 	if(rplayer != 0 && rplayer != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	group* targetsgroup = lua_get<group*>(L, 4);
 	const auto pduel = lua_get<duel*>(L);
 	group* pgroup = pduel->new_group();
@@ -3327,8 +3327,8 @@ int32 scriptlib::duel_get_overlay_count(lua_State* L) {
 	auto rplayer = lua_get<uint8>(L, 1);
 	if(rplayer != 0 && rplayer != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	group* pgroup = lua_get<group*>(L, 4);
 	const auto pduel = lua_get<duel*>(L);
 	lua_pushinteger(L, pduel->game_field->get_overlay_count(rplayer, self, oppo, pgroup));
@@ -3339,8 +3339,8 @@ int32 scriptlib::duel_check_remove_overlay_card(lua_State* L) {
 	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	auto count = lua_get<uint16>(L, 4);
 	auto reason = lua_get<uint32>(L, 5);
 	group* pgroup = lua_get<group*>(L, 6);
@@ -3354,8 +3354,8 @@ int32 scriptlib::duel_remove_overlay_card(lua_State* L) {
 	auto playerid = lua_get<uint8>(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	auto self = lua_get<bool>(L, 2);
-	auto oppo = lua_get<bool>(L, 3);
+	auto self = lua_get<uint8>(L, 2);
+	auto oppo = lua_get<uint8>(L, 3);
 	auto min = lua_get<uint16>(L, 4);
 	auto max = lua_get<uint16>(L, 5);
 	auto reason = lua_get<uint32>(L, 6);

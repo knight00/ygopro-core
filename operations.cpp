@@ -3930,7 +3930,7 @@ int32 field::destroy(uint16 step, group* targets, effect* reason_effect, uint32 
 			if(!((pcard->current.reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) || pcard->current.reason & REASON_COST)) {	
 			////////kdiy//////////	
 				bool is_destructable = true;
-				if(pcard->is_affect_by_effect(pcard->current.reason_effect)) {
+				if(!pcard->current.reason_effect || pcard->is_affect_by_effect(pcard->current.reason_effect)) {
 					effect* indestructable_effect = pcard->check_indestructable_by_effect(pcard->current.reason_effect, pcard->current.reason_player);
 					if(indestructable_effect) {
 						if(reason_player != 5)
