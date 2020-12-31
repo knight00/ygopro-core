@@ -398,9 +398,10 @@ int32 card::is_set_card(uint32 set_code) {
 	std::set<uint16> setcodes = data.setcodes;
 	/////kdiy///////
 	// if (code != data.code) {
-	// 	setcodes = pduel->read_card(code)->setcodes;
-	// }
-	/////kdiy///////	
+	if (code != data.code && setcodes.empty()) {	
+	/////kdiy///////		
+		setcodes = pduel->read_card(code)->setcodes;
+	}
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
 	for(auto& setcode : setcodes) {
@@ -527,11 +528,12 @@ uint32 card::get_set_card() {
 	uint32 count = 0;
 	uint32 code = get_code();
 	std::set<uint16> setcodes = data.setcodes;
-	//////kdiy///////
-	// if(code != data.code) {
-	// 	setcodes = pduel->read_card(code)->setcodes;
-	// }
-	//////kdiy///////	
+	/////kdiy///////
+	// if (code != data.code) {
+	if (code != data.code && setcodes.empty()) {	
+	/////kdiy///////	
+		setcodes = pduel->read_card(code)->setcodes;
+	}
 	for(auto& setcode : setcodes) {
 		count++;
 		lua_pushinteger(pduel->lua->current_state, setcode);
@@ -562,11 +564,12 @@ uint32 card::get_pre_set_card() {
 	uint32 count = 0;
 	uint32 code = previous.code;
 	std::set<uint16> setcodes = data.setcodes;
-	////////kdiy//////
-	// if(code != data.code) {
-	// 	setcodes = pduel->read_card(code)->setcodes;
-	// }
-	////////kdiy//////	
+	/////kdiy///////
+	// if (code != data.code) {
+	if (code != data.code && setcodes.empty()) {	
+	/////kdiy///////
+		setcodes = pduel->read_card(code)->setcodes;
+	}
 	for(auto& setcode : setcodes) {
 		count++;
 		lua_pushinteger(pduel->lua->current_state, setcode);
