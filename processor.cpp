@@ -4655,7 +4655,7 @@ int32 field::add_chain(uint16 step) {
 					///////kdiy///////
 					if(loc == LOCATION_MZONE) {	
 						///////kdiy///////
-						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
+						//move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP_ATTACK);
 						move_to_field(phandler, phandler->current.controler, phandler->current.controler, loc, POS_FACEUP);
 						///////kdiy///////						
 					} else {
