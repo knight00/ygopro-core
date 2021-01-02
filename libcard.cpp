@@ -2134,7 +2134,10 @@ int32 scriptlib::card_is_link_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto lnk = lua_get<uint32>(L, 2);
-	uint32 plnk = pcard->get_link();
+	//kdiy////////
+	//uint32 plnk = pcard->get_link();
+	int32 plnk = pcard->get_link();
+	//kdiy////////
 	lua_pushboolean(L, plnk > 0 && plnk <= lnk);
 	return 1;
 }
@@ -2142,7 +2145,10 @@ int32 scriptlib::card_is_link_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
 	auto lnk = lua_get<uint32>(L, 2);
-	uint32 plnk = pcard->get_link();
+	//kdiy////////
+	//uint32 plnk = pcard->get_link();
+	int32 plnk = pcard->get_link();
+	//kdiy////////
 	lua_pushboolean(L, plnk > 0 && plnk >= lnk);
 	return 1;
 }

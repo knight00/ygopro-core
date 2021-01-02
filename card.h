@@ -37,13 +37,14 @@ struct card_state {
 	uint32 code2;
 	std::set<uint16> setcodes;
 	uint32 type;
-/////////kdiy/////////	
+	/////////kdiy/////////	
 	//uint32 level;
     int32 level;
 	int32 rank;
 	//uint32 rank;
-/////////kdiy/////////		
-	uint32 link;
+	//uint32 link;
+	int32 link;
+	/////////kdiy/////////		
 	uint32 link_marker;
 	uint32 lscale;
 	uint32 rscale;
@@ -203,8 +204,9 @@ public:
 	int32 get_level();
     int32 get_rank();
 	//uint32 get_rank();
+    //uint32 get_link();
+    int32 get_link();
 	///////kdiy//////////		
-	uint32 get_link();
 	///////kdiy//////////		
 	//uint32 get_synchro_level(card* pcard);
 	//uint32 get_ritual_level(card* pcard);
