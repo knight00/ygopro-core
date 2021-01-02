@@ -1297,7 +1297,7 @@ int32 card::get_defense() {
 		}
 //////////kdiy/////////////		
 	}
-	for(const auto& peffect : effects_def_r)
+	for(const auto& peffect : effects_def)
 		temp.defense = peffect->get_value(this);
 	if(temp.attack == -1) {
 		if(swap_final) {
