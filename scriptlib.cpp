@@ -19,6 +19,8 @@ int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 
 			if(retobj)
 				*(lua_obj**)retobj = obj;
 			return TRUE;
+		} else if(obj && obj->lua_type == PARAM_TYPE_DELETED) {
+			luaL_error(L, "Attempting to access deleted object.");
 		}
 		type = param_type == PARAM_TYPE_CARD ? "Card" : param_type == PARAM_TYPE_GROUP ? "Group" : "Effect";
 		break;
@@ -47,12 +49,10 @@ int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 
 		return FALSE;
 	if(param_type == PARAM_TYPE_INT) {
 		interpreter::print_stacktrace(L);
-		char buffer[70];
-		sprintf(buffer, "Parameter %d should be \"%s\".", index, type);
 		const auto pduel = lua_get<duel*>(L);
-		pduel->handle_message(pduel->handle_message_payload, buffer, OCG_LOG_TYPE_ERROR);
+		pduel->handle_message(pduel->lua->format(R"(Parameter %d should be "%s".)", index, type), OCG_LOG_TYPE_ERROR);
 	} else {
-		luaL_error(L, "Parameter %d should be \"%s\".", index, type);
+		luaL_error(L, R"(Parameter %d should be "%s".)", index, type);
 	}
 	return FALSE;
 }
