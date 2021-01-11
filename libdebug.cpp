@@ -10,7 +10,9 @@
 #include "duel.h"
 #include "field.h"
 #include "card.h"
-
+/////kdiy//////////
+#include "effect.h"
+/////kdiy//////////
 int32 scriptlib::debug_message(lua_State* L) {
 	const auto pduel = lua_get<duel*>(L);
 	lua_getglobal(L, "tostring");
