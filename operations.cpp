@@ -3927,7 +3927,7 @@ int32 field::destroy(uint16 step, group* targets, effect* reason_effect, uint32 
 			}
 			////////kdiy//////////
 			//if(!(pcard->current.reason & (REASON_RULE | REASON_COST))) {
-			if(!((pcard->current.reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) || pcard->current.reason & REASON_COST)) {	
+			if(!(((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))) || (pcard->current.reason & REASON_COST))) {
 			////////kdiy//////////	
 				bool is_destructable = true;
 				if(!pcard->current.reason_effect || pcard->is_affect_by_effect(pcard->current.reason_effect)) {
@@ -4258,7 +4258,7 @@ int32 field::release_replace(uint16 /*step*/, group* targets, card* target) {
 		return TRUE;
 	////////kdiy//////////	
 	//if(!(target->current.reason & REASON_RULE)) {
-	if(!(target->current.reason & REASON_RULE && !target->is_affected_by_effect(EFFECT_GOD_IMMUNE))) {
+	if(!((target->current.reason & REASON_RULE) && !(target->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !target->is_affect_by_effect(target->current.reason_effect)))) {
 	////////kdiy//////////
 		returns.at<int32>(0) = FALSE;
 		effect_set eset;
@@ -4278,7 +4278,7 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 				|| ((reason & REASON_SUMMON) && !pcard->is_releasable_by_summon(reason_player, pcard->current.reason_card))
 				////////kdiy//////////
 				//|| (!(pcard->current.reason & (REASON_RULE | REASON_SUMMON | REASON_COST))
-				|| (!(pcard->current.reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) || pcard->current.reason & (REASON_SUMMON | REASON_COST))	
+				|| (!((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) || (pcard->current.reason & (REASON_SUMMON | REASON_COST)))	
 	            ////////kdiy//////////
 					&& (!pcard->is_affect_by_effect(pcard->current.reason_effect) || !pcard->is_releasable_by_nonsummon(reason_player)))) {
 				pcard->current.reason = pcard->temp.reason;
@@ -4295,7 +4295,7 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 		for(auto cit = targets->container.begin(); cit != targets->container.end();) {
 		auto rm = cit++;
 		card* pcard = *rm;
-		if(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))
+		if((reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !pcard->is_affect_by_effect(pcard->current.reason_effect)))
 		  rule_chk+=1;
 		}
 		if(rule_chk==tcount)
@@ -4373,7 +4373,7 @@ int32 field::send_replace(uint16 /*step*/, group* targets, card* target) {
 	}
 	////////kdiy/////////
 	//if(!(target->current.reason & REASON_RULE)) {
-	if(!(target->current.reason & REASON_RULE) && !target->is_affected_by_effect(EFFECT_GOD_IMMUNE)) {
+	if(!(target->current.reason & REASON_RULE) && !(target->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !target->is_affect_by_effect(target->current.reason_effect))) {
 	////////kdiy/////////
 		returns.at<int32>(0) = FALSE;
 		effect_set eset;
@@ -4400,7 +4400,7 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 			uint8 dest = pcard->sendto_param.location;
 			/////////kdiy////////
 			//if(!(reason & REASON_RULE) &&
-			if(!(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) &&
+			if(!((reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !pcard->is_affect_by_effect(pcard->current.reason_effect))) &&
 			/////////kdiy////////
 				(pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP)
 					|| (!(pcard->current.reason & (REASON_COST | REASON_SUMMON | REASON_MATERIAL)) && !pcard->is_affect_by_effect(pcard->current.reason_effect))
@@ -4423,8 +4423,8 @@ int32 field::send_to(uint16 step, group* targets, effect* reason_effect, uint32 
 		for(auto cit = targets->container.begin(); cit != targets->container.end();) {
 		auto rm = cit++;
 		card* pcard = *rm;
-		if(reason & REASON_RULE && !pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))
-		  rule_chk+=1;
+		if((reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !pcard->is_affect_by_effect(pcard->current.reason_effect)))
+		    rule_chk+=1;
 		}
 		if(rule_chk==tcount)
 		/////////kdiy////////

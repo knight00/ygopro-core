@@ -953,7 +953,10 @@ static int32 is_declarable(const card_data* cd, const std::vector<uint64>& opcod
 	if(stack.size() != 1 || stack.top() == 0)
 		return FALSE;
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
-		|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN))));
+	    /////////kdiy///////////
+		//|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN))));
+		|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_TOKEN)) != (TYPE_TOKEN))));
+	    /////////kdiy///////////	
 }
 #undef BINARY_OP
 #undef UNARY_OP
