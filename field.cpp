@@ -2289,12 +2289,24 @@ void field::get_ritual_material(uint8 playerid, effect* peffect, card_set* mater
 		if((pcard->data.type & TYPE_MONSTER) && pcard->is_affected_by_effect(EFFECT_EXTRA_RITUAL_MATERIAL) && pcard->is_removeable(playerid, POS_FACEUP, REASON_EFFECT))
 			material->insert(pcard);
 	for(auto& pcard : player[playerid].list_mzone) {
-		if(!pcard)
+		/////kdiy//////
+		//if(!pcard)
+		if(!pcard || pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+		/////kdiy//////
 			continue;
 		for(auto& ppcard : pcard->xyz_materials)
 			if(ppcard->is_affected_by_effect(EFFECT_EXTRA_RITUAL_MATERIAL))
 				material->insert(ppcard);
 	}
+	/////kdiy//////
+	for(auto& pcard : player[playerid].list_szone) {
+		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+			continue;
+		for(auto& ppcard : pcard->xyz_materials)
+			if(ppcard->is_affected_by_effect(EFFECT_EXTRA_RITUAL_MATERIAL))
+				material->insert(ppcard);
+	}
+	/////kdiy//////
 }
 void field::get_fusion_material(uint8 playerid, card_set* material) {
 	for(auto& pcard : player[playerid].list_mzone) {
