@@ -4644,13 +4644,14 @@ int32 field::add_chain(uint16 step) {
 					loc = peffect->value;
 				if(loc > 0) {
 					phandler->enable_field_effect(false);
-					///////kdiy///////						
+					///////kdiy///////	
+					effect* seffect = is_player_affected_by_effect(phandler->current.controler,EFFECT_SANCT);
 					if(is_player_affected_by_effect(phandler->current.controler, EFFECT_SANCT) && !phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)) {
 						effect* deffect = pduel->new_effect();
-						deffect->owner = pduel->game_field->player[phandler->current.controler].list_szone[5];
+						deffect->owner = seffect->owner;
 						deffect->code = EFFECT_SANCT_MZONE;
 						deffect->type = EFFECT_TYPE_SINGLE;
-						deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE | EFFECT_FLAG_OWNER_RELATE;
+						deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE;
 						deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
 						phandler->add_effect(deffect);
 					}	
