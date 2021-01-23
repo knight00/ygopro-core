@@ -1582,29 +1582,27 @@ void field::filter_affected_cards(effect* peffect, card_set* cset) {
 		// if(range & LOCATION_MZONE)
 		// 	cvec.push_back(&player[self].list_mzone);
 		// if(range & LOCATION_SZONE)
-		// 	cvec.push_back(&player[self].list_szone);	
-		card_vector list_sp;			
+		// 	cvec.push_back(&player[self].list_szone);			
 		if(range & LOCATION_MZONE) {
 			for(auto& pcard : player[self].list_mzone) {
-				if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_target(pcard) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+				    cset->insert(pcard);
 			}			
 			for(auto& pcard : player[self].list_szone) {
-				if(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_target(pcard) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+				    cset->insert(pcard);
 			}
 		}
 		if(range & LOCATION_SZONE) {
 			for(auto& pcard : player[self].list_mzone) {
-				if(pcard && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_target(pcard) && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+				    cset->insert(pcard);
 			}			
 			for(auto& pcard : player[self].list_szone) {
-				if(pcard && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_target(pcard) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+				    cset->insert(pcard);
 			}
 		}	
-		cvec.push_back(&list_sp);
 		//////kdiy/////////
 		if(range & LOCATION_GRAVE)
 			cvec.push_back(&player[self].list_grave);
@@ -1640,28 +1638,26 @@ void field::filter_inrange_cards(effect* peffect, card_set* cset) {
 		// 	cvec.push_back(&player[self].list_mzone);
 		// if(range & LOCATION_SZONE)
 		// 	cvec.push_back(&player[self].list_szone);	
-		card_vector list_sp;			
 		if(range & LOCATION_MZONE) {
 			for(auto& pcard : player[self].list_mzone) {
-				if(pcard && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_fit_target_function(pcard) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+				    cset->insert(pcard);
 			}			
 			for(auto& pcard : player[self].list_szone) {
-				if(pcard && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_fit_target_function(pcard) && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+				    cset->insert(pcard);
 			}
 		}
 		if(range & LOCATION_SZONE) {
 			for(auto& pcard : player[self].list_mzone) {
-				if(pcard && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_fit_target_function(pcard) && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
+				    cset->insert(pcard);
 			}			
 			for(auto& pcard : player[self].list_szone) {
-				if(pcard && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
-				    list_sp.push_back(pcard);
+				if(pcard && peffect->is_fit_target_function(pcard) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
+				    cset->insert(pcard);
 			}
 		}	
-		cvec.push_back(&list_sp);
 		//////kdiy/////////			
 		if(range & LOCATION_GRAVE)
 			cvec.push_back(&player[self].list_grave);
@@ -2147,10 +2143,8 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	}
 	////////kdiy//////
 	for(auto& pcard : player[p].list_szone) {
-		////////kdiy//////
 		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
-		  continue;
-		////////kdiy//////		
+		  continue;	
 		if(pcard && ((releasable >> pcard->current.sequence) & 1) && pcard->is_releasable_by_summon(p, target)) {
 			if(mg && !mg->has_card(pcard))
 				continue;
@@ -2166,10 +2160,8 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 		}
 	}
 	for(auto& pcard : player[1 - p].list_szone) {
-		////////kdiy//////
 		if(!pcard || !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 		  continue;
-		////////kdiy//////		
 		if(!pcard || !((releasable >> (pcard->current.sequence + 16)) & 1) || !pcard->is_releasable_by_summon(p, target))
 			continue;
 		if (mg && !mg->has_card(pcard))
