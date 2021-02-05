@@ -3995,7 +3995,7 @@ int32 field::destroy(uint16 step, group* targets, effect* reason_effect, uint32 
 			}
 			////////kdiy//////////
 			//if(!(pcard->current.reason & (REASON_RULE | REASON_COST))) {
-			if(!(((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE))) || (pcard->current.reason & REASON_COST))) {
+			if(!(((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !pcard->is_affect_by_effect(pcard->current.reason_effect))) || (pcard->current.reason & REASON_COST))) {
 			////////kdiy//////////	
 				bool is_destructable = true;
 				if(!pcard->current.reason_effect || pcard->is_affect_by_effect(pcard->current.reason_effect)) {
@@ -4346,7 +4346,7 @@ int32 field::release(uint16 step, group* targets, effect* reason_effect, uint32 
 				|| ((reason & REASON_SUMMON) && !pcard->is_releasable_by_summon(reason_player, pcard->current.reason_card))
 				////////kdiy//////////
 				//|| (!(pcard->current.reason & (REASON_RULE | REASON_SUMMON | REASON_COST))
-				|| (!((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE)) || (pcard->current.reason & (REASON_SUMMON | REASON_COST)))	
+				|| (!((pcard->current.reason & REASON_RULE) && !(pcard->is_affected_by_effect(EFFECT_GOD_IMMUNE) && !pcard->is_affect_by_effect(pcard->current.reason_effect)) || (pcard->current.reason & (REASON_SUMMON | REASON_COST)))	
 	            ////////kdiy//////////
 					&& (!pcard->is_affect_by_effect(pcard->current.reason_effect) || !pcard->is_releasable_by_nonsummon(reason_player)))) {
 				pcard->current.reason = pcard->temp.reason;
