@@ -36,7 +36,17 @@ struct objref {
 	}
 };
 
-constexpr luaL_Reg cardlib[] = {
+static int is_deleted_object(lua_State* L) {
+	if(auto obj = lua_touserdata(L, 1)) {
+		auto* ret = *reinterpret_cast<lua_obj**>(obj);
+		lua_pushboolean(L, ret->lua_type == PARAM_TYPE_DELETED);
+	} else {
+		lua_pushboolean(L, false);
+	}
+	return 1;
+}
+
+static constexpr luaL_Reg cardlib[] = {
 ///////kdiy///////
 	{ "SetEntityCode", scriptlib::card_set_entity_code },
 	{ "SetCardData", scriptlib::card_set_card_data },
@@ -306,10 +316,11 @@ constexpr luaL_Reg cardlib[] = {
 	{ "Cover", scriptlib::card_cover },
 	{ "GetLuaRef", objref<card>::get_lua_ref },
 	{ "FromLuaRef", objref<card>::from_lua_ref },
+	{ "IsDeleted", is_deleted_object },
 	{ NULL, NULL }
 };
 
-constexpr luaL_Reg effectlib[] = {
+static constexpr luaL_Reg effectlib[] = {
 /////////////kdiy/////////////////
 	{ "SetOwner", scriptlib::effect_set_owner },
 	{ "GetRange", scriptlib::effect_get_range },
@@ -370,10 +381,11 @@ constexpr luaL_Reg effectlib[] = {
 	{ "UseCountLimit", scriptlib::effect_use_count_limit },
 	{ "GetLuaRef", objref<effect>::get_lua_ref },
 	{ "FromLuaRef", objref<effect>::from_lua_ref },
+	{ "IsDeleted", is_deleted_object },
 	{ NULL, NULL }
 };
 
-constexpr luaL_Reg grouplib[] = {
+static constexpr luaL_Reg grouplib[] = {
 	{ "__band", scriptlib::group_band },
 	{ "__add", scriptlib::group_add },
 	{ "__sub", scriptlib::group_sub_const },
@@ -420,10 +432,11 @@ constexpr luaL_Reg grouplib[] = {
 	{ "Includes", scriptlib::group_includes },
 	{ "GetLuaRef", objref<group>::get_lua_ref },
 	{ "FromLuaRef", objref<group>::from_lua_ref },
+	{ "IsDeleted", is_deleted_object },
 	{ NULL, NULL }
 };
 
-constexpr luaL_Reg duellib[] = {
+static constexpr luaL_Reg duellib[] = {
     /////////////////////KDIY///
 	{ "SelectField", scriptlib::duel_select_field },
 	{ "GetMasterRule", scriptlib::duel_get_master_rule },
@@ -664,7 +677,7 @@ constexpr luaL_Reg duellib[] = {
 	{ NULL, NULL }
 };
 
-constexpr luaL_Reg debuglib[] = {
+static constexpr luaL_Reg debuglib[] = {
 	{ "Message", scriptlib::debug_message },
 	{ "AddCard", scriptlib::debug_add_card },
 	{ "SetPlayerInfo", scriptlib::debug_set_player_info },
