@@ -5704,7 +5704,7 @@ int32 field::change_position(uint16 step, group* targets, effect* reason_effect,
 					deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE;
 					deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
 					pcard->add_effect(deffect);
-					}					
+				}					
 				// move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN, FALSE, 2);
 				move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN, FALSE, 2,0xff,FALSE,0,TRUE,2);
 				///////kdiy///////					

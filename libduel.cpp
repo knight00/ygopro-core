@@ -990,6 +990,33 @@ int32 scriptlib::duel_return_to_field(lua_State* L) {
 	pcard->enable_field_effect(false);
 	pduel->game_field->adjust_instant();
 	pduel->game_field->refresh_location_info_instant();
+	///////kdiy///////	
+	effect* oeffect = pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_ORICA);
+	effect* seffect = pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_SANCT);		
+	if(pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_ORICA) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (pcard->data.type & TYPE_MONSTER)) {
+		effect* deffect = pduel->new_effect();
+		deffect->owner = oeffect->owner;
+		deffect->code = EFFECT_ORICA_SZONE;
+		deffect->type = EFFECT_TYPE_SINGLE;
+		deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE;
+		deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
+		pcard->add_effect(deffect);
+	}	
+	else if(pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_SANCT) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && !(pcard->data.type & TYPE_MONSTER)) {
+		effect* deffect = pduel->new_effect();
+		deffect->owner = seffect->owner;
+		deffect->code = EFFECT_SANCT_MZONE;
+		deffect->type = EFFECT_TYPE_SINGLE;
+		deffect->flag[0] = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_IGNORE_IMMUNE | EFFECT_FLAG_UNCOPYABLE;
+		deffect->reset_flag = RESET_EVENT+0x1fe0000+RESET_CONTROL-RESET_TURN_SET;
+		pcard->add_effect(deffect);
+	}		
+	if(pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_ORICA) && (pcard->data.type & TYPE_MONSTER)) {
+	pduel->game_field->move_to_field(pcard, pcard->previous.controler, pcard->previous.controler, LOCATION_MZONE, pos, TRUE, 1, zone, FALSE, LOCATION_REASON_TOFIELD | LOCATION_REASON_RETURN,TRUE,1);
+	} else if(pduel->game_field->is_player_affected_by_effect(pcard->previous.controler,EFFECT_SANCT) && !(pcard->data.type & TYPE_MONSTER)) {
+	pduel->game_field->move_to_field(pcard, pcard->previous.controler, pcard->previous.controler, LOCATION_SZONE, pos, TRUE, 1, zone, FALSE, LOCATION_REASON_TOFIELD | LOCATION_REASON_RETURN,TRUE,2);
+	} else
+	///////kdiy///////	
 	pduel->game_field->move_to_field(pcard, pcard->previous.controler, pcard->previous.controler, pcard->previous.location, pos, TRUE, 1, zone, FALSE, LOCATION_REASON_TOFIELD | LOCATION_REASON_RETURN);
 	return lua_yieldk(L, 0, (lua_KContext)pduel, [](lua_State* L, int32/* status*/, lua_KContext ctx) {
 		duel* pduel = (duel*)ctx;
