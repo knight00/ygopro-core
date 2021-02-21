@@ -3373,9 +3373,34 @@ int32 scriptlib::duel_overlay(lua_State* L) {
 	if(pcard) {
 		card::card_set cset;
 		cset.insert(pcard);
+		/////kdiy////////
+		auto tp = pcard->current.controler;
+		card::card_set tcset;
+		tcset.insert(target);
+		/////kdiy////////
 		target->xyz_overlay(&cset);
+		/////kdiy////////
+		pduel->game_field->raise_single_event(pcard, &tcset, EVENT_OVERLAY, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, tp, 0);
+		pduel->game_field->process_single_event();
+		pduel->game_field->process_instant_event();
+		/////kdiy////////
 	} else
-		target->xyz_overlay(&pgroup->container);
+	    /////kdiy////////
+		//target->xyz_overlay(&pgroup->container);
+		{
+			card::card_set tcset;
+			tcset.insert(target);
+			for(auto& pcard : pgroup->container) {
+				card::card_set cset;
+				cset.insert(pcard);
+				auto tp = pcard->current.controler;
+				target->xyz_overlay(&cset);
+				pduel->game_field->raise_single_event(pcard, &tcset, EVENT_OVERLAY, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, tp, 0);
+				pduel->game_field->process_single_event();
+				pduel->game_field->process_instant_event();
+			}
+		}
+	    /////kdiy////////
 	if(target->current.location & LOCATION_ONFIELD)
 		pduel->game_field->adjust_all();
 	return lua_yield(L, 0);

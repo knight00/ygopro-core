@@ -216,6 +216,7 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EFFECT_SANCT_MZONE		            508
 #define EFFECT_LINK_RANK                    509
 #define EFFECT_LINK_RANK_S                  510
+#define EVENT_OVERLAY                       511
 //////////kdiy/////////
 #define EFFECT_IMMUNE_EFFECT                1
 #define EFFECT_DISABLE                      2
