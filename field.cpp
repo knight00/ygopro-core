@@ -24,6 +24,13 @@ void chain::set_triggering_state(card* pcard) {
 	else if(pcard->current.is_location(LOCATION_PZONE))
 		triggering_location = LOCATION_SZONE | LOCATION_PZONE;
 	else
+	/////kdiy///////
+	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(LOCATION_SZONE))
+	   triggering_location = LOCATION_MZONE;
+	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(LOCATION_MZONE))
+	   triggering_location = LOCATION_SZONE;   
+	else
+	/////kdiy///////
 		triggering_location = pcard->current.location;
 	triggering_sequence = pcard->current.sequence;
 	triggering_position = pcard->current.position;
@@ -318,7 +325,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	if (pcard->current.location) {
 		/////kdiy///////
 		//if (pcard->current.location == location) {
-		if (pcard->current.location == location && !(pcard->is_affected_by_effect(EFFECT_PRE_MONSTER)) && !(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) && !(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) {			
+		if((location == pcard->current.location && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))))) {
 		/////kdiy///////			
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {
@@ -344,7 +351,10 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 				} else
 					remove_card(pcard);
 			} else if(location & LOCATION_ONFIELD) {
-				if (playerid == preplayer && sequence == presequence)
+				///kdiy//////
+				//if (playerid == preplayer && sequence == presequence)
+				if(playerid == preplayer && sequence == presequence && pcard->current.location == location)
+				///kdiy//////
 					return;
 				if(location == LOCATION_MZONE) {
 					if(sequence >= player[playerid].list_mzone.size() || player[playerid].list_mzone[sequence])
@@ -354,7 +364,10 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 						return;
 				}
 				duel::duel_message* message = nullptr;
-				if(preplayer == playerid) {
+				///kdiy//////
+				//if(preplayer == playerid) {
+				if(preplayer == playerid && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))) {	
+				///kdiy//////	
 					message = pduel->new_message(MSG_MOVE);
 					message->write<uint32>(pcard->data.code);
 					message->write(pcard->get_info_location());
@@ -2366,6 +2379,12 @@ void field::get_overlay_group(uint8 playerid, uint8 self, uint8 oppo, card_set* 
 					if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
 						pset->insert(pcard->xyz_materials.begin(), pcard->xyz_materials.end());
 				}
+				//kdiy////////////
+				for(auto& pcard : player[i].list_szone) {
+					if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+						pset->insert(pcard->xyz_materials.begin(), pcard->xyz_materials.end());
+				}
+				//kdiy////////////
 			}
 		}
 	}
@@ -2385,6 +2404,12 @@ int32 field::get_overlay_count(uint8 playerid, uint8 self, uint8 oppo, group* pg
 				if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
 					count += pcard->xyz_materials.size();
 			}
+			//kdiy////////////
+			for(auto& pcard : player[i].list_szone) {
+				if(pcard && !pcard->get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
+					count += pcard->xyz_materials.size();
+			}
+			//kdiy////////////
 		}
 	}
 	return count;

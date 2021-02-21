@@ -5829,14 +5829,14 @@ int32 field::adjust_step(uint16 step) {
 				card* pcard = player[tp].list_szone[i];
 				//////kdiy//////
 				//if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target))
-				if(pcard && pcard->equiping_target && (!pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))))
+				if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) &&!pcard->is_affected_by_effect(EFFECT_ORICA_SZONE))
 				//////kdiy//////
 					destroy_set.insert(pcard);
 			}
 			//////kdiy//////
 			for(uint8 i = 0; i < 5; ++i) {
 				card* pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->equiping_target && (!pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) || (!pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))))
+				if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target) && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
 					destroy_set.insert(pcard);
 			}	
 			//////kdiy//////					
