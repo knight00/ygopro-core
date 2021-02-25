@@ -324,8 +324,8 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 		///kdiy///////////
 		//if (pcard->current.location == location) {	
 		if (pcard->current.location == location && !((location & LOCATION_ONFIELD) 
-		&& ((pcard->current.location == LOCATION_SZONE && !(pcard->get_type() & TYPE_EQUIP) && !(pcard->get_type() & TYPE_SPELL) && !(pcard->get_type() & TYPE_TRAP) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
-		|| (pcard->current.location == LOCATION_MZONE && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->get_type() & TYPE_TRAPMONSTER) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) )) {		
+		&& ((pcard->current.location == LOCATION_SZONE && !(pcard->get_type() & (TYPE_EQUIP | TYPE_SPELL | TYPE_TRAP)) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
+		|| (pcard->current.location == LOCATION_MZONE && !(pcard->get_type() & (TYPE_MONSTER | TYPE_TRAPMONSTER)) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) )) {		
 		///kdiy///////////
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {
