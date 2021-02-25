@@ -333,7 +333,9 @@ void field::move_to_field(card* target, uint32 move_player, uint32 playerid, uin
 		return;
 	//////kdiy///////		
 	//if(destination == target->current.location && playerid == target->current.controler)
-	if((destination == target->current.location && playerid == target->current.controler && ((target->current.location == LOCATION_SZONE && destination == LOCATION_SZONE && !target->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (target->current.location == LOCATION_MZONE && destination == LOCATION_MZONE && !target->is_affected_by_effect(EFFECT_SANCT_MZONE)))))
+	if(!((destination == target->current.location && ((target->current.location == LOCATION_SZONE && destination == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (target->current.location == LOCATION_MZONE && destination == LOCATION_MZONE && target->is_affected_by_effect(EFFECT_SANCT_MZONE))))
+		|| (destination != target->current.location))
+		&& playerid == target->current.controler)
 	//////kdiy///////	
 		return;
 	uint8 pzone = false;

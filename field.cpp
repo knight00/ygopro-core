@@ -25,10 +25,8 @@ void chain::set_triggering_state(card* pcard) {
 		triggering_location = LOCATION_SZONE | LOCATION_PZONE;
 	else
 	/////kdiy///////
-	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(LOCATION_SZONE))
-	   triggering_location = LOCATION_MZONE;
-	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(LOCATION_MZONE))
-	   triggering_location = LOCATION_SZONE;   
+	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(LOCATION_SZONE) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(LOCATION_MZONE)))
+	   triggering_location = LOCATION_SZONE| LOCATION_MZONE;   
 	else
 	/////kdiy///////
 		triggering_location = pcard->current.location;
@@ -323,10 +321,12 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 		pcard->sendto_param.position = POS_FACEDOWN_DEFENSE;
 	}
 	if (pcard->current.location) {
-		/////kdiy///////
-		//if (pcard->current.location == location) {
-		if((location == pcard->current.location && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))))) {
-		/////kdiy///////			
+		///kdiy///////////
+		//if (pcard->current.location == location) {	
+		if (pcard->current.location == location && !((location & LOCATION_ONFIELD) 
+		&& ((pcard->current.location == LOCATION_SZONE && !(pcard->get_type() & TYPE_EQUIP) && !(pcard->get_type() & TYPE_SPELL) && !(pcard->get_type() & TYPE_TRAP) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
+		|| (pcard->current.location == LOCATION_MZONE && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->get_type() & TYPE_TRAPMONSTER) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) )) {		
+		///kdiy///////////
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {
 					auto message = pduel->new_message(MSG_MOVE);
@@ -364,10 +364,11 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 						return;
 				}
 				duel::duel_message* message = nullptr;
-				///kdiy//////
+				/////kdiy///////////
 				//if(preplayer == playerid) {
-				if(preplayer == playerid && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))) {	
-				///kdiy//////	
+				if(preplayer == playerid && !((location == pcard->current.location && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))) 
+		        || (location != pcard->current.location))) {
+				/////kdiy///////////	
 					message = pduel->new_message(MSG_MOVE);
 					message->write<uint32>(pcard->data.code);
 					message->write(pcard->get_info_location());
@@ -380,19 +381,45 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 				pcard->previous.position = pcard->current.position;
 				pcard->previous.pzone = pcard->current.pzone;
 				if (location == LOCATION_MZONE) {
+					///kdiy//////	
+					if (pcard->current.location == LOCATION_SZONE) {
+					player[preplayer].list_szone[presequence] = 0;
+					player[preplayer].used_location &= ~(256 << presequence);
+					player[playerid].list_mzone[sequence] = pcard;
+					player[playerid].used_location |= 1 << sequence;
+					pcard->current.controler = playerid;
+					pcard->current.sequence = sequence;
+					} else {
+					///kdiy//////	
 					player[preplayer].list_mzone[presequence] = 0;
 					player[preplayer].used_location &= ~(1 << presequence);
 					player[playerid].list_mzone[sequence] = pcard;
 					player[playerid].used_location |= 1 << sequence;
 					pcard->current.controler = playerid;
 					pcard->current.sequence = sequence;
+					///kdiy//////	
+					}
+					///kdiy//////	
 				} else {
+					///kdiy//////	
+					if (pcard->current.location == LOCATION_MZONE) {
+					player[preplayer].list_mzone[presequence] = 0;
+					player[preplayer].used_location &= ~(1 << presequence);
+					player[playerid].list_szone[sequence] = pcard;
+					player[playerid].used_location |= 256 << sequence;
+					pcard->current.controler = playerid;
+					pcard->current.sequence = sequence;
+					} else {
+					///kdiy//////	
 					player[preplayer].list_szone[presequence] = 0;
 					player[preplayer].used_location &= ~(256 << presequence);
 					player[playerid].list_szone[sequence] = pcard;
 					player[playerid].used_location |= 256 << sequence;
 					pcard->current.controler = playerid;
 					pcard->current.sequence = sequence;
+					///kdiy//////	
+					}
+					///kdiy//////	
 				}
 				if(message) {
 					message->write(pcard->get_info_location());
