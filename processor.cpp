@@ -4109,15 +4109,19 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 			if (double_dam)
 				/////kdiy//////////
 				//core.battle_damage[p] *= 2;	
+				{
 				if (core.battle_damage[p] >= 999999)
 					core.battle_damage[p] = 1000000;
+				}
 			else core.battle_damage[p] *= 2;			
                 /////kdiy//////////
 			if (half_dam)
 				/////kdiy//////////
-				//core.battle_damage[p] /= 2;	
+				//core.battle_damage[p] /= 2;
+				{
 				if (core.battle_damage[p] >= 999999)
 					core.battle_damage[p] = 1000000;
+				}
 			else core.battle_damage[p] /= 2;			
             /////kdiy//////////			
 			if(dam_value >= 0 && core.battle_damage[p] > 0)
@@ -4618,7 +4622,7 @@ int32 field::add_chain(uint16 step) {
 			}
 			/////////kdiy//////////
 			//if(phandler->current.location == LOCATION_SZONE) {
-			if((phandler->get_type() & (TYPE_SPELL | TYPE_TRAP)) && (phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))) {
+			if((phandler->get_type() & (TYPE_SPELL | TYPE_TRAP)) && !(phandler->get_type() & (TYPE_TRAPMONSTER)) && ((phandler->current.location == LOCATION_SZONE && !phandler->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE)))) {
 			/////////kdiy//////////	
 				phandler->set_status(STATUS_ACT_FROM_HAND, FALSE);
 				change_position(phandler, 0, phandler->current.controler, POS_FACEUP, 0);

@@ -28,10 +28,7 @@ uint32 card::set_entity_code(uint32 entity_code) {
 int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return FALSE;
-	////////kdiy////////		
-	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN))
-	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN))	
-	////////kdiy////////	
+	if (!((current.location & LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN))		
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_ATTACK_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		return FALSE;
@@ -42,10 +39,7 @@ int32 card::is_attack_decreasable_as_cost(uint8 playerid, int32 val) {
 int32 card::is_defense_decreasable_as_cost(uint8 playerid, int32 val) {
 	if(!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return FALSE;
-	////////kdiy////////		
-	//if(!(current.location & LOCATION_MZONE) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))
 	if (!(((current.location & LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location & LOCATION_SZONE) && is_affected_by_effect(EFFECT_ORICA_SZONE))) || is_position(POS_FACEDOWN) || (data.type & TYPE_LINK))	
-	////////kdiy////////	
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_SET_DEFENSE_FINAL) || is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		return FALSE;
@@ -1024,7 +1018,7 @@ int32 card::get_base_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
 	////////kdiy////////	
 		return data.defense;
 	if (temp.base_defense != -1)
@@ -1123,7 +1117,7 @@ int32 card::get_defense() {
 		return 0;
 	////////kdiy////////	
 	//if (current.location != LOCATION_MZONE || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
-	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))		
+	if (!(((current.location == LOCATION_MZONE) && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || ((current.location == LOCATION_SZONE) && (is_affected_by_effect(EFFECT_ORICA_SZONE) || is_affected_by_effect(EFFECT_EQUIP_MONSTER)))) || get_status(STATUS_SUMMONING | STATUS_SPSUMMON_STEP))
 	////////kdiy////////	
 		return data.defense;
 	if (temp.defense != -1)
@@ -2345,7 +2339,10 @@ void card::enable_field_effect(bool enabled) {
 			if (it.second->in_range(this))
 				it.second->id = pduel->game_field->infos.field_id++;
 		}
-		if(current.location == LOCATION_SZONE) {
+		//kdiy/////////
+		//if(current.location == LOCATION_SZONE) {
+		if((current.location == LOCATION_SZONE && !is_affected_by_effect(EFFECT_ORICA_SZONE)) || (current.location == LOCATION_MZONE && is_affected_by_effect(EFFECT_SANCT_MZONE))) {	
+		//kdiy/////////	
 			for (auto& it : equip_effect)
 				it.second->id = pduel->game_field->infos.field_id++;
 		}
@@ -3913,8 +3910,7 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 	}
 	////////kdiy////////
 	//if(current.location == LOCATION_MZONE) {
-	if((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE))
-		    || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) {
+	if((current.location == LOCATION_MZONE && !is_affected_by_effect(EFFECT_SANCT_MZONE)) || (current.location == LOCATION_SZONE && is_affected_by_effect(EFFECT_ORICA_SZONE))) {
 	////////kdiy////////	
 		if(is_position(POS_FACEDOWN)
 						|| !is_affected_by_effect(EFFECT_GEMINI_SUMMONABLE)
@@ -4059,7 +4055,10 @@ int32 card::is_can_be_special_summoned(effect* reason_effect, uint32 sumtype, ui
 	if(current.location == LOCATION_REMOVED && (current.position & POS_FACEDOWN))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
-		if((!nolimit && (current.location & (LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_SZONE)))
+		////////kdiy////////	
+		//if((!nolimit && (current.location & (LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_SZONE)))
+		if((!nolimit && (current.location & (LOCATION_GRAVE | LOCATION_REMOVED)) || (current.location & LOCATION_SZONE) && !is_affected_by_effect(EFFECT_ORICA_SZONE) || (current.location & LOCATION_MZONE) && is_affected_by_effect(EFFECT_SANCT_MZONE))
+		////////kdiy////////	
 			|| (!nocheck && !nolimit && (current.location & (LOCATION_DECK | LOCATION_HAND))))
 			return FALSE;
 		if(!nolimit && (data.type & TYPE_PENDULUM) && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP))
