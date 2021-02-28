@@ -5314,10 +5314,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 			seq = 5;
 		if(ret != 1) {
 			//kdiy//////
-			//if(location != target->current.location) {
-			if((location == target->current.location && ((target->current.location == LOCATION_SZONE && location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (target->current.location == LOCATION_MZONE && location == LOCATION_MZONE && target->is_affected_by_effect(EFFECT_SANCT_MZONE)))) 
-			|| (location != target->current.location)) {
-			//kdiy//////	
+			if(location != target->current.location) {	
 				uint32 resetflag = 0;
 				///kdiy////////
 				uint32 orica = 0;
@@ -5373,10 +5370,7 @@ int32 field::move_to_field(uint16 step, card* target, uint8 enable, uint8 ret, u
 		if(ret == 1)
 			target->current.reason &= ~REASON_TEMPORARY;
 		////kdiy/////
-		//if((ret == 0 && location != target->current.location)
-		if((ret == 0 && (location == target->current.location && ((target->current.location == LOCATION_SZONE && location == LOCATION_SZONE && target->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (target->current.location == LOCATION_MZONE && location == LOCATION_MZONE && target->is_affected_by_effect(EFFECT_SANCT_MZONE)))) 
-			|| (location != target->current.location))
-		////kdiy/////	
+		if((ret == 0 && location != target->current.location)
 			|| (ret == 1 && target->turnid != infos.turn_id)) {
 			target->set_status(STATUS_SUMMON_TURN, FALSE);
 			target->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
