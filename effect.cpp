@@ -823,11 +823,9 @@ int32 effect::in_range(card* pcard) {
 	if(type & EFFECT_TYPE_XMATERIAL)
 		return handler->overlay_target ? TRUE : FALSE;
 	/////kdiy/////
-	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE && (range & LOCATION_MZONE) && !(range & LOCATION_SZONE))
-	   return true;
-	else if(pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.location == LOCATION_MZONE && (range & LOCATION_SZONE) && !(range & LOCATION_MZONE))
-	   return true;   
-	else
+	// if((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (range & LOCATION_MZONE) && !(range & LOCATION_SZONE)) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (range & LOCATION_SZONE) && !(range & LOCATION_MZONE)))
+	// return pcard->current.is_location(range | LOCATION_ONFIELD);  
+	// else
 	/////kdiy/////	
 	return pcard->current.is_location(range);
 }
@@ -838,11 +836,6 @@ int32 effect::in_range(const chain& ch) {
 }
 void effect::set_activate_location() {
 	card* phandler = get_handler();
-	/////kdiy/////
-	if(phandler->is_affected_by_effect(EFFECT_ORICA_SZONE) && phandler->current.is_location(LOCATION_SZONE) || (phandler->is_affected_by_effect(EFFECT_SANCT_MZONE) && phandler->current.is_location(LOCATION_MZONE)) && (phandler->current.location & LOCATION_ONFIELD))
-	active_location = LOCATION_SZONE| LOCATION_MZONE;
-	else
-	/////kdiy/////
 	active_location = phandler->current.location;
 	active_sequence = phandler->current.sequence;
 }

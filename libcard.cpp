@@ -1450,6 +1450,16 @@ int32 scriptlib::card_register_effect(lua_State* L) {
 	}
 	int32 id = -1;
 	if (!peffect->handler)
+	    //////kdiy////////
+		if ((peffect->range & LOCATION_MZONE) && !(peffect->range & LOCATION_SZONE)) {
+		    effect* ceffect = peffect->clone();
+			ceffect->range = LOCATION_SZONE;
+			if(peffect->condition)
+			    peffect->condition = peffect->condition && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE);
+			else peffect->condition = (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)!=0);
+			pcard->add_effect(ceffect);
+		}
+		//////kdiy////////
 		id = pcard->add_effect(peffect);
 	lua_pushinteger(L, id);
 	return 1;

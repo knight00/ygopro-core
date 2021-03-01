@@ -24,11 +24,6 @@ void chain::set_triggering_state(card* pcard) {
 	else if(pcard->current.is_location(LOCATION_PZONE))
 		triggering_location = LOCATION_SZONE | LOCATION_PZONE;
 	else
-	/////kdiy///////
-	if(pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(LOCATION_SZONE) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(LOCATION_MZONE)))
-	   triggering_location = LOCATION_SZONE| LOCATION_MZONE;   
-	else
-	/////kdiy///////
 		triggering_location = pcard->current.location;
 	triggering_sequence = pcard->current.sequence;
 	triggering_position = pcard->current.position;
@@ -322,10 +317,16 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	}
 	if (pcard->current.location) {
 		///kdiy///////////
+		if(false) {
 		//if (pcard->current.location == location) {	
-		if (pcard->current.location == location && !((location & LOCATION_ONFIELD) 
-		&& ((pcard->current.location == LOCATION_SZONE && !(pcard->get_type() & (TYPE_EQUIP | TYPE_SPELL | TYPE_TRAP)) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
-		|| (pcard->current.location == LOCATION_MZONE && !(pcard->get_type() & (TYPE_MONSTER | TYPE_TRAPMONSTER)) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) )) {		
+		// if (pcard->current.location == location && !((location & LOCATION_ONFIELD) 
+		// && ((pcard->current.location == LOCATION_SZONE && !(pcard->get_type() & (TYPE_EQUIP | TYPE_SPELL | TYPE_TRAP) && !(pcard->get_type() & (TYPE_TRAPMONSTER))) && !pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
+		// || (pcard->current.location == LOCATION_MZONE && !(pcard->get_type() & (TYPE_MONSTER | TYPE_TRAPMONSTER)) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))) )) {	
+		//if ((pcard->current.location == location 
+		//&& !((location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)) || (location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)))
+		//)
+		//|| ((pcard->current.location == LOCATION_MZONE && location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) 
+		//|| (pcard->current.location == LOCATION_SZONE && location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))//) ) {			
 		///kdiy///////////
 			if (pcard->current.location == LOCATION_DECK) {
 				if(preplayer == playerid) {
@@ -352,8 +353,8 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					remove_card(pcard);
 			} else if(location & LOCATION_ONFIELD) {
 				///kdiy//////
-				//if (playerid == preplayer && sequence == presequence)
-				if(playerid == preplayer && sequence == presequence && pcard->current.location == location)
+				if (playerid == preplayer && sequence == presequence)
+				//if(playerid == preplayer && sequence == presequence && pcard->current.location == location)
 				///kdiy//////
 					return;
 				if(location == LOCATION_MZONE) {
@@ -366,8 +367,9 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 				duel::duel_message* message = nullptr;
 				/////kdiy///////////
 				//if(preplayer == playerid) {
-				if(preplayer == playerid && !((location == pcard->current.location && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))) 
-		        || (location != pcard->current.location))) {
+				// if(preplayer == playerid && !((location == pcard->current.location && ((pcard->current.location == LOCATION_SZONE && location == LOCATION_SZONE && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)) || (pcard->current.location == LOCATION_MZONE && location == LOCATION_MZONE && pcard->is_affected_by_effect(EFFECT_SANCT_MZONE)))) 
+		        // || (location != pcard->current.location))) {
+				if(preplayer == playerid && location == pcard->current.location) {	
 				/////kdiy///////////	
 					message = pduel->new_message(MSG_MOVE);
 					message->write<uint32>(pcard->data.code);
@@ -1621,10 +1623,10 @@ void field::filter_affected_cards(effect* peffect, card_set* cset) {
 	uint16 range = peffect->s_range;
 	for(uint32 p = 0; p < 2; ++p) {
 		//////kdiy/////////			
-		// if(range & LOCATION_MZONE)
-		// 	cvec.push_back(&player[self].list_mzone);
-		// if(range & LOCATION_SZONE)
-		// 	cvec.push_back(&player[self].list_szone);			
+/* 		if(range & LOCATION_MZONE)
+			cvec.push_back(&player[self].list_mzone);
+		if(range & LOCATION_SZONE)
+			cvec.push_back(&player[self].list_szone);	 */		
 		if(range & LOCATION_MZONE) {
 			for(auto& pcard : player[self].list_mzone) {
 				if(pcard && peffect->is_target(pcard) && !pcard->is_affected_by_effect(EFFECT_SANCT_MZONE))
