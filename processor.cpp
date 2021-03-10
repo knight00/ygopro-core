@@ -4653,6 +4653,13 @@ int32 field::add_chain(uint16 step) {
 				}
 				if(peffect->value && !peffect->is_flag(EFFECT_FLAG_LIMIT_ZONE))
 					loc = peffect->value;
+				///////kdiy///////
+				phandler->prev_temp.location = phandler->current.location;
+				if(phandler->current.location == LOCATION_SZONE && phandler->is_affected_by_effect(EFFECT_ORICA_SZONE))
+					phandler->prev_temp.location = LOCATION_MZONE;
+				if(phandler->current.location == LOCATION_MZONE && phandler->is_affected_by_effect(EFFECT_SANCT_MZONE))
+					phandler->prev_temp.location = LOCATION_SZONE;	
+				///////kdiy///////
 				if(loc > 0) {
 					phandler->enable_field_effect(false);
 					///////kdiy///////	

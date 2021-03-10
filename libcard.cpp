@@ -1450,17 +1450,26 @@ int32 scriptlib::card_register_effect(lua_State* L) {
 	}
 	int32 id = -1;
 	if (!peffect->handler)
-	    //////kdiy////////
-		if ((peffect->range & LOCATION_MZONE) && !(peffect->range & LOCATION_SZONE)) {
-		    effect* ceffect = peffect->clone();
-			ceffect->range = LOCATION_SZONE;
-			if(peffect->condition)
-			    peffect->condition = peffect->condition && pcard->is_affected_by_effect(EFFECT_ORICA_SZONE);
-			else peffect->condition = (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE)!=0);
-			pcard->add_effect(ceffect);
-		}
-		//////kdiy////////
+	    //////ktest////////
+		// {
+		// 	if (peffect->range && (peffect->range & LOCATION_MZONE) && !(peffect->range & LOCATION_SZONE)) {
+		// 		effect* ceffect = peffect->clone();
+		// 		ceffect->range = LOCATION_SZONE;
+		// 		ceffect->excondtion = false;
+		// 		pcard->add_effect(ceffect);
+		// 	}
+		// 	else if (peffect->range && (peffect->range & LOCATION_SZONE) && !(peffect->range & LOCATION_MZONE)) {
+		// 		effect* ceffect = peffect->clone();
+		// 		ceffect->range = LOCATION_MZONE;
+		// 		ceffect->excondtion = false;
+		// 		pcard->add_effect(ceffect);
+		// 	}
+		// 	peffect->excondtion = true;
+		//////ktest////////
 		id = pcard->add_effect(peffect);
+		//////ktest////////
+		//}
+		//////ktest////////
 	lua_pushinteger(L, id);
 	return 1;
 }
@@ -2095,16 +2104,18 @@ int32 scriptlib::card_is_pre_location(lua_State* L) {
 int32 scriptlib::card_is_level_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto lvl = lua_get<uint32>(L, 2);
 	//////kdiy/////////		
+	//auto lvl = lua_get<uint32>(L, 2);
+	auto lvl = lua_get<int32>(L, 2);
 	//uint32 plvl = pcard->get_level();
 	//lua_pushboolean(L, plvl > 0 && plvl <= lvl);
 	int32 plvl = pcard->get_level();
+	bool is_xyz = (pcard->data.type & TYPE_XYZ) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)));
+	bool is_link = (pcard->data.type & TYPE_LINK) || ((pcard->data.type & TYPE_XYZ) && (pcard->is_affected_by_effect(EFFECT_RANK_LINK) || pcard->is_affected_by_effect(EFFECT_RANK_LINK_S)));	
 	bool lv = true;
-	if((pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	if ((is_xyz && !(pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	    || (is_link && !(pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S))))
 	    lv = false;
-	if((pcard->get_type() & (TYPE_LINK)) && !((pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
-	    lv = false;		
 	lua_pushboolean(L, plvl <= lvl && lv);
 	//////kdiy/////////		
 	return 1;
@@ -2112,16 +2123,18 @@ int32 scriptlib::card_is_level_below(lua_State* L) {
 int32 scriptlib::card_is_level_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto lvl = lua_get<uint32>(L, 2);
-	//////kdiy/////////	
+	//////kdiy/////////		
+	//auto lvl = lua_get<uint32>(L, 2);
+	auto lvl = lua_get<int32>(L, 2);
 	//uint32 plvl = pcard->get_level();
 	//lua_pushboolean(L, plvl > 0 && plvl >= lvl);
 	int32 plvl = pcard->get_level();
+	bool is_xyz = (pcard->data.type & TYPE_XYZ) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)));
+	bool is_link = (pcard->data.type & TYPE_LINK) || ((pcard->data.type & TYPE_XYZ) && (pcard->is_affected_by_effect(EFFECT_RANK_LINK) || pcard->is_affected_by_effect(EFFECT_RANK_LINK_S)));	
 	bool lv = true;
-	if((pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	if ((is_xyz && !(pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	    || (is_link && !(pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S))))
 	    lv = false;
-	if((pcard->get_type() & (TYPE_LINK)) && !((pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
-	    lv = false;			
 	lua_pushboolean(L, plvl >= lvl && lv);
 	//////kdiy/////////	
 	return 1;
@@ -2129,16 +2142,18 @@ int32 scriptlib::card_is_level_above(lua_State* L) {
 int32 scriptlib::card_is_rank_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto rnk = lua_get<uint32>(L, 2);
-	//////kdiy/////////	
+	//////kdiy/////////		
+	//auto rnk = lua_get<uint32>(L, 2);
+	auto rnk = lua_get<int32>(L, 2);
 	//uint32 prnk = pcard->get_rank();
 	//lua_pushboolean(L, prnk > 0 && prnk <= rnk);
 	int32 prnk = pcard->get_rank();
+	bool is_lv = !(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
+	bool is_link = (pcard->data.type & TYPE_LINK) || (!(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) && (pcard->is_affected_by_effect(EFFECT_LEVEL_LINK) || pcard->is_affected_by_effect(EFFECT_LEVEL_LINK_S)));
 	bool lv = true;
-	if(!(pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
-	    lv = false;
-	if((pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)))
-	    lv = false;			
+	if ((is_lv && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S)))
+	    || (is_link && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
+	    lv = false;	
 	lua_pushboolean(L, prnk <= rnk && lv);
 	//////kdiy/////////	
 	return 1;
@@ -2146,15 +2161,17 @@ int32 scriptlib::card_is_rank_below(lua_State* L) {
 int32 scriptlib::card_is_rank_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto rnk = lua_get<uint32>(L, 2);
-	//////kdiy/////////	
+	//////kdiy/////////		
+	//auto rnk = lua_get<uint32>(L, 2);
+	auto rnk = lua_get<int32>(L, 2);
 	//uint32 prnk = pcard->get_rank();
 	//lua_pushboolean(L, prnk > 0 && prnk >= rnk);
 	int32 prnk = pcard->get_rank();
+	bool is_lv = !(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
+	bool is_link = (pcard->data.type & TYPE_LINK) || (!(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) && (pcard->is_affected_by_effect(EFFECT_LEVEL_LINK) || pcard->is_affected_by_effect(EFFECT_LEVEL_LINK_S)));
 	bool lv = true;
-	if(!(pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
-	    lv = false;
-	if((pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)))
+	if ((is_lv && !(pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S)))
+	    || (is_link && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
 	    lv = false;		
 	lua_pushboolean(L, prnk >= rnk && lv);
 	//////kdiy/////////	
@@ -2163,15 +2180,18 @@ int32 scriptlib::card_is_rank_above(lua_State* L) {
 int32 scriptlib::card_is_link_below(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto lnk = lua_get<uint32>(L, 2);
+	//////kdiy/////////		
+	//auto lnk = lua_get<uint32>(L, 2);
+	auto lnk = lua_get<int32>(L, 2);	
 	//kdiy////////
 	//uint32 plnk = pcard->get_link();
 	int32 plnk = pcard->get_link();
+	bool is_lv = !(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
+	bool is_xyz = (pcard->data.type & TYPE_XYZ) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)));
 	bool lv = true;
-	if((pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)))
-	    lv = false;
-	if(!(pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !((pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
-	    lv = false;			
+	if ((is_lv && !(pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	    || (is_xyz && !(pcard->is_affected_by_effect(EFFECT_RANK_LINK) || pcard->is_affected_by_effect(EFFECT_RANK_LINK_S))))
+	    lv = false;		
 	//lua_pushboolean(L, plnk > 0 && plnk <= lnk);
 	lua_pushboolean(L, plnk <= lnk && lv);
 	//kdiy////////
@@ -2180,14 +2200,16 @@ int32 scriptlib::card_is_link_below(lua_State* L) {
 int32 scriptlib::card_is_link_above(lua_State* L) {
 	check_param_count(L, 2);
 	auto pcard = lua_get<card*, true>(L, 1);
-	auto lnk = lua_get<uint32>(L, 2);
-	//kdiy////////
+	//////kdiy/////////		
+	//auto lnk = lua_get<uint32>(L, 2);
+	auto lnk = lua_get<int32>(L, 2);
 	//uint32 plnk = pcard->get_link();
 	int32 plnk = pcard->get_link();
+	bool is_lv = !(pcard->data.type & (TYPE_XYZ | TYPE_LINK)) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
+	bool is_xyz = (pcard->data.type & TYPE_XYZ) || ((pcard->data.type & TYPE_LINK) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)));
 	bool lv = true;
-	if((pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !(pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S)))
-	    lv = false;
-	if(!(pcard->get_type() & (TYPE_XYZ)) && !(pcard->get_type() & (TYPE_LINK)) && !((pcard->is_affected_by_effect(EFFECT_LEVEL_RANK) || pcard->is_affected_by_effect(EFFECT_LEVEL_RANK_S) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL) || pcard->is_affected_by_effect(EFFECT_RANK_LEVEL_S)) && (pcard->is_affected_by_effect(EFFECT_LINK_RANK) || pcard->is_affected_by_effect(EFFECT_LINK_RANK_S))))
+	if ((is_lv && !(pcard->is_affected_by_effect(EFFECT_LINK_LEVEL) || pcard->is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	    || (is_xyz && !(pcard->is_affected_by_effect(EFFECT_RANK_LINK) || pcard->is_affected_by_effect(EFFECT_RANK_LINK_S))))
 	    lv = false;	
 	//lua_pushboolean(L, plnk > 0 && plnk >= lnk);
 	lua_pushboolean(L, plnk >= lnk && lv);

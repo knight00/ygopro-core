@@ -53,6 +53,9 @@ public:
 	std::vector<uint32> label;
 	int32 label_object;
 	int32 condition;
+	//ktest////
+	bool excondtion;
+	//ktest////
 	int32 cost;
 	int32 target;
 	int32 value;
@@ -216,6 +219,12 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EFFECT_SANCT_MZONE		            508
 #define EFFECT_LINK_RANK                    509
 #define EFFECT_LINK_RANK_S                  510
+#define EFFECT_RANK_LINK                    512
+#define EFFECT_RANK_LINK_S                  513
+#define EFFECT_LEVEL_LINK                   514
+#define EFFECT_LEVEL_LINK_S                 515
+#define EFFECT_LINK_LEVEL                   516
+#define EFFECT_LINK_LEVEL_S                 517
 #define EVENT_OVERLAY                       511
 //////////kdiy/////////
 #define EFFECT_IMMUNE_EFFECT                1

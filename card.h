@@ -115,6 +115,9 @@ public:
 	card_data data;
 	card_state previous;
 	card_state temp;
+	//kdiy////
+	card_state prev_temp;
+	//kdiy////
 	card_state current;
 	uint8 owner;
 	uint8 summon_player;

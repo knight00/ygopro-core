@@ -361,7 +361,7 @@ int32 effect::is_action_check(uint8 playerid) {
 }
 // check functions: condition, cost(chk=0), target(chk=0)
 int32 effect::is_activate_ready(effect* reason_effect, uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
-	if(!neglect_cond && condition) {
+	if(!neglect_cond && condition) {	
 		pduel->lua->add_param(reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		pduel->lua->add_param(e.event_cards, PARAM_TYPE_GROUP);
@@ -468,13 +468,13 @@ int32 effect::is_target(card* pcard) {
 			return FALSE;
 		if(is_flag(EFFECT_FLAG_ABSOLUTE_TARGET)) {
 			////////kdiy//////			
-			//if(pcard->current.controler == 0) {
-				//if(!pcard->current.is_location(s_range))
-					//return FALSE;
-			//} else {
-				//if(!pcard->current.is_location(o_range))
-					//return FALSE;
-			//}
+			// if(pcard->current.controler == 0) {
+			// 	if(!pcard->current.is_location(s_range))
+			// 		return FALSE;
+			// } else {
+			// 	if(!pcard->current.is_location(o_range))
+			// 		return FALSE;
+			// }
 			if(pcard->current.controler == 0) {
 				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (s_range & LOCATION_MZONE) && (pcard->current.is_location(s_range | LOCATION_SZONE))) 
 				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (s_range & LOCATION_SZONE) && (pcard->current.is_location(s_range | LOCATION_MZONE)))
@@ -489,13 +489,13 @@ int32 effect::is_target(card* pcard) {
 			////////kdiy//////				
 		} else {
 			////////kdiy//////				
-			//if(pcard->current.controler == get_handler_player()) {
-				//if(!pcard->current.is_location(s_range))
-					//return FALSE;
-			//} else {
-				//if(!pcard->current.is_location(o_range))
-					//return FALSE;
-			//}
+			// if(pcard->current.controler == get_handler_player()) {
+			// 	if(!pcard->current.is_location(s_range))
+			// 		return FALSE;
+			// } else {
+			// 	if(!pcard->current.is_location(o_range))
+			// 		return FALSE;
+			// }
 			if(pcard->current.controler == get_handler_player()) {			
 				if(!((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (s_range & LOCATION_MZONE) && (pcard->current.is_location(s_range | LOCATION_SZONE))) 
 				|| (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (s_range & LOCATION_SZONE) && (pcard->current.is_location(s_range | LOCATION_MZONE)))
@@ -822,11 +822,13 @@ uint8 effect::get_handler_player() {
 int32 effect::in_range(card* pcard) {
 	if(type & EFFECT_TYPE_XMATERIAL)
 		return handler->overlay_target ? TRUE : FALSE;
-	/////kdiy/////
-	// if((pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && (range & LOCATION_MZONE) && !(range & LOCATION_SZONE)) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && (range & LOCATION_SZONE) && !(range & LOCATION_MZONE)))
-	// return pcard->current.is_location(range | LOCATION_ONFIELD);  
+	/////ktest/////
+	// if((range & LOCATION_MZONE) && !(range & LOCATION_SZONE))
+	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(range | LOCATION_SZONE));
+	// else if((range & LOCATION_SZONE) && !(range & LOCATION_MZONE))
+	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(range | LOCATION_MZONE));
 	// else
-	/////kdiy/////	
+	/////ktest/////	
 	return pcard->current.is_location(range);
 }
 int32 effect::in_range(const chain& ch) {
