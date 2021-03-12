@@ -1593,6 +1593,12 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 			core.set_forced_attack = false;
 			add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
 		}
+		////kdiy//////////
+		if(core.mainphase_forced_attack) {
+			add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
+			core.mainphase_forced_attack = false;
+		}
+		////kdiy//////////
 		return TRUE;
 	}
 	case 30: {
@@ -1666,6 +1672,12 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 		core.set_forced_attack = false;
 		add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
 	}
+	////kdiy//////////
+	if(core.mainphase_forced_attack) {
+		add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
+		core.mainphase_forced_attack = false;
+	}
+	////kdiy//////////
 	return TRUE;
 }
 int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priority) {
@@ -2187,6 +2199,14 @@ int32 field::process_idle_command(uint16 step) {
 			add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
 			return FALSE;
 		}
+		////kdiy//////////
+		if(core.mainphase_forced_attack) {
+			core.units.begin()->step = -1;
+			add_process(PROCESSOR_FORCED_BATTLE, 0, 0, 0, 0, 0);
+			core.mainphase_forced_attack = false;
+			return FALSE;
+		}
+		////kdiy//////////
 		core.to_bp = TRUE;
 		core.to_ep = TRUE;
 		if((!is_flag(DUEL_ATTACK_FIRST_TURN) && infos.turn_id == 1 && !(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_FIRST_TURN))) || infos.phase == PHASE_MAIN2 || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP) || core.force_turn_end)
@@ -3519,7 +3539,7 @@ int32 field::process_battle_command(uint16 step) {
 		// normal end of battle step
 		////kdiy////////
 		//if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
-		if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE) && !core.forced_attack)			
+		if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE) && !core.mainphase_forced_attack)			
 		////kdiy////////		
 			core.units.begin()->arg2 = 1;
 		else
@@ -3543,20 +3563,24 @@ int32 field::process_forced_battle(uint16 step) {
 	switch(step) {
 	case 0: {
 		////kdiy///////////
-		// if (is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
-		// 	return TRUE;
-		// core.battle_phase_count[infos.turn_player]++;
-		// if (is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.force_turn_end) {
-		// 	auto message = pduel->new_message(MSG_NEW_PHASE);
-		// 	message->write<uint16>(PHASE_BATTLE_START);
-		// 	reset_phase(PHASE_BATTLE_START);
-		// 	reset_phase(PHASE_BATTLE_STEP);
-		// 	reset_phase(PHASE_BATTLE);
-		// 	adjust_all();
-		// 	message = pduel->new_message(MSG_NEW_PHASE);
-		// 	message->write<uint16>(infos.phase);
-		// 	return TRUE;
-		// }
+		if (!core.mainphase_forced_attack) {
+		////kdiy///////////	
+		if (is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
+			return TRUE;
+		core.battle_phase_count[infos.turn_player]++;
+		if (is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.force_turn_end) {
+			auto message = pduel->new_message(MSG_NEW_PHASE);
+			message->write<uint16>(PHASE_BATTLE_START);
+			reset_phase(PHASE_BATTLE_START);
+			reset_phase(PHASE_BATTLE_STEP);
+			reset_phase(PHASE_BATTLE);
+			adjust_all();
+			message = pduel->new_message(MSG_NEW_PHASE);
+			message->write<uint16>(infos.phase);
+			return TRUE;
+		}
+		////kdiy///////////
+		}
 		////kdiy///////////
 		core.units.begin()->arg1 = infos.phase;
 		auto tmp_attacker = core.forced_attacker;
@@ -3566,9 +3590,10 @@ int32 field::process_forced_battle(uint16 step) {
 		card_vector cv;
 		get_attack_target(tmp_attacker, &cv);
 		///////kdiy///////
-		//if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
-			//return TRUE;
+		// if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()))
+		if((cv.size() == 0 && tmp_attacker->direct_attackable == 0) || (tmp_attack_target && std::find(cv.begin(), cv.end(), tmp_attack_target)==cv.end()) && !core.mainphase_forced_attack)
 		///////kdiy///////			
+			return TRUE;		
 		core.attacker = tmp_attacker;
 		core.attack_target = tmp_attack_target;
 		for(uint8 p = 0; p < 2; ++p) {
@@ -6041,9 +6066,9 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 15: {
 		raise_event((card*)0, EVENT_ADJUST, 0, 0, PLAYER_NONE, PLAYER_NONE, 0);
-		/////////kdiy//////	
-		if(!core.forced_attack)
-		/////////kdiy//////	
+		/////////ktest//////	
+		//if(!core.mainphase_forced_attack)
+		/////////ktest//////	
 		process_instant_event();
 		return FALSE;
 	}

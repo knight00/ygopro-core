@@ -1360,12 +1360,13 @@ int32 card::get_defense() {
 ////kdiy//////////
 //uint32 card::get_level() {
 int32 card::get_level() {	
-	bool is_xyz = (data.type & TYPE_XYZ) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
-	bool is_link = (data.type & TYPE_LINK) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));	
+	bool is_xyz = ((data.type & TYPE_XYZ) && !(data.type & TYPE_LINK)) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
+	bool is_link = ((data.type & TYPE_LINK) && !(data.type & TYPE_XYZ)) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));
 	//if(((data.type & TYPE_XYZ) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
 		//|| (data.type & TYPE_LINK) || (status & STATUS_NO_LEVEL)
-	if ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
-	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	if ( ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S))) 
+		&& !(is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)))
 		|| (status & STATUS_NO_LEVEL)
 		//|| (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)))
 	    || (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) 
@@ -1382,7 +1383,17 @@ int32 card::get_level() {
 	temp.level = level;
 	int32 up = 0, upc = 0;
 	//////////kdiy////////
-	if (is_affected_by_effect(EFFECT_LINK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL_FINAL, &effects);
+	} else if (is_affected_by_effect(EFFECT_LINK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_LINK_S)) {
 		if (is_affected_by_effect(EFFECT_RANK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)) {
 			filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
 			filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
@@ -1460,12 +1471,13 @@ int32 card::get_level() {
 ///////kdiy///////////////
 //uint32 card::get_rank() {
 int32 card::get_rank() {
-	bool is_lv = !(data.type & (TYPE_XYZ | TYPE_LINK)) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
-	bool is_link = (data.type & TYPE_LINK) || (!(data.type & (TYPE_XYZ | TYPE_LINK)) && (is_affected_by_effect(EFFECT_LEVEL_LINK) || is_affected_by_effect(EFFECT_LEVEL_LINK_S)));
+	bool is_lv = !(data.type & (TYPE_XYZ | TYPE_LINK)) || ((data.type & TYPE_LINK) && !(data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
+	bool is_link = ((data.type & TYPE_LINK) && !(data.type & TYPE_XYZ)) || (!(data.type & (TYPE_XYZ | TYPE_LINK)) && (is_affected_by_effect(EFFECT_LEVEL_LINK) || is_affected_by_effect(EFFECT_LEVEL_LINK_S)));
 	//if(((!(data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL)) && !(is_affected_by_effect(EFFECT_LEVEL_RANK) || is_affected_by_effect(EFFECT_LEVEL_RANK_S))) 		
 	//|| (data.type & TYPE_LINK))
-	if ((is_lv && !(is_affected_by_effect(EFFECT_LEVEL_RANK) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)))
+	if ( ((is_lv && !(is_affected_by_effect(EFFECT_LEVEL_RANK) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)))
 	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)))
+		&& !(is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)))
 		|| is_affected_by_effect(EFFECT_SANCT_MZONE)
 		|| (status & STATUS_NO_LEVEL))
 ////////kdiy////////		
@@ -1486,7 +1498,17 @@ int32 card::get_rank() {
 	int32 up = 0, upc = 0;
 	//kdiy///////////
 	//if (is_affected_by_effect(EFFECT_RANK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)) {	
-	if (is_affected_by_effect(EFFECT_LINK_RANK_S) || is_affected_by_effect(EFFECT_RANK_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL_FINAL, &effects);
+	} else if (is_affected_by_effect(EFFECT_LINK_RANK_S) || is_affected_by_effect(EFFECT_RANK_LINK_S)) {
 		if (is_affected_by_effect(EFFECT_LINK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_LINK_S)) {
 			filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
 			filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
@@ -1561,11 +1583,12 @@ int32 card::get_rank() {
 ///////kdiy///////////////
 //uint32 card::get_link() {
 int32 card::get_link() {
-    bool is_lv = !(data.type & (TYPE_XYZ | TYPE_LINK)) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)));
-	bool is_xyz = (data.type & TYPE_XYZ) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
+    bool is_lv = !(data.type & (TYPE_XYZ | TYPE_LINK)) || ((data.type & TYPE_XYZ) && !(data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)));
+	bool is_xyz = ((data.type & TYPE_XYZ) && !(data.type & TYPE_LINK)) || (!(data.type & (TYPE_XYZ | TYPE_LINK)) && (is_affected_by_effect(EFFECT_LEVEL_RANK) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)));
 	//if(!(data.type & TYPE_LINK) || (status & STATUS_NO_LEVEL))
-	if ((is_lv && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	if ( ((is_lv && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
 	    || (is_xyz && !(is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)))
+		&& !(is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)))
 		|| is_affected_by_effect(EFFECT_SANCT_MZONE)
 		|| (status & STATUS_NO_LEVEL))
 ////////kdiy////////	
@@ -1585,7 +1608,17 @@ int32 card::get_link() {
 	temp.level = link;
 	int32 up = 0, upc = 0;
 	////////kdiy////////		
-	if (is_affected_by_effect(EFFECT_LINK_RANK_S) || is_affected_by_effect(EFFECT_RANK_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_RANK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LINK_FINAL, &effects, FALSE);
+		filter_effect(EFFECT_CHANGE_LEVEL_FINAL, &effects);
+	} else if (is_affected_by_effect(EFFECT_LINK_RANK_S) || is_affected_by_effect(EFFECT_RANK_LINK_S)) {
 		if (is_affected_by_effect(EFFECT_LEVEL_RANK_S) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)) {
 			filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
 			filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
@@ -1660,10 +1693,11 @@ int32 card::get_link() {
 int32 card::get_synchro_level(card* pcard) {
 	//if(((data.type & TYPE_XYZ) || ((status & STATUS_NO_LEVEL) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S))))	
 	//|| (data.type & TYPE_LINK))
-	bool is_xyz = (data.type & TYPE_XYZ) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
-	bool is_link = (data.type & TYPE_LINK) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));	
-	if ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
-	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	bool is_xyz = ((data.type & TYPE_XYZ) && !(data.type & TYPE_LINK)) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
+	bool is_link = ((data.type & TYPE_LINK) && !(data.type & TYPE_XYZ)) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));
+	if ( ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S))) 
+		&& !(is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)))
 		|| (status & STATUS_NO_LEVEL)
 	    || (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) 
 		|| is_affected_by_effect(EFFECT_SANCT_MZONE))	
@@ -1686,10 +1720,11 @@ int32 card::get_synchro_level(card* pcard) {
 int32 card::get_ritual_level(card* pcard) {				
 	//if(((data.type & TYPE_XYZ) || ((status & STATUS_NO_LEVEL) && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S))))
 	//|| (data.type & TYPE_LINK))
-	bool is_xyz = (data.type & TYPE_XYZ) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
-	bool is_link = (data.type & TYPE_LINK) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));	
-	if ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
-	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S)))
+	bool is_xyz = ((data.type & TYPE_XYZ) && !(data.type & TYPE_LINK)) || ((data.type & TYPE_LINK) && (is_affected_by_effect(EFFECT_LINK_RANK) || is_affected_by_effect(EFFECT_LINK_RANK_S)));
+	bool is_link = ((data.type & TYPE_LINK) && !(data.type & TYPE_XYZ)) || ((data.type & TYPE_XYZ) && (is_affected_by_effect(EFFECT_RANK_LINK) || is_affected_by_effect(EFFECT_RANK_LINK_S)));
+	if ( ((is_xyz && !(is_affected_by_effect(EFFECT_RANK_LEVEL) || is_affected_by_effect(EFFECT_RANK_LEVEL_S)))
+	    || (is_link && !(is_affected_by_effect(EFFECT_LINK_LEVEL) || is_affected_by_effect(EFFECT_LINK_LEVEL_S))) 
+		&& !(is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)))
 		|| (status & STATUS_NO_LEVEL)
 	    || (!(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER) && !is_affected_by_effect(EFFECT_PRE_MONSTER)) 
 		|| is_affected_by_effect(EFFECT_SANCT_MZONE))

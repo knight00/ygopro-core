@@ -282,6 +282,9 @@ struct processor {
 	bool forced_attack;
 	card* forced_attacker;
 	card* forced_attack_target;
+	//////kdiy//////////
+	bool mainphase_forced_attack;
+	//////kdiy//////////
 	group* must_use_mats;
 	group* only_use_mats;
 	int32 forced_summon_minc;

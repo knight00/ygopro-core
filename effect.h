@@ -225,6 +225,8 @@ inline effect_flag operator|(effect_flag flag1, effect_flag flag2)
 #define EFFECT_LEVEL_LINK_S                 515
 #define EFFECT_LINK_LEVEL                   516
 #define EFFECT_LINK_LEVEL_S                 517
+#define EFFECT_LEVEL_RANK_LINK              518
+#define EFFECT_LEVEL_RANK_LINK_S            519
 #define EVENT_OVERLAY                       511
 //////////kdiy/////////
 #define EFFECT_IMMUNE_EFFECT                1

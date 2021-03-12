@@ -1611,6 +1611,10 @@ int32 scriptlib::duel_pay_lp_cost(lua_State* L) {
 		return 0;
 	auto cost = lua_get<uint32>(L, 2);
 	const auto pduel = lua_get<duel*>(L);
+	///////////kdiy//////////		
+    if (pduel->game_field->player[playerid].lp>=999999)    
+	    cost=0;
+    ///////////kdiy//////////		
 	pduel->game_field->add_process(PROCESSOR_PAY_LPCOST, 0, 0, 0, playerid, cost);
 	return lua_yield(L, 0);
 }
@@ -1840,10 +1844,10 @@ int32 scriptlib::duel_force_attack(lua_State* L) {
 	//auto attack_target = lua_get<card*, true>(L, 2);
 	auto attack_target = check_param(L, PARAM_TYPE_CARD, 2, true)? lua_get<card*, true>(L, 2): 0;
 	//////kdiy//////////	
-	pduel->game_field->core.set_forced_attack = true;
+	pduel->game_field->core.mainphase_forced_attack = true;
 	pduel->game_field->core.forced_attacker = attacker;
 	//////kdiy//////////
-	if(attack_target!=0)
+	if(attack_target != 0)
 	//////kdiy//////////
 	   pduel->game_field->core.forced_attack_target = attack_target;
 	return lua_yield(L, 0);
