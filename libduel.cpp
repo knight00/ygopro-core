@@ -1844,7 +1844,7 @@ int32 scriptlib::duel_force_attack(lua_State* L) {
 	//auto attack_target = lua_get<card*, true>(L, 2);
 	auto attack_target = check_param(L, PARAM_TYPE_CARD, 2, true)? lua_get<card*, true>(L, 2): 0;
 	//////kdiy//////////	
-	pduel->game_field->core.mainphase_forced_attack = true;
+	pduel->game_field->core.set_forced_attack = true;
 	pduel->game_field->core.forced_attacker = attacker;
 	//////kdiy//////////
 	if(attack_target != 0)
