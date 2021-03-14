@@ -826,10 +826,10 @@ int32 effect::in_range(card* pcard) {
 		return handler->overlay_target ? TRUE : FALSE;
 	/////ktest/////
 	// if((range & LOCATION_MZONE) && !(range & LOCATION_SZONE))
-	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.is_location(range | LOCATION_SZONE));
+	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_ORICA_SZONE) && pcard->current.location == LOCATION_SZONE);
 	// else if((range & LOCATION_SZONE) && !(range & LOCATION_MZONE))
-	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.is_location(range | LOCATION_MZONE));
-	// else
+	// return pcard->current.is_location(range) || (pcard->is_affected_by_effect(EFFECT_SANCT_MZONE) && pcard->current.location == LOCATION_MZONE);
+	//else
 	/////ktest/////	
 	return pcard->current.is_location(range);
 }

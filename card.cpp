@@ -1383,7 +1383,7 @@ int32 card::get_level() {
 	temp.level = level;
 	int32 up = 0, upc = 0;
 	//////////kdiy////////
-	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
 		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
@@ -1498,7 +1498,7 @@ int32 card::get_rank() {
 	int32 up = 0, upc = 0;
 	//kdiy///////////
 	//if (is_affected_by_effect(EFFECT_RANK_LEVEL_S) || is_affected_by_effect(EFFECT_LEVEL_RANK_S)) {	
-	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
 		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
@@ -1608,7 +1608,7 @@ int32 card::get_link() {
 	temp.level = link;
 	int32 up = 0, upc = 0;
 	////////kdiy////////		
-	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK) || is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
+	if (is_affected_by_effect(EFFECT_LEVEL_RANK_LINK_S)) {
 		filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LINK, &effects, FALSE);
 		filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
